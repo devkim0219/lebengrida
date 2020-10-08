@@ -4,7 +4,8 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      appBar: AppBar(title: Text('치매 사전 진단 서비스')),
+      body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(60.0),
           child: Column(
@@ -19,7 +20,6 @@ class Login extends StatelessWidget {
                 )
               ),
               SizedBox(
-                
                 height: 80,
               ),
               Text(
@@ -30,15 +30,19 @@ class Login extends StatelessWidget {
                   color: Colors.black54,
                 )
               ),
+              SizedBox(
+                height: 20,
+              ),
               TextFormField(
                 decoration: InputDecoration(
                   hintText: '전화번호를 입력하세요.'
                 ),
               ),
               SizedBox(
-                height: 24,
+                height: 40,
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RaisedButton(
                     color: Colors.green,
@@ -47,14 +51,24 @@ class Login extends StatelessWidget {
                       Navigator.pushReplacementNamed(context, '/join');
                     },
                   ),
+                  SizedBox(
+                    width: 20,
+                  ),
                   RaisedButton(
                     color: Colors.green,
                     child: Text('검사 시작'),
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/');
                     },
-                  )
+                  ),
                 ],
+              ),
+              RaisedButton(
+                color: Colors.green,
+                child: Text('목록보기(test)'),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/userList');
+                },
               )
             ],
           ),

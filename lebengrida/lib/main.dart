@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lebengrida/views/join.dart';
 import 'package:lebengrida/views/login.dart';
+import 'package:lebengrida/views/userList.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Login(),
         '/join': (context) => Join(),
+        '/userList': (context) => UserList(),
       },
     );
   } 
