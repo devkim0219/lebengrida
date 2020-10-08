@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lebengrida/views/join.dart';
-import 'package:lebengrida/views/login.dart';
-import 'package:lebengrida/views/userList.dart';
+import 'package:lebengrida/screens/join.dart';
+import 'package:lebengrida/screens/login.dart';
+import 'package:lebengrida/screens/userList.dart';
 
 void main() {
   runApp(MyApp());
