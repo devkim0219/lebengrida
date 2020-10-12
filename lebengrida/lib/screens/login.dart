@@ -45,7 +45,7 @@ class Login extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RaisedButton(
-                    color: Colors.green,
+                    color: Colors.teal,
                     child: Text('사용자 등록'),
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/join');
@@ -55,21 +55,21 @@ class Login extends StatelessWidget {
                     width: 20,
                   ),
                   RaisedButton(
-                    color: Colors.green,
+                    color: Colors.teal,
                     child: Text('검사 시작'),
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/');
+                      Navigator.pushReplacementNamed(context, '/inspection');
                     },
                   ),
                 ],
               ),
               RaisedButton(
-                color: Colors.green,
-                child: Text('목록보기(test)'),
+                color: Colors.teal,
+                child: Text('사용자 목록'),
                 onPressed: () {
                   Navigator.pushReplacementNamed(context, '/userList');
                 },
-              )
+              ),
             ],
           ),
         ),

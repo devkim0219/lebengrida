@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lebengrida/screens/inspection.dart';
 import 'package:lebengrida/screens/join.dart';
 import 'package:lebengrida/screens/login.dart';
 import 'package:lebengrida/screens/userList.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.teal,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => Login(),
         '/join': (context) => Join(),
         '/userList': (context) => UserList(),
+        '/inspection': (context) => Inspection(),
       },
     );
   } 

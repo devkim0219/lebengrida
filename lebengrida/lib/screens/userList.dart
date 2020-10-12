@@ -44,13 +44,13 @@ class UserListState extends State<UserList> {
     });
   }
 
-  _showSnackBar(context, message) {
-    _scaffoldKey.currentState.showSnackBar(
-      SnackBar(
-        content: Text(message)
-      )
-    );
-  }
+  // _showSnackBar(context, message) {
+  //   _scaffoldKey.currentState.showSnackBar(
+  //     SnackBar(
+  //       content: Text(message)
+  //     )
+  //   );
+  // }
 
   // 사용자 등록
   _addUser() {
@@ -213,9 +213,9 @@ class UserListState extends State<UserList> {
         title: Text(_titleProgress),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.home),
             onPressed: () {
-              // _createTable();
+              Navigator.pushReplacementNamed(context, '/');
             },
           ),
           IconButton(
