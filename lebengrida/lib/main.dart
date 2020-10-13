@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lebengrida/screens/inspection.dart';
 import 'package:lebengrida/screens/join.dart';
 import 'package:lebengrida/screens/login.dart';
+import 'package:lebengrida/screens/question.dart';
 import 'package:lebengrida/screens/userList.dart';
 
 void main() {
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/join': (context) => Join(),
         '/userList': (context) => UserList(),
         '/inspection': (context) => Inspection(),
+        '/question': (context) => Question(),
       },
     );
   } 

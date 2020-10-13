@@ -3,7 +3,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 final List<String> imgList = [
   'assets/images/dog_1.png',
@@ -21,7 +20,6 @@ class Inspection extends StatefulWidget {
 class _InspectionState extends State<Inspection> {
   String reason = '';
   final CarouselController _carouselController = CarouselController();
-  final CountDownController _countdownController = CountDownController();
 
   AudioCache player = new AudioCache();
 
@@ -53,7 +51,7 @@ class _InspectionState extends State<Inspection> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text('치매 진단 테스트'),
+        title: Text('삽화 읽기'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context)
@@ -112,9 +110,12 @@ class _InspectionState extends State<Inspection> {
                 ),
               ],
             ),
+            SizedBox(
+              height: 30,
+            ),
             MaterialButton(
               child: Text('Sound test'),
-              color: Colors.lightBlue,
+              color: Colors.teal,
               onPressed: () {
                 _incrementCounter();
               },
@@ -122,71 +123,12 @@ class _InspectionState extends State<Inspection> {
             SizedBox(
               height: 30,
             ),
-            CircularCountDownTimer(
-              duration: 5,
-              controller: _countdownController,
-              width: MediaQuery.of(context).size.width / 5,
-              height: MediaQuery.of(context).size.height / 5,
-              color: Colors.white,
-              fillColor: Colors.teal,
-              backgroundColor: null,
-              strokeWidth: 5.0,
-              textStyle: TextStyle(
-                fontSize: 22.0,
-                color: Colors.black,
-                fontWeight: FontWeight.bold
-              ),
-              isReverse: true,
-              isReverseAnimation: false,
-              isTimerTextShown: true,
-              onComplete: () {
-                print('Countdown ended.');
+            RaisedButton(
+              color: Colors.teal,
+              child: Text('문제 보기'),
+              onPressed: () {
+                Navigator.pushNamed(context, '/question');
               },
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('문제1. 위 동물의 종류는?\n',
-                  style: (
-                    TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold
-                    )
-                  ),
-                ),
-                Text('① 개',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('② 고양이',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('③ 원숭이',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('④ 닭',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-              ]
             ),
           ],
         ),
