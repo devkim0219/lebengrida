@@ -123,7 +123,7 @@ class Join extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   RaisedButton(
-                    color: Colors.green,
+                    color: Colors.teal,
                     child: Text('등록'),
                     onPressed: () {
                       sendData();
@@ -134,7 +134,7 @@ class Join extends StatelessWidget {
                     width: 20,
                   ),
                   RaisedButton(
-                    color: Colors.green,
+                    color: Colors.teal,
                     child: Text('취소'),
                     onPressed: () {
                       Navigator.pushReplacementNamed(context, '/');
