@@ -50,12 +50,17 @@ class _InspectionState extends State<Inspection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         title: Text('치매 진단 테스트'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context)
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pushNamed(context, '/');
             },
           )
         ],
