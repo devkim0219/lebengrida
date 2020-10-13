@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 final List<String> imgList = [
   'assets/images/dog_1.png',
@@ -19,7 +20,8 @@ class Inspection extends StatefulWidget {
 
 class _InspectionState extends State<Inspection> {
   String reason = '';
-  final CarouselController _controller = CarouselController();
+  final CarouselController _carouselController = CarouselController();
+  final CountDownController _countdownController = CountDownController();
 
   AudioCache player = new AudioCache();
 
@@ -83,28 +85,28 @@ class _InspectionState extends State<Inspection> {
                 autoPlay: true,
                 autoPlayInterval: Duration(seconds: 2)
               ),
-              carouselController: _controller,
+              carouselController: _carouselController,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _controller.previousPage(),
+                    onPressed: () => _carouselController.previousPage(),
                     child: Text('←'),
                   ),
                 ),
                 ...Iterable<int>.generate(imgList.length).map(
                   (int pageIndex) => Flexible(
                     child: RaisedButton(
-                      onPressed: () => _controller.animateToPage(pageIndex),
+                      onPressed: () => _carouselController.animateToPage(pageIndex),
                       child: Text("$pageIndex"),
                     ),
                   ),
                 ),
                 Flexible(
                   child: RaisedButton(
-                    onPressed: () => _controller.nextPage(),
+                    onPressed: () => _carouselController.nextPage(),
                     child: Text('→'),
                   ),
                 ),
@@ -118,7 +120,31 @@ class _InspectionState extends State<Inspection> {
               },
             ),
             SizedBox(
-              height: 50,
+              height: 30,
+            ),
+            CircularCountDownTimer(
+              duration: 5,
+              controller: _countdownController,
+              width: MediaQuery.of(context).size.width / 5,
+              height: MediaQuery.of(context).size.height / 5,
+              color: Colors.white,
+              fillColor: Colors.teal,
+              backgroundColor: null,
+              strokeWidth: 5.0,
+              textStyle: TextStyle(
+                fontSize: 22.0,
+                color: Colors.black,
+                fontWeight: FontWeight.bold
+              ),
+              isReverse: true,
+              isReverseAnimation: false,
+              isTimerTextShown: true,
+              onComplete: () {
+                print('Countdown ended.');
+              },
+            ),
+            SizedBox(
+              height: 30,
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
