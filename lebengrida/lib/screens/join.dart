@@ -1,151 +1,192 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/services/user_service.dart';
 
-String username = '';
+class Join extends StatefulWidget {
+  Join() : super();
 
-class Join extends StatelessWidget {
-  TextEditingController name = new TextEditingController();
-  TextEditingController mobile = new TextEditingController();
-  TextEditingController birth = new TextEditingController();
-  TextEditingController gender = new TextEditingController();
-  TextEditingController address = new TextEditingController();
+  final String title = '사용자 등록';
 
-  Future<List> sendData() async {
-    final response = await http.post('http://192.168.0.132/RestAPI/insertdata.php',
-                                      body: {
-                                        'name': name.text,
-                                        'mobile': mobile.text,
-                                        'birth': birth.text,
-                                        'gender': gender.text,
-                                        'address': address.text,
-                                      }
-                                    );
+  @override
+  JoinState createState() => JoinState();
+}
+
+class JoinState extends State<Join> {
+  final _focusNode = FocusScopeNode();
+  
+  String _titleProgress;
+  TextEditingController _nameController;
+  TextEditingController _mobileController;
+  TextEditingController _birthController;
+  TextEditingController _genderController;
+  TextEditingController _addressController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _titleProgress = widget.title;
+    _nameController = TextEditingController();
+    _mobileController = TextEditingController();
+    _birthController = TextEditingController();
+    _genderController = TextEditingController();
+    _addressController = TextEditingController();
+  }
+
+  _showProgress(String message) {
+    setState(() {
+      _titleProgress = message;
+    });
+  }
+
+  _addUser() {
+    if (_nameController.text.isEmpty || _mobileController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty) {
+      print('Empty Fields');
+      return;
+    }
+    _showProgress('사용자 등록중...');
+    Services.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
+    .then((result) {
+      if ('success' == result) {
+        Fluttertoast.showToast(
+          msg: '등록이 완료되었습니다.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('사용자 등록')),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '이름',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black54,
-                )
-              ),
-              TextField(
-                controller: name,
-                decoration: InputDecoration(
-                  hintText: 'ex) 홍길동'
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                '연락처',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black54,
-                )
-              ),
-              TextField(
-                controller: mobile,
-                decoration: InputDecoration(
-                  hintText: 'ex) 01012345678'
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                '출생년도',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black54,
-                )
-              ),
-              TextField(
-                controller: birth,
-                decoration: InputDecoration(
-                  hintText: 'ex) 드롭다운.. 2020'
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                '성별',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black54,
-                )
-              ),
-              TextField(
-                controller: gender,
-                decoration: InputDecoration(
-                  hintText: 'ex) 체크박스.. 남자 or 여자'
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                '주소',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black54,
-                )
-              ),
-              TextField(
-                controller: address,
-                decoration: InputDecoration(
-                  hintText: 'ex) 드롭다운.. 시, 군, 구'
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+      },
+      child: FocusScope(
+        node: _focusNode,
+        child: Scaffold(
+          appBar: AppBar(title: Text(_titleProgress)),
+          body: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.all(30.0),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RaisedButton(
-                    color: Colors.teal,
-                    child: Text('등록'),
-                    onPressed: () {
-                      sendData();
-                      Navigator.pushReplacementNamed(context, '/');
-                    },
+                children: <Widget>[
+                  // Text(
+                  //   '이름',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 20,
+                  //     color: Colors.black54,
+                  //   )
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        hintText: '이름'
+                      ),
+                    ),
                   ),
-                  SizedBox(
-                    width: 20,
+                  // Text(
+                  //   '연락처',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 20,
+                  //     color: Colors.black54,
+                  //   )
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _mobileController,
+                      decoration: InputDecoration(
+                        hintText: '연락처'
+                      ),
+                    ),
                   ),
-                  RaisedButton(
-                    color: Colors.teal,
-                    child: Text('취소'),
-                    onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/');
-                    },
+                  // Text(
+                  //   '출생년도',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 20,
+                  //     color: Colors.black54,
+                  //   )
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _birthController,
+                      decoration: InputDecoration(
+                        hintText: '출생년도'
+                      ),
+                    ),
+                  ),
+                  // Text(
+                  //   '성별',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 20,
+                  //     color: Colors.black54,
+                  //   )
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _genderController,
+                      decoration: InputDecoration(
+                        hintText: '성별'
+                      ),
+                    ),
+                  ),
+                  // Text(
+                  //   '주소',
+                  //   style: TextStyle(
+                  //     fontWeight: FontWeight.bold,
+                  //     fontSize: 20,
+                  //     color: Colors.black54,
+                  //   )
+                  // ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _addressController,
+                      decoration: InputDecoration(
+                        hintText: '주소'
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RaisedButton(
+                        color: Colors.teal,
+                        child: Text('등록'),
+                        onPressed: () {
+                          _addUser();
+                          Navigator.pushReplacementNamed(context, '/');
+                        },
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      RaisedButton(
+                        color: Colors.teal,
+                        child: Text('취소'),
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/');
+                        },
+                      )
+                    ],
                   )
                 ],
-              )
-            ],
-          ),
-        ),
-      )
+              ),
+            ),
+          )
+        )
+      ),
     );
   }
 }

@@ -12,6 +12,8 @@ class UserList extends StatefulWidget {
 }
 
 class UserListState extends State<UserList> {
+  final _focusNode = FocusScopeNode();
+
   List<User> _users;
   GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _nameController;
@@ -207,104 +209,112 @@ class UserListState extends State<UserList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text(_titleProgress),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: () {
-              _getUsers();
-            },
-          )
-        ],
-      ),
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: _nameController,
-                decoration: InputDecoration.collapsed(
-                  hintText: '이름'
-                ),
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+      },
+      child: FocusScope(
+        node: _focusNode,
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(_titleProgress),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/');
+                },
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: _mobileController,
-                decoration: InputDecoration.collapsed(
-                  hintText: '연락처'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: _birthController,
-                decoration: InputDecoration.collapsed(
-                  hintText: '출생년도'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: _genderController,
-                decoration: InputDecoration.collapsed(
-                  hintText: '성별'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20.0),
-              child: TextField(
-                controller: _addressController,
-                decoration: InputDecoration.collapsed(
-                  hintText: '주소'
-                ),
-              ),
-            ),
-            _isUpdating
-              ? Row(
-                children: <Widget>[
-                  OutlineButton(
-                    child: Text('수정'),
-                    onPressed: () {
-                      _updateUser(_selectedUser);
-                    },
-                  ),
-                  OutlineButton(
-                    child: Text('취소'),
-                    onPressed: () {
-                      setState(() {
-                        _isUpdating = false;
-                      });
-                      _clearValues();
-                    },
-                  ),
-                ],
+              IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () {
+                  _getUsers();
+                },
               )
-              : Container(),
-            Expanded(child: _dataBody())
-          ],
+            ],
+          ),
+          body: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      hintText: '이름'
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _mobileController,
+                    decoration: InputDecoration(
+                      hintText: '연락처'
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _birthController,
+                    decoration: InputDecoration(
+                      hintText: '출생년도'
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _genderController,
+                    decoration: InputDecoration(
+                      hintText: '성별'
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: _addressController,
+                    decoration: InputDecoration(
+                      hintText: '주소'
+                    ),
+                  ),
+                ),
+                _isUpdating
+                  ? Row(
+                    children: <Widget>[
+                      OutlineButton(
+                        child: Text('수정'),
+                        onPressed: () {
+                          _updateUser(_selectedUser);
+                        },
+                      ),
+                      OutlineButton(
+                        child: Text('취소'),
+                        onPressed: () {
+                          setState(() {
+                            _isUpdating = false;
+                          });
+                          _clearValues();
+                        },
+                      ),
+                    ],
+                  )
+                  : Container(),
+                Expanded(child: _dataBody())
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              _addUser();
+            },
+            child: Icon(Icons.add),
+          ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _addUser();
-        },
-        child: Icon(Icons.add),
       ),
     );
   }

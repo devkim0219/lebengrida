@@ -60,7 +60,7 @@ class _InspectionState extends State<Inspection> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pushNamed(context, '/');
+              Navigator.pushReplacementNamed(context, '/');
             },
           )
         ],
