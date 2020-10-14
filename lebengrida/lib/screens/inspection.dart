@@ -3,12 +3,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:video_player/video_player.dart';
+import 'package:flick_video_player/flick_video_player.dart';
 
-final List<String> imgList = [
-  'assets/images/dog_1.png',
-  'assets/images/dog_2.png',
-  'assets/images/dog_3.png',
-];
+// final List<String> imgList = [
+//   'assets/images/dog_1.png',
+//   'assets/images/dog_2.png',
+//   'assets/images/dog_3.png',
+// ];
 
 class Inspection extends StatefulWidget {
   @override
@@ -19,9 +21,25 @@ class Inspection extends StatefulWidget {
 
 class _InspectionState extends State<Inspection> {
   String reason = '';
-  final CarouselController _carouselController = CarouselController();
+  // final CarouselController _carouselController = CarouselController();
 
   AudioCache player = new AudioCache();
+  
+  FlickManager flickManager;
+
+  @override
+  void initState() {
+    super.initState();
+    flickManager = FlickManager(
+      videoPlayerController: VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+    );
+  }
+
+  @override
+  void dispose() {
+    flickManager.dispose();
+    super.dispose();
+  }
 
   void onPageChange(int index, CarouselPageChangedReason changeReason) {
     setState(() {
@@ -66,49 +84,55 @@ class _InspectionState extends State<Inspection> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            CarouselSlider(
-              items: imgList.map((item) => Container(
-                child: Center(
-                  child: Image.asset(item, fit: BoxFit.fill),
-                ),
-              )).toList(),
-              options: CarouselOptions(
-                enlargeCenterPage: true,
-                aspectRatio: 16/9,
-                onPageChanged: onPageChange,
-                autoPlay: true,
-                autoPlayInterval: Duration(seconds: 2)
+            // CarouselSlider(
+            //   items: imgList.map((item) => Container(
+            //     child: Center(
+            //       child: Image.asset(item, fit: BoxFit.fill),
+            //     ),
+            //   )).toList(),
+            //   options: CarouselOptions(
+            //     enlargeCenterPage: true,
+            //     aspectRatio: 16/9,
+            //     onPageChanged: onPageChange,
+            //     autoPlay: true,
+            //     autoPlayInterval: Duration(seconds: 2)
+            //   ),
+            //   carouselController: _carouselController,
+            // ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: <Widget>[
+            //     Flexible(
+            //       child: RaisedButton(
+            //         onPressed: () => _carouselController.previousPage(),
+            //         child: Text('←'),
+            //       ),
+            //     ),
+            //     ...Iterable<int>.generate(imgList.length).map(
+            //       (int pageIndex) => Flexible(
+            //         child: RaisedButton(
+            //           onPressed: () => _carouselController.animateToPage(pageIndex),
+            //           child: Text("$pageIndex"),
+            //         ),
+            //       ),
+            //     ),
+            //     Flexible(
+            //       child: RaisedButton(
+            //         onPressed: () => _carouselController.nextPage(),
+            //         child: Text('→'),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            FlickVideoPlayer(
+              flickManager: flickManager,
+              flickVideoWithControls: FlickVideoWithControls(
+                controls: FlickPortraitControls(),
               ),
-              carouselController: _carouselController,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                  child: RaisedButton(
-                    onPressed: () => _carouselController.previousPage(),
-                    child: Text('←'),
-                  ),
-                ),
-                ...Iterable<int>.generate(imgList.length).map(
-                  (int pageIndex) => Flexible(
-                    child: RaisedButton(
-                      onPressed: () => _carouselController.animateToPage(pageIndex),
-                      child: Text("$pageIndex"),
-                    ),
-                  ),
-                ),
-                Flexible(
-                  child: RaisedButton(
-                    onPressed: () => _carouselController.nextPage(),
-                    child: Text('→'),
-                  ),
-                ),
-              ],
             ),
             SizedBox(
               height: 30,
@@ -121,7 +145,7 @@ class _InspectionState extends State<Inspection> {
               },
             ),
             SizedBox(
-              height: 30,
+              height: 10,
             ),
             RaisedButton(
               color: Colors.teal,
@@ -132,7 +156,7 @@ class _InspectionState extends State<Inspection> {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }
