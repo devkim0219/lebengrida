@@ -207,6 +207,83 @@ class UserListState extends State<UserList> {
     );
   }
 
+  SingleChildScrollView _showModifyUser() {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  hintText: '이름'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: TextField(
+                controller: _mobileController,
+                decoration: InputDecoration(
+                  hintText: '연락처'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: TextField(
+                controller: _birthController,
+                decoration: InputDecoration(
+                  hintText: '출생년도'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: TextField(
+                controller: _genderController,
+                decoration: InputDecoration(
+                  hintText: '성별'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: TextField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  hintText: '주소'
+                ),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                OutlineButton(
+                  child: Text('수정'),
+                  onPressed: () {
+                    _updateUser(_selectedUser);
+                  },
+                ),
+                OutlineButton(
+                  child: Text('취소'),
+                  onPressed: () {
+                    setState(() {
+                      _isUpdating = false;
+                    });
+                    _clearValues();
+                  },
+                ),
+              ],
+            )
+          ]
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -231,93 +308,22 @@ class UserListState extends State<UserList> {
                 onPressed: () {
                   _getUsers();
                 },
-              )
+              ),
             ],
           ),
-          body: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.all(5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-                    child: TextField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        hintText: '이름'
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-                    child: TextField(
-                      controller: _mobileController,
-                      decoration: InputDecoration(
-                        hintText: '연락처'
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-                    child: TextField(
-                      controller: _birthController,
-                      decoration: InputDecoration(
-                        hintText: '출생년도'
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 30, 20, 0),
-                    child: TextField(
-                      controller: _genderController,
-                      decoration: InputDecoration(
-                        hintText: '성별'
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(20, 30, 20, 20),
-                    child: TextField(
-                      controller: _addressController,
-                      decoration: InputDecoration(
-                        hintText: '주소'
-                      ),
-                    ),
-                  ),
-                  _isUpdating
-                    ? Row(
-                      children: <Widget>[
-                        OutlineButton(
-                          child: Text('수정'),
-                          onPressed: () {
-                            _updateUser(_selectedUser);
-                          },
-                        ),
-                        OutlineButton(
-                          child: Text('취소'),
-                          onPressed: () {
-                            setState(() {
-                              _isUpdating = false;
-                            });
-                            _clearValues();
-                          },
-                        ),
-                      ],
-                    )
-                    : Container(),
-                  Expanded(child: _dataBody())
-                ],
-              ),
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              _addUser();
-            },
-            child: Icon(Icons.add),
-          ),
+          body: Column(
+            children: [
+              _dataBody(),
+              _isUpdating ? _showModifyUser() : Container()
+            ],
+          )
         ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {
+        //     _addUser();
+        //   },
+        //   child: Icon(Icons.add),
+        // ),
       ),
     );
   }

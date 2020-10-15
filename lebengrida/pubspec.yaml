@@ -23,14 +23,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  audioplayers: ^0.16.1
+  audioplayer: ^0.8.1
+  audioplayer_web: ^0.7.1
+  audioplayers: ^0.13.2
   carousel_slider: ^2.3.1
   circular_countdown_timer: ^0.0.7
   cupertino_icons: ^1.0.0
   flick_video_player: ^0.1.1
   flutter_form_builder: ^3.14.0
   fluttertoast: ^7.1.1
+  foundation_fluttify: ^0.10.0
   http: ^0.12.2
+  path_provider: ^1.6.21
   provider: ^4.3.2+2
   shared_preferences: ^0.5.3+2
   video_player: ^0.10.8+1
@@ -50,11 +54,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/dog_1.png
-    - assets/images/dog_2.png
-    - assets/images/dog_3.png
-    - assets/sounds/click1.mp3
-    - assets/sounds/sample1.mp3
+    - assets/images/
+    - assets/sounds/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

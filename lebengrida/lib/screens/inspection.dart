@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:audioplayers/audio_cache.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 
@@ -22,8 +19,6 @@ class Inspection extends StatefulWidget {
 class _InspectionState extends State<Inspection> {
   String reason = '';
   // final CarouselController _carouselController = CarouselController();
-
-  AudioCache player = new AudioCache();
   
   FlickManager flickManager;
 
@@ -47,29 +42,14 @@ class _InspectionState extends State<Inspection> {
     });
   }
 
-  _incrementCounter() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int counter = (prefs.getInt('counter') ?? 0) + 1;
-
-    Fluttertoast.showToast(
-      msg: 'Pressed $counter times.',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 3
-    );
-
-    const alarmAudioPath = 'sounds/sample1.mp3';
-    player.play(alarmAudioPath);
-
-    await prefs.setInt('counter', counter);
-  }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text('삽화 읽기'),
+        title: Text('삽화 구연'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context)
@@ -136,16 +116,6 @@ class _InspectionState extends State<Inspection> {
             ),
             SizedBox(
               height: 30,
-            ),
-            MaterialButton(
-              child: Text('Sound test'),
-              color: Colors.teal,
-              onPressed: () {
-                _incrementCounter();
-              },
-            ),
-            SizedBox(
-              height: 10,
             ),
             RaisedButton(
               color: Colors.teal,
