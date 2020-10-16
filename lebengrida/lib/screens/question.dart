@@ -1,34 +1,29 @@
 import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:foundation_fluttify/foundation_fluttify.dart';
-import 'package:http/http.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:lebengrida/models/question_data.dart';
+import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 typedef void OnError(Exception exception);
 
 enum PlayerState { stopped, playing, paused }
 
-class Question extends StatefulWidget {
+class QuestionPage extends StatefulWidget {
   @override
-  _QuestionState createState() => _QuestionState();
+  _QuestionPageState createState() => _QuestionPageState();
 }
 
-class _QuestionState extends State<Question> {
+class _QuestionPageState extends State<QuestionPage> {
   final CountDownController _countdownController = CountDownController();
 
-  bool isStartAnswer = false;
+  List<Question> _qData;
+  int i = 0;
 
-  /**
-   *  Audio Player
-   */
+  bool isStartAnswer = true;
+
   Duration _duration = new Duration();
   Duration _position = new Duration();
   AudioPlayer audioPlayer;
@@ -52,6 +47,9 @@ class _QuestionState extends State<Question> {
   void initState() {
     super.initState();
     initAudioPlayer();
+
+    _qData = [];
+    _getQuestions();
   }
 
   @override
@@ -62,6 +60,45 @@ class _QuestionState extends State<Question> {
     super.dispose();
   }
 
+  // Question ->
+  // 문제 데이터 가져오기
+  _getQuestions() {
+    QuestionServices.getQuestions().then((questions) {
+      setState(() {
+        _qData = questions;
+      });
+      print('Length ${questions.length}');
+    });
+  }
+
+  // 문제 선택지
+  Widget choiceButton(int choiceNum) {
+    if (choiceNum == 1) {
+      
+    }
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: 10.0,
+        horizontal: 20.0
+      ),
+      child: TextButton(
+        onPressed: () => null,
+        child: Text(
+          _qData[0].choice_1,
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+      ),
+    );
+  }
+  // <- Question
+
+
+
+
+  // Audio Player ->
+  // 오디오 플레이어 초기화
   void initAudioPlayer() {
     audioPlayer = new AudioPlayer();
     audioCache = new AudioCache(fixedPlayer: audioPlayer);
@@ -75,6 +112,7 @@ class _QuestionState extends State<Question> {
     });
   }
 
+  // 오디오 플레이어 슬라이더
   Widget slider() {
     return Slider(
       value: _position.inSeconds.toDouble(),
@@ -89,6 +127,7 @@ class _QuestionState extends State<Question> {
     );
   }
 
+  // 오디오 플레이어 시간 찾기
   void seekToSecond(int second) {
     Duration newDuration = Duration(seconds: second);
     audioPlayer.seek(newDuration);
@@ -101,17 +140,20 @@ class _QuestionState extends State<Question> {
   //   });
   // }
 
+  // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
     // await audioPlayer.play(localFilePath, isLocal: true);
     audioCache.play('sounds/sample1.mp3');
     setState(() => playerState = PlayerState.playing);
   }
 
+  // 오디오 플레이어 일시정지
   Future pause() async {
     await audioPlayer.pause();
     setState(() => playerState = PlayerState.paused);
   }
 
+  // 오디오 플레이어 정지
   Future stop() async {
     await audioPlayer.stop();
     setState(() {
@@ -127,12 +169,11 @@ class _QuestionState extends State<Question> {
   //   });
   // }
 
+  // 오디오 재생이 끝났을 때 플레이어 정지
   void onComplete() {
     setState(() => playerState = PlayerState.stopped);
   }
-  /**
-   *  // Audio Player
-   */
+  // <- Audio Player
 
   // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
   Widget countDown(int sec) {
@@ -154,7 +195,7 @@ class _QuestionState extends State<Question> {
       isReverseAnimation: false,
       isTimerTextShown: true,
       onComplete: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Question2()));
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => Question2()));
       },
     );
   }
@@ -164,7 +205,7 @@ class _QuestionState extends State<Question> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text('A-1(요구)'),
+        title: Text(_qData[0].type),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context)
@@ -183,7 +224,6 @@ class _QuestionState extends State<Question> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            isStartAnswer ? countDown(5) : Container(),
             Material(
               child: _buildPlayer(),
             ),
@@ -194,7 +234,8 @@ class _QuestionState extends State<Question> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('A-1(요구) 민구는 학교에서 사용할 지우개가 다 떨어졌다. 민구는 지우개가 꼭 필요하다. 어머니에게 어떻게 했을까요?\n',
+                Text(
+                  _qData[0].title,
                   style: (
                     TextStyle(
                       fontSize: 23,
@@ -202,33 +243,27 @@ class _QuestionState extends State<Question> {
                     )
                   ),
                 ),
-                Text('①지우개 줄까?',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('②지우개가 필요해요',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('③지우개를 어머니에게 준다.',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
-                ),
-                Text('④지우개 사주세요',
-                  style: (
-                    TextStyle(
-                      fontSize: 20,
-                    )
-                  ),
+                // Expanded(
+                //   child: AbsorbPointer(
+                //     // absorbing: disableAnswer,
+                //     child: Container(
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: <Widget>[
+                //           choiceButton('1'),
+                //           choiceButton('2'),
+                //           choiceButton('3'),
+                //           choiceButton('4'),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    countDown(5),
+                  ],
                 ),
               ]
             ),
@@ -238,6 +273,7 @@ class _QuestionState extends State<Question> {
     );
   }
 
+  // 오디오 플레이어 생성
   Widget _buildPlayer() => Container(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -271,6 +307,7 @@ class _QuestionState extends State<Question> {
         ),
       );
 
+  // 오디오 플레이어 진행상태
   Row _buildProgressView() => Row(mainAxisSize: MainAxisSize.min, children: [
         Padding(
           padding: EdgeInsets.all(12.0),
@@ -291,6 +328,7 @@ class _QuestionState extends State<Question> {
         )
       ]);
 
+  // 오디오 플레이어 음소거 버튼
   // Row _buildMuteButtons() {
   //   return Row(
   //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -313,104 +351,4 @@ class _QuestionState extends State<Question> {
   //     ],
   //   );
   // }
-}
-
-class Question2 extends StatelessWidget {
-  final CountDownController _countdownController = CountDownController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: Text('A-2(요구)'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context)
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            CircularCountDownTimer(
-              duration: 5,
-              controller: _countdownController,
-              width: MediaQuery.of(context).size.width / 5,
-              height: MediaQuery.of(context).size.height / 5,
-              color: Colors.white,
-              fillColor: Colors.teal,
-              backgroundColor: null,
-              strokeWidth: 5.0,
-              textStyle: TextStyle(
-                fontSize: 22.0,
-                color: Colors.black,
-                fontWeight: FontWeight.bold
-              ),
-              isReverse: true,
-              isReverseAnimation: false,
-              isTimerTextShown: true,
-              onComplete: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => Question2()));
-              },
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('A-2(요구) 어머니는 민수에게 선물을 하기로 하였다. 민수는 신고 있는 신발을 새것으로 바꾸고 싶다. 민수는 어머니에게 “신발 사주세요”라고 말했다. 어머니는 어떻게 했을까요?\n',
-                style: (
-                  TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold
-                  )
-                ),
-              ),
-              Text('①신발은 장터에서 팔아',
-                style: (
-                  TextStyle(
-                    fontSize: 20,
-                  )
-                ),
-              ),
-              Text('②신발을 사준다.',
-                style: (
-                  TextStyle(
-                    fontSize: 20,
-                  )
-                ),
-              ),
-              Text('③신발이 뭐야?',
-                style: (
-                  TextStyle(
-                    fontSize: 20,
-                  )
-                ),
-              ),
-              Text('④신발을 벗어준다.',
-                style: (
-                  TextStyle(
-                    fontSize: 20,
-                  )
-                ),
-              ),
-              ]
-            ),
-          ],
-        )
-      )
-    );
-  }
 }

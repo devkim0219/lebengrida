@@ -82,7 +82,7 @@ class _LoginState extends State<Login> {
                       children: [
                         RaisedButton(
                           color: Colors.teal,
-                          child: Text('사용자 등록'),
+                          child: Text('사용자 등록', style: TextStyle(color: Colors.white)),
                           onPressed: () {
                             Navigator.pushNamed(context, '/join');
                           },
@@ -92,7 +92,7 @@ class _LoginState extends State<Login> {
                         ),
                         RaisedButton(
                           color: Colors.teal,
-                          child: Text('검사 시작'),
+                          child: Text('검사 시작', style: TextStyle(color: Colors.white)),
                           onPressed: () {
                             Navigator.pushNamed(context, '/inspection');
                           },
@@ -101,7 +101,7 @@ class _LoginState extends State<Login> {
                     ),
                     RaisedButton(
                       color: Colors.teal,
-                      child: Text('사용자 목록'),
+                      child: Text('사용자 목록', style: TextStyle(color: Colors.white)),
                       onPressed: () {
                         Navigator.pushNamed(context, '/userList');
                       },

@@ -61,7 +61,7 @@ class UserListState extends State<UserList> {
       return;
     }
     _showProgress('사용자 등록중...');
-    Services.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
+    UserServices.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
     .then((result) {
       if ('success' == result) {
         _getUsers();
@@ -73,7 +73,7 @@ class UserListState extends State<UserList> {
   // 사용자 리스트 조회
   _getUsers() {
     _showProgress('사용자 목록 조회중...');
-    Services.getUsers().then((users) {
+    UserServices.getUsers().then((users) {
       setState(() {
         _users = users;
       });
@@ -88,7 +88,7 @@ class UserListState extends State<UserList> {
       _isUpdating = true;
     });
     _showProgress('사용자 정보 수정중...');
-    Services.updateUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
+    UserServices.updateUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
     .then((result) {
       if ('success' == result) {
         _getUsers();
@@ -103,7 +103,7 @@ class UserListState extends State<UserList> {
   // 사용자 정보 삭제
   _deleteUser(User user) {
     _showProgress('사용자 정보 삭제중...');
-    Services.deleteUser(user.mobile).then((result) {
+    UserServices.deleteUser(user.mobile).then((result) {
       if ('success' == result) {
         _getUsers();
       }

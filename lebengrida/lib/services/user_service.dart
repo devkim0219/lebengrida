@@ -2,7 +2,7 @@ import 'package:lebengrida/models/user_data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Services {
+class UserServices {
   static const ROOT = 'http://192.168.0.132/RestAPI/user_actions.php';
   static const _GET_ALL_ACTION = 'GET_ALL';
   static const _ADD_USER_ACTION = 'ADD_USER';
@@ -19,6 +19,7 @@ class Services {
       
       if (200 == response.statusCode) {
         List<User> list = parseResponse(response.body);
+        print('### user list: $list');
         return list;
       } else {
         return List<User>();

@@ -10,6 +10,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  List qData;
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,8 @@ class MyApp extends StatelessWidget {
         '/join': (context) => Join(),
         '/userList': (context) => UserList(),
         '/inspection': (context) => Inspection(),
-        '/question': (context) => Question(),
+        '/question': (context) => QuestionPage(),
+        // '/result': (context) => Result(),
       },
     );
   } 

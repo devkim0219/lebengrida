@@ -44,7 +44,7 @@ class JoinState extends State<Join> {
       return;
     }
     _showProgress('사용자 등록중...');
-    Services.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
+    UserServices.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
     .then((result) {
       if ('success' == result) {
         Fluttertoast.showToast(
