@@ -9,14 +9,14 @@ import 'package:flick_video_player/flick_video_player.dart';
 //   'assets/images/dog_3.png',
 // ];
 
-class InspectionPage extends StatefulWidget {
+class AnimationPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _InspectionPageState();
+    return _AnimationPageState();
   }
 }
 
-class _InspectionPageState extends State<InspectionPage> {
+class _AnimationPageState extends State<AnimationPage> {
   String reason = '';
   // final CarouselController _carouselController = CarouselController();
   
@@ -119,7 +119,12 @@ class _InspectionPageState extends State<InspectionPage> {
             ),
             RaisedButton(
               color: Colors.teal,
-              child: Text('문제 보기'),
+              child: Text(
+                '문제 보기',
+                style: TextStyle(
+                  color: Colors.white
+                ),
+              ),
               onPressed: () {
                 Navigator.pushNamed(context, '/question');
               },

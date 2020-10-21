@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lebengrida/screens/guide.dart';
-import 'package:lebengrida/screens/inspection.dart';
+import 'package:lebengrida/screens/animation.dart';
 import 'package:lebengrida/screens/join.dart';
 import 'package:lebengrida/screens/login.dart';
 import 'package:lebengrida/screens/question.dart';
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoginPage(),
         '/join': (context) => JoinPage(),
         '/userList': (context) => UserListPage(),
-        '/inspection': (context) => InspectionPage(),
+        '/animation': (context) => AnimationPage(),
         '/question': (context) => QuestionPage(),
         '/guide': (context) => GuidePage(),
         '/result': (context) => ResultPage(),

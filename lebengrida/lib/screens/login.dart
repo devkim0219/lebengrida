@@ -42,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     LoginService.checkUser(mobile).then((result) {
+        print('result -> ' + result);
         if (result == 'success') {
           Navigator.pushNamed(context, '/inspection');
         } else {
@@ -85,7 +86,13 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(top: 60),
+                      padding: EdgeInsets.only(top: 30),
+                      child: Image(
+                        image: AssetImage('assets/images/logo.png'),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 50),
                       child: Text(
                         '스마트 화행 검사',
                         style: TextStyle(
@@ -96,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 20),
+                      padding: EdgeInsets.only(top: 100),
                       child: TextField(
                         controller: _mobileController,
                         decoration: InputDecoration(
@@ -104,34 +111,40 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RaisedButton(
-                          color: Colors.teal,
-                          child: Text('사용자 등록', style: TextStyle(color: Colors.white)),
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/join');
-                          },
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        RaisedButton(
-                          color: Colors.teal,
-                          child: Text('검사 시작', style: TextStyle(color: Colors.white)),
-                          onPressed: () {
-                            _checkUser(_mobileController.text);
-                          },
-                        ),
-                      ],
+                    Padding(
+                      padding: EdgeInsets.only(top: 30),
+                      child:Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          RaisedButton(
+                            color: Colors.teal,
+                            child: Text('사용자 등록', style: TextStyle(color: Colors.white)),
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/join');
+                            },
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          RaisedButton(
+                            color: Colors.teal,
+                            child: Text('로그인', style: TextStyle(color: Colors.white)),
+                            onPressed: () {
+                              _checkUser(_mobileController.text);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    RaisedButton(
-                      color: Colors.teal,
-                      child: Text('사용자 목록', style: TextStyle(color: Colors.white)),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/userList');
-                      },
+                    Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child:RaisedButton(
+                        color: Colors.teal,
+                        child: Text('사용자 목록(Test)', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/userList');
+                        },
+                      ),
                     ),
                   ],
                 ),
