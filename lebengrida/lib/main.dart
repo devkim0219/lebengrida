@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:lebengrida/screens/guide.dart';
 import 'package:lebengrida/screens/inspection.dart';
 import 'package:lebengrida/screens/join.dart';
 import 'package:lebengrida/screens/login.dart';
 import 'package:lebengrida/screens/question.dart';
+import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/userList.dart';
 
 void main() {
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '치매 사전 진단 서비스 - 레벤그리다',
+      title: '스마트 화행 검사 - 레벤그리다',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
@@ -36,12 +38,13 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => Login(),
-        '/join': (context) => Join(),
-        '/userList': (context) => UserList(),
-        '/inspection': (context) => Inspection(),
+        '/': (context) => LoginPage(),
+        '/join': (context) => JoinPage(),
+        '/userList': (context) => UserListPage(),
+        '/inspection': (context) => InspectionPage(),
         '/question': (context) => QuestionPage(),
-        // '/result': (context) => Result(),
+        '/guide': (context) => GuidePage(),
+        '/result': (context) => ResultPage(),
       },
     );
   } 

@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/services/user_service.dart';
 
-class UserList extends StatefulWidget {
-  UserList() : super();
+class UserListPage extends StatefulWidget {
+  UserListPage() : super();
 
   final String title = '사용자 리스트';
 
   @override
-  UserListState createState() => UserListState();
+  UserListPageState createState() => UserListPageState();
 }
 
-class UserListState extends State<UserList> {
+class UserListPageState extends State<UserListPage> {
   final _focusNode = FocusScopeNode();
 
   List<User> _users;

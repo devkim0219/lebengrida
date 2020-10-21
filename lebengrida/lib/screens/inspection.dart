@@ -9,14 +9,14 @@ import 'package:flick_video_player/flick_video_player.dart';
 //   'assets/images/dog_3.png',
 // ];
 
-class Inspection extends StatefulWidget {
+class InspectionPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _InspectionState();
+    return _InspectionPageState();
   }
 }
 
-class _InspectionState extends State<Inspection> {
+class _InspectionPageState extends State<InspectionPage> {
   String reason = '';
   // final CarouselController _carouselController = CarouselController();
   

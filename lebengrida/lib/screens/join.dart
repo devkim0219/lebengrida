@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/services/user_service.dart';
 
-class Join extends StatefulWidget {
-  Join() : super();
+class JoinPage extends StatefulWidget {
+  JoinPage() : super();
 
   final String title = '사용자 등록';
 
   @override
-  JoinState createState() => JoinState();
+  JoinPageState createState() => JoinPageState();
 }
 
-class JoinState extends State<Join> {
+class JoinPageState extends State<JoinPage> {
   final _focusNode = FocusScopeNode();
   
   String _titleProgress;
@@ -40,7 +40,12 @@ class JoinState extends State<Join> {
 
   _addUser() {
     if (_nameController.text.isEmpty || _mobileController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty) {
-      print('Empty Fields');
+      Fluttertoast.showToast(
+        msg: '모든 항목을 입력해주세요.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3
+      );
       return;
     }
     _showProgress('사용자 등록중...');
