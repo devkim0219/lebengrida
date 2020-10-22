@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 
+// 이미지 슬라이드에 사용될 이미지 목록
 // final List<String> imgList = [
 //   'assets/images/dog_1.png',
 //   'assets/images/dog_2.png',
@@ -58,7 +59,8 @@ class _AnimationPageState extends State<AnimationPage> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
+              // Navigator.pushNamed(context, '/');
+              Navigator.pop(context);
             },
           )
         ],

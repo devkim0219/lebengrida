@@ -16,29 +16,14 @@ class UserListPageState extends State<UserListPage> {
 
   List<User> _users;
   GlobalKey<ScaffoldState> _scaffoldKey;
-  TextEditingController _nameController;
-  TextEditingController _birthController;
-  TextEditingController _genderController;
-  TextEditingController _addressController;
-  TextEditingController _mobileController;
-  TextEditingController _protectorController;
-  User _selectedUser;
-  bool _isUpdating;
   String _titleProgress;
 
   @override
   void initState() {
     super.initState();
     _users = [];
-    _isUpdating = false;
     _titleProgress = widget.title;
     _scaffoldKey = GlobalKey();
-    _nameController = TextEditingController();
-    _birthController = TextEditingController();
-    _genderController = TextEditingController();
-    _addressController = TextEditingController();
-    _mobileController = TextEditingController();
-    _protectorController = TextEditingController();
     _getUsers();
   }
 

@@ -34,12 +34,6 @@ class JoinPageState extends State<JoinPage> {
     _protectorController = TextEditingController();
   }
 
-  _showProgress(String message) {
-    setState(() {
-      _titleProgress = message;
-    });
-  }
-
   _addUser() {
     if (_nameController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty || _mobileController.text.isEmpty || _protectorController.text.isEmpty) {
       Fluttertoast.showToast(
@@ -50,7 +44,7 @@ class JoinPageState extends State<JoinPage> {
       );
       return;
     }
-    _showProgress('회원 등록중...');
+
     UserServices.addUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
     .then((result) {
       if ('success' == result) {
@@ -62,6 +56,8 @@ class JoinPageState extends State<JoinPage> {
         );
       }
     });
+
+    Navigator.pop(context);
   }
 
   @override
@@ -177,9 +173,14 @@ class JoinPageState extends State<JoinPage> {
                   SizedBox(
                     height: 15,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                  ButtonBar(
+                    children: <Widget>[
+                      FlatButton(
+                        child: Text('취소'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                       RaisedButton(
                         color: Colors.teal,
                         child: Text(
@@ -190,26 +191,43 @@ class JoinPageState extends State<JoinPage> {
                         ),
                         onPressed: () {
                           _addUser();
-                          Navigator.pushReplacementNamed(context, '/');
                         },
                       ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      RaisedButton(
-                        color: Colors.teal,
-                        child: Text(
-                          '취소',
-                          style: TextStyle(
-                            color: Colors.white
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                      )
                     ],
-                  )
+                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   children: [
+                  //     RaisedButton(
+                  //       color: Colors.teal,
+                  //       child: Text(
+                  //         '등록',
+                  //         style: TextStyle(
+                  //           color: Colors.white
+                  //         ),
+                  //       ),
+                  //       onPressed: () {
+                  //         _addUser();
+                  //         Navigator.pushReplacementNamed(context, '/');
+                  //       },
+                  //     ),
+                  //     SizedBox(
+                  //       width: 20,
+                  //     ),
+                  //     RaisedButton(
+                  //       color: Colors.teal,
+                  //       child: Text(
+                  //         '취소',
+                  //         style: TextStyle(
+                  //           color: Colors.white
+                  //         ),
+                  //       ),
+                  //       onPressed: () {
+                  //         Navigator.pushReplacementNamed(context, '/');
+                  //       },
+                  //     )
+                  //   ],
+                  // ),
                 ],
               ),
             ),

@@ -94,9 +94,6 @@ class _QuestionPageState extends State<QuestionPage> {
   }
   // <- Question
 
-
-
-
   // Audio Player ->
   // 오디오 플레이어 초기화
   void initAudioPlayer() {
@@ -162,6 +159,7 @@ class _QuestionPageState extends State<QuestionPage> {
     });
   }
 
+  // 오디오 플레이어 음소거
   // Future mute(bool muted) async {
   //   await audioPlayer.mute(muted);
   //   setState(() {
@@ -214,7 +212,7 @@ class _QuestionPageState extends State<QuestionPage> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/');
+              Navigator.pushNamed(context, '/');
             },
           )
         ],
