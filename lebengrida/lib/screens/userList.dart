@@ -5,7 +5,7 @@ import 'package:lebengrida/services/user_service.dart';
 class UserListPage extends StatefulWidget {
   UserListPage() : super();
 
-  final String title = '사용자 리스트';
+  final String title = '회원 목록';
 
   @override
   UserListPageState createState() => UserListPageState();
@@ -17,10 +17,11 @@ class UserListPageState extends State<UserListPage> {
   List<User> _users;
   GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _nameController;
-  TextEditingController _mobileController;
   TextEditingController _birthController;
   TextEditingController _genderController;
   TextEditingController _addressController;
+  TextEditingController _mobileController;
+  TextEditingController _protectorController;
   User _selectedUser;
   bool _isUpdating;
   String _titleProgress;
@@ -33,10 +34,11 @@ class UserListPageState extends State<UserListPage> {
     _titleProgress = widget.title;
     _scaffoldKey = GlobalKey();
     _nameController = TextEditingController();
-    _mobileController = TextEditingController();
     _birthController = TextEditingController();
     _genderController = TextEditingController();
     _addressController = TextEditingController();
+    _mobileController = TextEditingController();
+    _protectorController = TextEditingController();
     _getUsers();
   }
 
@@ -54,25 +56,9 @@ class UserListPageState extends State<UserListPage> {
   //   );
   // }
 
-  // 사용자 등록
-  _addUser() {
-    if (_nameController.text.isEmpty || _mobileController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty) {
-      print('Empty Fields');
-      return;
-    }
-    _showProgress('사용자 등록중...');
-    UserServices.addUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
-    .then((result) {
-      if ('success' == result) {
-        _getUsers();
-        _clearValues();
-      }
-    });
-  }
-
-  // 사용자 리스트 조회
+  // 회원 목록 조회
   _getUsers() {
-    _showProgress('사용자 목록 조회중...');
+    _showProgress('회원 목록 조회중...');
     UserServices.getUsers().then((users) {
       setState(() {
         _users = users;
@@ -82,13 +68,13 @@ class UserListPageState extends State<UserListPage> {
     });
   }
 
-  // 사용자 정보 수정
+  // 회원 정보 수정
   _updateUser(User user) {
     setState(() {
       _isUpdating = true;
     });
-    _showProgress('사용자 정보 수정중...');
-    UserServices.updateUser(_nameController.text, _mobileController.text, _birthController.text, _genderController.text, _addressController.text)
+    _showProgress('회원 정보 수정중...');
+    UserServices.updateUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
     .then((result) {
       if ('success' == result) {
         _getUsers();
@@ -100,9 +86,9 @@ class UserListPageState extends State<UserListPage> {
     });
   }
 
-  // 사용자 정보 삭제
+  // 회원 정보 삭제(탈퇴)
   _deleteUser(User user) {
-    _showProgress('사용자 정보 삭제중...');
+    _showProgress('회원 탈퇴중...');
     UserServices.deleteUser(user.mobile).then((result) {
       if ('success' == result) {
         _getUsers();
@@ -113,19 +99,21 @@ class UserListPageState extends State<UserListPage> {
   // 입력값 초기화
   _clearValues() {
     _nameController.text = '';
-    _mobileController.text = '';
     _birthController.text = '';
     _genderController.text = '';
     _addressController.text = '';
+    _mobileController.text = '';
+    _protectorController.text = '';
   }
 
   // 각 회원의 정보 조회
   _showValues(User user) {
     _nameController.text = user.name;
-    _mobileController.text = user.mobile;
     _birthController.text = user.birth;
     _genderController.text = user.gender;
     _addressController.text = user.address;
+    _mobileController.text = user.mobile;
+    _protectorController.text = user.protector;
   }
 
   SingleChildScrollView _dataBody() {
@@ -136,26 +124,17 @@ class UserListPageState extends State<UserListPage> {
         child: DataTable(
           columns: [
             DataColumn(label: Text('이름')),
-            DataColumn(label: Text('연락처')),
             DataColumn(label: Text('출생년도')),
             DataColumn(label: Text('성별')),
             DataColumn(label: Text('주소')),
+            DataColumn(label: Text('연락처')),
+            DataColumn(label: Text('보호자')),
             DataColumn(label: Text('삭제')),
           ],
           rows: _users.map(
             (user) => DataRow(cells: [
               DataCell(
                 Text(user.name),
-                onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
-                }
-              ),
-              DataCell(
-                Text(user.mobile),
                 onTap: () {
                   _showValues(user);
                   _selectedUser = user;
@@ -186,6 +165,26 @@ class UserListPageState extends State<UserListPage> {
               ),
               DataCell(
                 Text(user.address),
+                onTap: () {
+                  _showValues(user);
+                  _selectedUser = user;
+                  setState(() {
+                    _isUpdating = true;
+                  });
+                }
+              ),
+              DataCell(
+                Text(user.mobile),
+                onTap: () {
+                  _showValues(user);
+                  _selectedUser = user;
+                  setState(() {
+                    _isUpdating = true;
+                  });
+                }
+              ),
+              DataCell(
+                Text(user.protector),
                 onTap: () {
                   _showValues(user);
                   _selectedUser = user;
@@ -226,15 +225,6 @@ class UserListPageState extends State<UserListPage> {
             Padding(
               padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: TextField(
-                controller: _mobileController,
-                decoration: InputDecoration(
-                  hintText: '연락처'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
                 controller: _birthController,
                 decoration: InputDecoration(
                   hintText: '출생년도'
@@ -251,11 +241,29 @@ class UserListPageState extends State<UserListPage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: TextField(
                 controller: _addressController,
                 decoration: InputDecoration(
                   hintText: '주소'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: TextField(
+                controller: _mobileController,
+                decoration: InputDecoration(
+                  hintText: '연락처'
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+              child: TextField(
+                controller: _protectorController,
+                decoration: InputDecoration(
+                  hintText: '보호자'
                 ),
               ),
             ),

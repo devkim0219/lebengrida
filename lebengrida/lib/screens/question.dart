@@ -176,7 +176,7 @@ class _QuestionPageState extends State<QuestionPage> {
   // <- Audio Player
 
   // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
-  Widget countDown(int sec) {
+  Widget countDown(int attempt, int sec) {
     return CircularCountDownTimer(
       duration: sec,
       controller: _countdownController,
@@ -188,8 +188,8 @@ class _QuestionPageState extends State<QuestionPage> {
       strokeWidth: 5.0,
       textStyle: TextStyle(
         fontSize: 22.0,
-        color: Colors.black,
-        fontWeight: FontWeight.bold
+        color: Colors.black87,
+        fontWeight: FontWeight.normal
       ),
       isReverse: true,
       isReverseAnimation: false,
@@ -262,7 +262,9 @@ class _QuestionPageState extends State<QuestionPage> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    countDown(5),
+                    Center(
+                      child: countDown(1, 5),
+                    ),
                   ],
                 ),
               ]

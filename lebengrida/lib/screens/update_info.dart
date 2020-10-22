@@ -1,31 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/services/user_service.dart';
 
-class JoinPage extends StatefulWidget {
-  JoinPage() : super();
+class UpdateInfoPage extends StatefulWidget {
+  UpdateInfoPage() : super();
 
-  final String title = '회원 등록';
+  final String title = '회원 정보 수정';
 
   @override
-  JoinPageState createState() => JoinPageState();
+  UpdateInfoPageState createState() => UpdateInfoPageState();
 }
 
-class JoinPageState extends State<JoinPage> {
+class UpdateInfoPageState extends State<UpdateInfoPage> {
   final _focusNode = FocusScopeNode();
-  
-  String _titleProgress;
+
+  GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _nameController;
   TextEditingController _birthController;
   TextEditingController _genderController;
   TextEditingController _addressController;
   TextEditingController _mobileController;
   TextEditingController _protectorController;
-  
+  String _titleProgress;
+  User _selectedUser;
+
   @override
   void initState() {
     super.initState();
     _titleProgress = widget.title;
+    _scaffoldKey = GlobalKey();
     _nameController = TextEditingController();
     _birthController = TextEditingController();
     _genderController = TextEditingController();
@@ -40,28 +44,82 @@ class JoinPageState extends State<JoinPage> {
     });
   }
 
-  _addUser() {
-    if (_nameController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty || _mobileController.text.isEmpty || _protectorController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: '모든 항목을 입력해주세요.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3
-      );
-      return;
-    }
-    _showProgress('회원 등록중...');
-    UserServices.addUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
+  // 회원 정보 수정
+  _updateUser(User user) {
+    _showProgress('회원 정보 수정중...');
+    UserServices.updateUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
     .then((result) {
       if ('success' == result) {
+        Navigator.pushNamed(context, '/');
         Fluttertoast.showToast(
-          msg: '등록이 완료되었습니다.',
+          msg: '회원 정보가 수정되었습니다.',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 3
         );
       }
     });
+  }
+
+  // 회원 정보 수정을 위한 해당 회원의 정보 조회
+  _getUserInfo(String mobile) {
+    _showProgress('회원 정보 조회중...');
+    UserServices.getUserInfo(mobile).then((user) {
+      setState(() {
+        _selectedUser = user;
+      });
+      _showValues(_selectedUser);
+    });
+  }
+
+  // 회원 정보 삭제(탈퇴)
+  _deleteUser(User user) {
+    _showProgress('회원 탈퇴중...');
+    UserServices.deleteUser(user.mobile).then((result) {
+      if ('success' == result) {
+        Navigator.pushNamed(context, '/');
+        Fluttertoast.showToast(
+          msg: '회원 탈퇴가 완료되었습니다.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+      }
+    });
+  }
+
+  // 입력값 초기화
+  _clearValues() {
+    _nameController.text = '';
+    _birthController.text = '';
+    _genderController.text = '';
+    _addressController.text = '';
+    _mobileController.text = '';
+    _protectorController.text = '';
+  }
+
+  // 각 회원의 정보 조회
+  _showValues(User user) {
+    _nameController.text = user.name;
+    _birthController.text = user.birth;
+    _genderController.text = user.gender;
+    _addressController.text = user.address;
+    _mobileController.text = user.mobile;
+    _protectorController.text = user.protector;
+  }
+
+  SingleChildScrollView _showModifyUser() {
+    return SingleChildScrollView(
+      child: Container(
+        padding: EdgeInsets.all(30),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            
+          ]
+        ),
+      ),
+    );
   }
 
   @override
@@ -73,21 +131,30 @@ class JoinPageState extends State<JoinPage> {
       child: FocusScope(
         node: _focusNode,
         child: Scaffold(
-          appBar: AppBar(title: Text(_titleProgress)),
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text(_titleProgress),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.home),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/');
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.refresh),
+                onPressed: () {
+                  _clearValues();
+                },
+              ),
+            ],
+          ),
           body: SingleChildScrollView(
             child: Container(
               padding: EdgeInsets.all(30.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  // Text(
-                  //   '이름',
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 20,
-                  //     color: Colors.black54,
-                  //   )
-                  // ),
                   Padding(
                     padding: EdgeInsets.only(top: 30, bottom: 20),
                     child: TextField(
@@ -97,31 +164,6 @@ class JoinPageState extends State<JoinPage> {
                       ),
                     ),
                   ),
-                  // Text(
-                  //   '연락처',
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 20,
-                  //     color: Colors.black54,
-                  //   )
-                  // ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 20),
-                    child: TextField(
-                      controller: _mobileController,
-                      decoration: InputDecoration(
-                        hintText: '연락처'
-                      ),
-                    ),
-                  ),
-                  // Text(
-                  //   '출생년도',
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 20,
-                  //     color: Colors.black54,
-                  //   )
-                  // ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 20),
                     child: TextField(
@@ -131,14 +173,6 @@ class JoinPageState extends State<JoinPage> {
                       ),
                     ),
                   ),
-                  // Text(
-                  //   '성별',
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 20,
-                  //     color: Colors.black54,
-                  //   )
-                  // ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 20),
                     child: TextField(
@@ -148,20 +182,21 @@ class JoinPageState extends State<JoinPage> {
                       ),
                     ),
                   ),
-                  // Text(
-                  //   '주소',
-                  //   style: TextStyle(
-                  //     fontWeight: FontWeight.bold,
-                  //     fontSize: 20,
-                  //     color: Colors.black54,
-                  //   )
-                  // ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 20),
                     child: TextField(
                       controller: _addressController,
                       decoration: InputDecoration(
                         hintText: '주소'
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: TextField(
+                      controller: _mobileController,
+                      decoration: InputDecoration(
+                        hintText: '연락처'
                       ),
                     ),
                   ),
@@ -175,46 +210,52 @@ class JoinPageState extends State<JoinPage> {
                     ),
                   ),
                   SizedBox(
-                    height: 15,
+                    height: 15
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+                    children: <Widget>[
                       RaisedButton(
                         color: Colors.teal,
                         child: Text(
-                          '등록',
+                          '수정', 
                           style: TextStyle(
                             color: Colors.white
-                          ),
+                          )
                         ),
                         onPressed: () {
-                          _addUser();
-                          Navigator.pushReplacementNamed(context, '/');
+                          _getUserInfo('01022222222');
+                          // _updateUser(_selectedUser);
                         },
                       ),
                       SizedBox(
-                        width: 20,
+                        width: 15,
                       ),
                       RaisedButton(
                         color: Colors.teal,
                         child: Text(
-                          '취소',
+                          '취소', 
                           style: TextStyle(
                             color: Colors.white
-                          ),
+                          )
                         ),
                         onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/');
+                          Navigator.pushNamed(context, '/');
                         },
-                      )
+                      ),
                     ],
                   )
                 ],
               ),
             ),
           )
-        )
+        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {
+        //     _addUser();
+        //   },
+        //   child: Icon(Icons.add),
+        // ),
       ),
     );
   }

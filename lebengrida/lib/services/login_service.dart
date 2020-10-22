@@ -4,7 +4,7 @@ class LoginService {
   static const ROOT = 'http://192.168.0.132/RestAPI/login_actions.php';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
 
-  // 사용자 등록 여부 체크
+  // 회원 등록 여부 체크
   static Future<String> checkUser(String mobile) async {
     try {
       var map = Map<String, dynamic>();

@@ -49,7 +49,7 @@ class _AnimationPageState extends State<AnimationPage> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text('삽화 구연'),
+        title: Text('동화 구연'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context)
@@ -68,6 +68,7 @@ class _AnimationPageState extends State<AnimationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // 이미지 슬라이더
             // CarouselSlider(
             //   items: imgList.map((item) => Container(
             //     child: Center(
@@ -108,6 +109,7 @@ class _AnimationPageState extends State<AnimationPage> {
             //     ),
             //   ],
             // ),
+            // 동영상 플레이어
             FlickVideoPlayer(
               flickManager: flickManager,
               flickVideoWithControls: FlickVideoWithControls(

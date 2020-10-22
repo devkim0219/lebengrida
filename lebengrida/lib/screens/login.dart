@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     return true;
   }
 
-  // 사용자 등록 여부 체크
+  // 회원 등록 여부 체크
   _checkUser(String mobile) {
     if (_mobileController.text.isEmpty) {
       Fluttertoast.showToast(
@@ -44,10 +44,10 @@ class _LoginPageState extends State<LoginPage> {
     LoginService.checkUser(mobile).then((result) {
         print('result -> ' + result);
         if (result == 'success') {
-          Navigator.pushNamed(context, '/inspection');
+          Navigator.pushNamed(context, '/animation');
         } else {
           Fluttertoast.showToast(
-            msg: '등록된 사용자가 아닙니다. 사용자 등록후 이용해주세요.',
+            msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 3
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           RaisedButton(
                             color: Colors.teal,
-                            child: Text('사용자 등록', style: TextStyle(color: Colors.white)),
+                            child: Text('회원 등록', style: TextStyle(color: Colors.white)),
                             onPressed: () {
                               Navigator.pushNamed(context, '/join');
                             },
@@ -140,9 +140,19 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.only(top: 10),
                       child:RaisedButton(
                         color: Colors.teal,
-                        child: Text('사용자 목록(Test)', style: TextStyle(color: Colors.white)),
+                        child: Text('회원 목록(Test)', style: TextStyle(color: Colors.white)),
                         onPressed: () {
                           Navigator.pushNamed(context, '/userList');
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child:RaisedButton(
+                        color: Colors.teal,
+                        child: Text('회원 정보 수정(Test)', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/updateInfo');
                         },
                       ),
                     ),

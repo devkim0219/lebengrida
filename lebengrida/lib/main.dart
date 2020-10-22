@@ -6,6 +6,7 @@ import 'package:lebengrida/screens/login.dart';
 import 'package:lebengrida/screens/question.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/userList.dart';
+import 'package:lebengrida/screens/update_info.dart';
 
 void main() {
   runApp(MyApp());
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/join': (context) => JoinPage(),
+        '/updateInfo': (context) => UpdateInfoPage(),
         '/userList': (context) => UserListPage(),
         '/animation': (context) => AnimationPage(),
         '/question': (context) => QuestionPage(),
@@ -47,5 +49,5 @@ class MyApp extends StatelessWidget {
         '/result': (context) => ResultPage(),
       },
     );
-  } 
+  }
 }
