@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/screens/update_info.dart';
 import 'package:lebengrida/services/login_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -103,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 100),
+                      padding: EdgeInsets.only(top: 60),
                       child: TextField(
                         controller: _mobileController,
                         decoration: InputDecoration(
@@ -152,7 +153,20 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.teal,
                         child: Text('회원 정보 수정(Test)', style: TextStyle(color: Colors.white)),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/updateInfo');
+                          if (_mobileController.text.isEmpty) {
+                            Fluttertoast.showToast(
+                              msg: '휴대폰 번호를 입력해주세요.',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 3
+                            );
+                            return;
+                          }
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => UpdateInfoPage(mobile: _mobileController.text)
+                            )
+                          );
                         },
                       ),
                     ),

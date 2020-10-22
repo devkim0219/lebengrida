@@ -20,13 +20,12 @@ class UserServices {
       
       if (200 == response.statusCode) {
         List<User> list = parseResponse(response.body);
-        print('### user list: $list');
         return list;
       } else {
-        return List<User>();
+        throw Exception('Failed to load users');
       }
     } catch(e) {
-      return List<User>();
+      throw Exception('Failed to load users: $e');
     }
   }
 
@@ -52,10 +51,10 @@ class UserServices {
       if (200 == response.statusCode) {
         return response.body;
       } else {
-        return 'error';
+        throw Exception('Failed to add user');
       }
     } catch(e) {
-      return 'error';
+      throw Exception('Failed to add user: $e');
     }
   }
 
@@ -76,10 +75,10 @@ class UserServices {
       if (200 == response.statusCode) {
         return response.body;
       } else {
-        return 'error';
+        throw Exception('Failed to update user');
       }
     } catch(e) {
-      return 'error';
+      throw Exception('Failed to update user: $e');
     }
   }
 
@@ -93,15 +92,13 @@ class UserServices {
       print('getUserInfo Response: ${response.body}');
 
       if (200 == response.statusCode) {
-        final parsed = json.decode(response.body).cast<Map<String, dynamic>>();
-        User user = parsed.map<User>((json) => User.fromJson(json));
-        print('### user: $user');
+        User user = User.fromJson(json.decode(response.body));
         return user;
       } else {
-        return User();
+        throw Exception('Failed to load user');
       }
     } catch(e) {
-      return User();
+      throw Exception('Failed to load user: $e');
     }
   }
 
@@ -117,10 +114,10 @@ class UserServices {
       if (200 == response.statusCode) {
         return response.body;
       } else {
-        return 'error';
+        throw Exception('Failed to delete user');
       }
     } catch(e) {
-      return 'error';
+      throw Exception('Failed to delete user: $e');
     }
   }
 }

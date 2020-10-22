@@ -48,14 +48,6 @@ class UserListPageState extends State<UserListPage> {
     });
   }
 
-  // _showSnackBar(context, message) {
-  //   _scaffoldKey.currentState.showSnackBar(
-  //     SnackBar(
-  //       content: Text(message)
-  //     )
-  //   );
-  // }
-
   // 회원 목록 조회
   _getUsers() {
     _showProgress('회원 목록 조회중...');
@@ -68,24 +60,6 @@ class UserListPageState extends State<UserListPage> {
     });
   }
 
-  // 회원 정보 수정
-  _updateUser(User user) {
-    setState(() {
-      _isUpdating = true;
-    });
-    _showProgress('회원 정보 수정중...');
-    UserServices.updateUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
-    .then((result) {
-      if ('success' == result) {
-        _getUsers();
-        setState(() {
-          _isUpdating = false;
-        });
-        _clearValues();
-      }
-    });
-  }
-
   // 회원 정보 삭제(탈퇴)
   _deleteUser(User user) {
     _showProgress('회원 탈퇴중...');
@@ -94,26 +68,6 @@ class UserListPageState extends State<UserListPage> {
         _getUsers();
       }
     });
-  }
-
-  // 입력값 초기화
-  _clearValues() {
-    _nameController.text = '';
-    _birthController.text = '';
-    _genderController.text = '';
-    _addressController.text = '';
-    _mobileController.text = '';
-    _protectorController.text = '';
-  }
-
-  // 각 회원의 정보 조회
-  _showValues(User user) {
-    _nameController.text = user.name;
-    _birthController.text = user.birth;
-    _genderController.text = user.gender;
-    _addressController.text = user.address;
-    _mobileController.text = user.mobile;
-    _protectorController.text = user.protector;
   }
 
   SingleChildScrollView _dataBody() {
@@ -136,61 +90,37 @@ class UserListPageState extends State<UserListPage> {
               DataCell(
                 Text(user.name),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(
                 Text(user.birth),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(
                 Text(user.gender),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(
                 Text(user.address),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(
                 Text(user.mobile),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(
                 Text(user.protector),
                 onTap: () {
-                  _showValues(user);
-                  _selectedUser = user;
-                  setState(() {
-                    _isUpdating = true;
-                  });
+
                 }
               ),
               DataCell(IconButton(
@@ -201,92 +131,6 @@ class UserListPageState extends State<UserListPage> {
               )),
             ]),
           ).toList(),
-        ),
-      ),
-    );
-  }
-
-  SingleChildScrollView _showModifyUser() {
-    return SingleChildScrollView(
-      child: Container(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  hintText: '이름'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
-                controller: _birthController,
-                decoration: InputDecoration(
-                  hintText: '출생년도'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
-                controller: _genderController,
-                decoration: InputDecoration(
-                  hintText: '성별'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  hintText: '주소'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: TextField(
-                controller: _mobileController,
-                decoration: InputDecoration(
-                  hintText: '연락처'
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-              child: TextField(
-                controller: _protectorController,
-                decoration: InputDecoration(
-                  hintText: '보호자'
-                ),
-              ),
-            ),
-            Row(
-              children: <Widget>[
-                OutlineButton(
-                  child: Text('수정'),
-                  onPressed: () {
-                    _updateUser(_selectedUser);
-                  },
-                ),
-                OutlineButton(
-                  child: Text('취소'),
-                  onPressed: () {
-                    setState(() {
-                      _isUpdating = false;
-                    });
-                    _clearValues();
-                  },
-                ),
-              ],
-            )
-          ]
         ),
       ),
     );
@@ -321,8 +165,7 @@ class UserListPageState extends State<UserListPage> {
           ),
           body: Column(
             children: [
-              _dataBody(),
-              _isUpdating ? _showModifyUser() : Container()
+              _dataBody()
             ],
           )
         ),

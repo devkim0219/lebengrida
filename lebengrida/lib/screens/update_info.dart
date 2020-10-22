@@ -4,7 +4,12 @@ import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/services/user_service.dart';
 
 class UpdateInfoPage extends StatefulWidget {
-  UpdateInfoPage() : super();
+  final String mobile;
+  
+  UpdateInfoPage({
+    Key key,
+    @required this.mobile
+  }) : super(key: key);
 
   final String title = '회원 정보 수정';
 
@@ -36,17 +41,12 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _addressController = TextEditingController();
     _mobileController = TextEditingController();
     _protectorController = TextEditingController();
-  }
 
-  _showProgress(String message) {
-    setState(() {
-      _titleProgress = message;
-    });
+    _getUserInfo(widget.mobile);
   }
 
   // 회원 정보 수정
   _updateUser(User user) {
-    _showProgress('회원 정보 수정중...');
     UserServices.updateUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
     .then((result) {
       if ('success' == result) {
@@ -63,18 +63,17 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
 
   // 회원 정보 수정을 위한 해당 회원의 정보 조회
   _getUserInfo(String mobile) {
-    _showProgress('회원 정보 조회중...');
     UserServices.getUserInfo(mobile).then((user) {
       setState(() {
         _selectedUser = user;
       });
+      print('### selected user info -> ${user.mobile}');
       _showValues(_selectedUser);
     });
   }
 
   // 회원 정보 삭제(탈퇴)
   _deleteUser(User user) {
-    _showProgress('회원 탈퇴중...');
     UserServices.deleteUser(user.mobile).then((result) {
       if ('success' == result) {
         Navigator.pushNamed(context, '/');
@@ -224,7 +223,6 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
                           )
                         ),
                         onPressed: () {
-                          _getUserInfo('01022222222');
                           // _updateUser(_selectedUser);
                         },
                       ),

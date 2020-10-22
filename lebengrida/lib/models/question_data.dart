@@ -11,13 +11,13 @@ class Question {
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
-      type: json['type'] as String,
-      title: json['title'] as String,
-      choice_1: json['choice_1'] as String,
-      choice_2: json['choice_2'] as String,
-      choice_3: json['choice_3'] as String,
-      choice_4: json['choice_4'] as String,
-      answer: json['answer'] as String,
+      type: json['type'],
+      title: json['title'],
+      choice_1: json['choice_1'],
+      choice_2: json['choice_2'],
+      choice_3: json['choice_3'],
+      choice_4: json['choice_4'],
+      answer: json['answer']
     );
   }
 }

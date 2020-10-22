@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/join': (context) => JoinPage(),
-        '/updateInfo': (context) => UpdateInfoPage(),
+        '/updateInfo': (context) => UpdateInfoPage(mobile: ''),
         '/userList': (context) => UserListPage(),
         '/animation': (context) => AnimationPage(),
         '/question': (context) => QuestionPage(),
