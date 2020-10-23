@@ -138,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 10),
+                      padding: EdgeInsets.only(top: 5),
                       child:RaisedButton(
                         color: Colors.teal,
                         child: Text('회원 목록(Test)', style: TextStyle(color: Colors.white)),
@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 10),
+                      padding: EdgeInsets.only(top: 5),
                       child:RaisedButton(
                         color: Colors.teal,
                         child: Text('회원 정보 수정(Test)', style: TextStyle(color: Colors.white)),

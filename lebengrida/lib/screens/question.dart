@@ -52,13 +52,13 @@ class _QuestionPageState extends State<QuestionPage> {
     _getQuestions();
   }
 
-  @override
-  void dispose() {
-    _positionSubscription.cancel();
-    _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _positionSubscription.cancel();
+  //   _audioPlayerStateSubscription.cancel();
+  //   audioPlayer.stop();
+  //   super.dispose();
+  // }
 
   // Question ->
   // 문제 데이터 가져오기
@@ -212,7 +212,7 @@ class _QuestionPageState extends State<QuestionPage> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              Navigator.pushNamed(context, '/');
+              Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           )
         ],

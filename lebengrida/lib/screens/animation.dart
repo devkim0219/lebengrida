@@ -59,8 +59,7 @@ class _AnimationPageState extends State<AnimationPage> {
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
-              // Navigator.pushNamed(context, '/');
-              Navigator.pop(context);
+              Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           )
         ],

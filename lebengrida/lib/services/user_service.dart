@@ -41,6 +41,7 @@ class UserServices {
       map['action'] = _ADD_USER_ACTION;
       map['name'] = name;
       map['birth'] = birth;
+      map['age'] = (DateTime.now().year - int.parse(birth) + 1).toString();
       map['gender'] = gender;
       map['address'] = address;
       map['mobile'] = mobile;
@@ -65,6 +66,7 @@ class UserServices {
       map['action'] = _UPDATE_USER_ACTION;
       map['name'] = name;
       map['birth'] = birth;
+      map['age'] = (DateTime.now().year - int.parse(birth) + 1).toString();
       map['gender'] = gender;
       map['address'] = address;
       map['mobile'] = mobile;
