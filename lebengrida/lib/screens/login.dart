@@ -43,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     LoginService.checkUser(mobile).then((result) {
-        print('result -> ' + result);
         if (result == 'success') {
           Navigator.pushNamed(context, '/animation');
         } else {
@@ -141,16 +140,6 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.only(top: 5),
                       child:RaisedButton(
                         color: Colors.teal,
-                        child: Text('회원 목록(Test)', style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/userList');
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 5),
-                      child:RaisedButton(
-                        color: Colors.teal,
                         child: Text('회원 정보 수정(Test)', style: TextStyle(color: Colors.white)),
                         onPressed: () {
                           if (_mobileController.text.isEmpty) {
@@ -167,6 +156,16 @@ class _LoginPageState extends State<LoginPage> {
                               builder: (context) => UpdateInfoPage(mobile: _mobileController.text)
                             )
                           );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child:RaisedButton(
+                        color: Colors.teal,
+                        child: Text('회원 목록(Test)', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/userList');
                         },
                       ),
                     ),

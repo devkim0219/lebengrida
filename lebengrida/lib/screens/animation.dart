@@ -18,7 +18,7 @@ class AnimationPage extends StatefulWidget {
 }
 
 class _AnimationPageState extends State<AnimationPage> {
-  String reason = '';
+  // String reason = '';
   // final CarouselController _carouselController = CarouselController();
   
   FlickManager flickManager;
@@ -27,7 +27,9 @@ class _AnimationPageState extends State<AnimationPage> {
   void initState() {
     super.initState();
     flickManager = FlickManager(
-      videoPlayerController: VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+      // videoPlayerController: VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
+      // videoPlayerController: VideoPlayerController.asset('assets/videos/ani_5.mp4'),
+      videoPlayerController: VideoPlayerController.asset('assets/videos/SampleVideo_1280x720_1mb.mp4'),
     );
   }
 
@@ -37,13 +39,11 @@ class _AnimationPageState extends State<AnimationPage> {
     super.dispose();
   }
 
-  void onPageChange(int index, CarouselPageChangedReason changeReason) {
-    setState(() {
-      reason = changeReason.toString();
-    });
-  }
-
-  
+  // void onPageChange(int index, CarouselPageChangedReason changeReason) {
+  //   setState(() {
+  //     reason = changeReason.toString();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

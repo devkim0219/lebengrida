@@ -5,8 +5,6 @@ import 'package:lebengrida/services/user_service.dart';
 class UserListPage extends StatefulWidget {
   UserListPage() : super();
 
-  final String title = '회원 목록';
-
   @override
   UserListPageState createState() => UserListPageState();
 }
@@ -16,13 +14,11 @@ class UserListPageState extends State<UserListPage> {
 
   List<User> _users;
   GlobalKey<ScaffoldState> _scaffoldKey;
-  String _titleProgress;
 
   @override
   void initState() {
     super.initState();
     _users = [];
-    _titleProgress = widget.title;
     _scaffoldKey = GlobalKey();
     _getUsers();
   }
@@ -109,7 +105,7 @@ class UserListPageState extends State<UserListPage> {
         child: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            title: Text(_titleProgress),
+            title: Text('회원 목록'),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.home),

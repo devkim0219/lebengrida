@@ -12,8 +12,6 @@ class LoginService {
       map['mobile'] = mobile;
       final response = await http.post(ROOT, body: map);
 
-      print('statuscode -> ' + '${response.statusCode}');
-
       if (response.statusCode == 200) {
         return response.body;
 

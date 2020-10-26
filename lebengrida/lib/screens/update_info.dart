@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:group_radio_button/group_radio_button.dart';
 import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/services/user_service.dart';
 
@@ -20,6 +21,9 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   final _fKey = GlobalKey<FormState>();
 
   String year;
+  
+  String _selectedGender = '남성';
+  List<String> _gender = ['남성', '여성'];
 
   GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _nameController;
@@ -34,17 +38,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
 
   // 회원 정보 수정
   _updateUser(User user) {
-    if (_nameController.text.isEmpty || _birthController.text.isEmpty || _genderController.text.isEmpty || _addressController.text.isEmpty || _mobileController.text.isEmpty || _protectorController.text.isEmpty) {
-      Fluttertoast.showToast(
-        msg: '모든 항목을 입력해주세요.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3
-      );
-      return;
-    }
-
-    UserServices.updateUser(_nameController.text, _birthController.text, _genderController.text, _addressController.text, _mobileController.text, _protectorController.text)
+    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _addressController.text, _mobileController.text, _protectorController.text)
     .then((result) {
       if ('success' == result) {
         Navigator.pop(context);
@@ -98,7 +92,13 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   _showValues(User user) {
     _nameController.text = user.name;
     _birthController.text = user.birth;
-    _genderController.text = user.gender;
+    
+    if (user.gender == 'm') {
+      _selectedGender = '남성';
+    } else {
+      _selectedGender = '여성';
+    }
+
     _addressController.text = user.address;
     _mobileController.text = user.mobile;
     _protectorController.text = user.protector;
@@ -191,14 +191,32 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 20),
-            child: TextField(
-              controller: _genderController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: '성별',
-                hintText: 'RadioButton으로 대체',
-                prefixIcon: Icon(Icons.person),
-              ),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Icon(
+                  Icons.people,
+                  color: Colors.black45,
+                ),
+                SizedBox(width: 15),
+                Text(
+                  '성별',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                SizedBox(width: 50,),
+                RadioGroup<String>.builder(
+                  direction: Axis.horizontal,
+                  groupValue: _selectedGender, 
+                  onChanged: (value) => setState(() {
+                    _selectedGender = value;
+                  }), 
+                  items: _gender, 
+                  itemBuilder: (item) => RadioButtonBuilder(item)
+                ),
+              ],
             ),
           ),
           Padding(
@@ -215,7 +233,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 20),
-            child: TextField(
+            child: TextFormField(
               controller: _mobileController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -223,18 +241,30 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
                 hintText: '예) 01012345678',
                 prefixIcon: Icon(Icons.phone_android),
               ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '연락처를 입력해주세요.';
+                }
+                return null;
+              },
             ),
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 20),
-            child: TextField(
+            child: TextFormField(
               controller: _protectorController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '보호자',
                 hintText: '예) 홍길동',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: Icon(Icons.person_add),
               ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '보호자를 입력해주세요.';
+                }
+                return null;
+              },
             ),
           ),
           ButtonBar(
@@ -248,7 +278,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
               RaisedButton(
                 color: Colors.teal,
                 child: Text(
-                  '등록',
+                  '수정',
                   style: TextStyle(
                     color: Colors.white
                   ),
