@@ -169,6 +169,16 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child:RaisedButton(
+                        color: Colors.teal,
+                        child: Text('검사 결과(Test)', style: TextStyle(color: Colors.white)),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/result');
+                        },
+                      ),
+                    ),
                   ],
                 ),
               ),

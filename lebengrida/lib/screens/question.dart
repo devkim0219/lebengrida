@@ -104,14 +104,14 @@ class _QuestionPageState extends State<QuestionPage> {
         selectButton(2),
         selectButton(3),
         selectButton(4),
-        Column(
+        _isStartAnswer ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Center(
               child: countDown(5),
             ),
           ],
-        ),
+        ) : Container(),
       ]
     );
   }
@@ -144,6 +144,12 @@ class _QuestionPageState extends State<QuestionPage> {
     // await audioPlayer.play(localFilePath, isLocal: true);
     await audioCache.play('sounds/sample_audio_$_qIdx.mp3');
     setState(() => playerState = PlayerState.playing);
+
+    audioPlayer.onPlayerCompletion.listen((event) {
+      setState(() {
+        _isStartAnswer = true;
+      });
+    });
   }
 
   // 오디오 플레이어 일시정지
@@ -170,13 +176,11 @@ class _QuestionPageState extends State<QuestionPage> {
   // }
 
   // 오디오 재생이 끝났을 때 플레이어 정지
-  void onComplete() {
-    setState(() {
-      playerState = PlayerState.stopped;
-      _isStartAnswer = true;
-      _makeQuestion();
-    });
-  }
+  // void onComplete() {
+  //   setState(() {
+  //     playerState = PlayerState.stopped;
+  //   });
+  // }
 
   // 오디오 플레이어 생성
   Widget _buildPlayer() => Container(
@@ -206,7 +210,7 @@ class _QuestionPageState extends State<QuestionPage> {
         // ]),
         if (_duration != null) _slider(),
         // if (position != null) _buildMuteButtons(),
-        if (_position != null) _buildProgressView()
+        if (_position != null) _buildProgressView(),
       ],
     ),
   );
@@ -306,6 +310,7 @@ class _QuestionPageState extends State<QuestionPage> {
           if (_qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
+            _playLocal();
           } else {
             Navigator.pushReplacementNamed(context, '/result');
           }
@@ -322,13 +327,13 @@ class _QuestionPageState extends State<QuestionPage> {
     _getQuestions();
   }
 
-  @override
-  void dispose() {
-    // _positionSubscription.cancel();
-    // _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   // _positionSubscription.cancel();
+  //   // _audioPlayerStateSubscription.cancel();
+  //   audioPlayer.stop();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
