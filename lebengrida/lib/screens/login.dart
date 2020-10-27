@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           RaisedButton(
                             color: Colors.teal,
-                            child: Text('로그인', style: TextStyle(color: Colors.white)),
+                            child: Text('검사 시작', style: TextStyle(color: Colors.white)),
                             onPressed: () {
                               _checkUser(_mobileController.text);
                             },

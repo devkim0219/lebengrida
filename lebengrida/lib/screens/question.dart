@@ -12,17 +12,21 @@ typedef void OnError(Exception exception);
 enum PlayerState { stopped, playing, paused }
 
 class QuestionPage extends StatefulWidget {
+  QuestionPage({Key key}) : super(key: key);
+
   @override
   _QuestionPageState createState() => _QuestionPageState();
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  final CountDownController _countdownController = CountDownController();
+  CountDownController _countdownController = CountDownController();
 
-  List<Question> _qData;
-  int i = 0;
+  bool _isStartAnswer = false;
 
-  bool isStartAnswer = true;
+  List<Question> _qData = [];
+  int _qIdx = 0;
+  String _selectText = '';
+  int attempt = 1;
 
   Duration _duration = new Duration();
   Duration _position = new Duration();
@@ -40,26 +44,9 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // bool isMuted = false;
 
-  StreamSubscription _positionSubscription;
-  StreamSubscription _audioPlayerStateSubscription;
+  // StreamSubscription _positionSubscription;
+  // StreamSubscription _audioPlayerStateSubscription;
   
-  @override
-  void initState() {
-    super.initState();
-    initAudioPlayer();
-
-    _qData = [];
-    _getQuestions();
-  }
-
-  // @override
-  // void dispose() {
-  //   _positionSubscription.cancel();
-  //   _audioPlayerStateSubscription.cancel();
-  //   audioPlayer.stop();
-  //   super.dispose();
-  // }
-
   // Question ->
   // 문제 데이터 가져오기
   _getQuestions() {
@@ -72,24 +59,60 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 문제 선택지
-  Widget choiceButton(int choiceNum) {
-    if (choiceNum == 1) {
-      
+  Widget selectButton(int selNum) {
+    if (selNum == 1) {
+      _selectText = '$selNum. ' + _qData[_qIdx].select_1;
+    } else if (selNum == 2) {
+      _selectText = '$selNum. ' + _qData[_qIdx].select_2;
+    } else if (selNum == 3) {
+      _selectText = '$selNum. ' + _qData[_qIdx].select_3;
+    } else {
+      _selectText = '$selNum. ' + _qData[_qIdx].select_4;
     }
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: 10.0,
-        horizontal: 20.0
-      ),
-      child: TextButton(
-        onPressed: () => null,
-        child: Text(
-          _qData[0].choice_1,
-          style: TextStyle(
-            color: Colors.black,
-          ),
+
+    return TextButton(
+      onPressed: () => null,
+      child: Text(
+        _selectText,
+        style: TextStyle(
+          fontSize: 20,
+          color: Colors.black,
         ),
       ),
+    );
+  }
+
+  // 문제 생성
+  Widget _makeQuestion() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _qData[_qIdx].title,
+          style: (
+            TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.bold
+            )
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        selectButton(1),
+        selectButton(2),
+        selectButton(3),
+        selectButton(4),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Center(
+              child: countDown(5),
+            ),
+          ],
+        ),
+      ]
     );
   }
   // <- Question
@@ -109,27 +132,6 @@ class _QuestionPageState extends State<QuestionPage> {
     });
   }
 
-  // 오디오 플레이어 슬라이더
-  Widget slider() {
-    return Slider(
-      value: _position.inSeconds.toDouble(),
-      min: 0.0,
-      max: _duration.inSeconds.toDouble(),
-      onChanged: (double value) {
-        setState(() {
-          seekToSecond(value.toInt());
-          value = value;
-        });
-      },
-    );
-  }
-
-  // 오디오 플레이어 시간 찾기
-  void seekToSecond(int second) {
-    Duration newDuration = Duration(seconds: second);
-    audioPlayer.seek(newDuration);
-  }
-
   // Future play() async {
   //   await audioPlayer.play(kUrl);
   //   setState(() {
@@ -140,7 +142,7 @@ class _QuestionPageState extends State<QuestionPage> {
   // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
     // await audioPlayer.play(localFilePath, isLocal: true);
-    audioCache.play('sounds/sample1.mp3');
+    await audioCache.play('sounds/sample_audio_$_qIdx.mp3');
     setState(() => playerState = PlayerState.playing);
   }
 
@@ -169,164 +171,90 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // 오디오 재생이 끝났을 때 플레이어 정지
   void onComplete() {
-    setState(() => playerState = PlayerState.stopped);
-  }
-  // <- Audio Player
-
-  // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
-  Widget countDown(int attempt, int sec) {
-    return CircularCountDownTimer(
-      duration: sec,
-      controller: _countdownController,
-      width: MediaQuery.of(context).size.width / 5,
-      height: MediaQuery.of(context).size.height / 5,
-      color: Colors.white,
-      fillColor: Colors.teal,
-      backgroundColor: null,
-      strokeWidth: 5.0,
-      textStyle: TextStyle(
-        fontSize: 22.0,
-        color: Colors.black87,
-        fontWeight: FontWeight.normal
-      ),
-      isReverse: true,
-      isReverseAnimation: false,
-      isTimerTextShown: true,
-      onComplete: () {
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => Question2()));
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: Text(_qData[0].type),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context)
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.home),
-            onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            },
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Material(
-              child: _buildPlayer(),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _qData[0].title,
-                  style: (
-                    TextStyle(
-                      fontSize: 23,
-                      fontWeight: FontWeight.bold
-                    )
-                  ),
-                ),
-                // Expanded(
-                //   child: AbsorbPointer(
-                //     // absorbing: disableAnswer,
-                //     child: Container(
-                //       child: Column(
-                //         mainAxisAlignment: MainAxisAlignment.center,
-                //         children: <Widget>[
-                //           choiceButton('1'),
-                //           choiceButton('2'),
-                //           choiceButton('3'),
-                //           choiceButton('4'),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: countDown(1, 5),
-                    ),
-                  ],
-                ),
-              ]
-            ),
-          ],
-        ),
-      )
-    );
+    setState(() {
+      playerState = PlayerState.stopped;
+      _isStartAnswer = true;
+      _makeQuestion();
+    });
   }
 
   // 오디오 플레이어 생성
   Widget _buildPlayer() => Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(mainAxisSize: MainAxisSize.min, children: [
-              IconButton(
-                onPressed: isPlaying ? null : () => _playLocal(),
-                iconSize: 40.0,
-                icon: Icon(Icons.play_arrow),
-                color: Colors.cyan,
-              ),
-              IconButton(
-                onPressed: isPlaying ? () => pause() : null,
-                iconSize: 40.0,
-                icon: Icon(Icons.pause),
-                color: Colors.cyan,
-              ),
-              IconButton(
-                onPressed: isPlaying || isPaused ? () => stop() : null,
-                iconSize: 40.0,
-                icon: Icon(Icons.stop),
-                color: Colors.cyan,
-              ),
-            ]),
-            if (_duration != null)
-              slider(),
-            // if (position != null) _buildMuteButtons(),
-            if (_position != null) _buildProgressView()
-          ],
-        ),
-      );
+    padding: EdgeInsets.all(16.0),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Row(mainAxisSize: MainAxisSize.min, children: [
+        //   IconButton(
+        //     onPressed: isPlaying ? null : () => _playLocal(),
+        //     iconSize: 30.0,
+        //     icon: Icon(Icons.play_arrow),
+        //     color: Colors.cyan,
+        //   ),
+        //   IconButton(
+        //     onPressed: isPlaying ? () => pause() : null,
+        //     iconSize: 30.0,
+        //     icon: Icon(Icons.pause),
+        //     color: Colors.cyan,
+        //   ),
+        //   IconButton(
+        //     onPressed: isPlaying || isPaused ? () => stop() : null,
+        //     iconSize: 30.0,
+        //     icon: Icon(Icons.stop),
+        //     color: Colors.cyan,
+        //   ),
+        // ]),
+        if (_duration != null) _slider(),
+        // if (position != null) _buildMuteButtons(),
+        if (_position != null) _buildProgressView()
+      ],
+    ),
+  );
+
+  // 오디오 플레이어 슬라이더
+  Widget _slider() {
+    return Slider(
+      value: _position.inSeconds.toDouble(),
+      min: 0.0,
+      max: _duration.inSeconds.toDouble(),
+      onChanged: (double value) {
+        setState(() {
+          seekToSecond(value.toInt());
+          value = value;
+        });
+      },
+    );
+  }
+
+  // 오디오 플레이어 시간 찾기
+  void seekToSecond(int second) {
+    Duration newDuration = Duration(seconds: second);
+    audioPlayer.seek(newDuration);
+  }
 
   // 오디오 플레이어 진행상태
-  Row _buildProgressView() => Row(mainAxisSize: MainAxisSize.min, children: [
-        Padding(
-          padding: EdgeInsets.all(12.0),
-          child: CircularProgressIndicator(
-            value: _position != null && _position.inMilliseconds > 0
-                ? (_position?.inMilliseconds?.toDouble() ?? 0.0) /
-                    (_duration?.inMilliseconds?.toDouble() ?? 0.0)
-                : 0.0,
-            valueColor: AlwaysStoppedAnimation(Colors.cyan),
-            backgroundColor: Colors.grey.shade400,
-          ),
+  Row _buildProgressView() => Row(
+    mainAxisSize: MainAxisSize.min, 
+    children: [
+      Padding(
+        padding: EdgeInsets.all(12.0),
+        child: CircularProgressIndicator(
+          value: _position != null && _position.inMilliseconds > 0
+              ? (_position?.inMilliseconds?.toDouble() ?? 0.0) /
+                  (_duration?.inMilliseconds?.toDouble() ?? 0.0)
+              : 0.0,
+          valueColor: AlwaysStoppedAnimation(Colors.teal),
+          backgroundColor: Colors.grey.shade400,
         ),
-        Text(
-          _position != null
-              ? "${positionText ?? ''} / ${durationText ?? ''}"
-              : _duration != null ? durationText : '',
-          style: TextStyle(fontSize: 24.0),
-        )
-      ]);
+      ),
+      Text(
+        _position != null
+            ? "${positionText ?? ''} / ${durationText ?? ''}"
+            : _duration != null ? durationText : '',
+        style: TextStyle(fontSize: 20.0),
+      )
+    ]
+  );
 
   // 오디오 플레이어 음소거 버튼
   // Row _buildMuteButtons() {
@@ -351,4 +279,91 @@ class _QuestionPageState extends State<QuestionPage> {
   //     ],
   //   );
   // }
+  // <- Audio Player
+
+  // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
+  Widget countDown(int sec) {
+    return CircularCountDownTimer(
+      key: UniqueKey(),
+      duration: sec,
+      controller: _countdownController,
+      width: MediaQuery.of(context).size.width / 5,
+      height: MediaQuery.of(context).size.height / 5,
+      color: Colors.white,
+      fillColor: Colors.teal,
+      backgroundColor: null,
+      strokeWidth: 5.0,
+      textStyle: TextStyle(
+        fontSize: 22.0,
+        color: Colors.black87,
+        fontWeight: FontWeight.normal
+      ),
+      isReverse: true,
+      isReverseAnimation: false,
+      isTimerTextShown: true,
+      onComplete: () {
+        setState(() {
+          if (_qIdx < 15) {
+            _isStartAnswer = false;
+            _qIdx++;
+          } else {
+            Navigator.pushReplacementNamed(context, '/result');
+          }
+        });
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initAudioPlayer();
+    isPlaying ? null : _playLocal();
+    _getQuestions();
+  }
+
+  @override
+  void dispose() {
+    // _positionSubscription.cancel();
+    // _audioPlayerStateSubscription.cancel();
+    audioPlayer.stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text(_qData[_qIdx].type),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context)
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () {
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+            },
+          )
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Material(
+              child: _buildPlayer(),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            _makeQuestion(),
+          ],
+        ),
+      )
+    );
+  }
 }

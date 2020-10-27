@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
@@ -15,10 +17,16 @@ class _AnimationPageState extends State<AnimationPage> {
   @override
   void initState() {
     super.initState();
+    // final video = File('assets/videos/animation_5.mp4');
     flickManager = FlickManager(
       // videoPlayerController: VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
-      // videoPlayerController: VideoPlayerController.asset('assets/videos/ani_5.mp4'),
-      videoPlayerController: VideoPlayerController.asset('assets/videos/SampleVideo_1280x720_1mb.mp4'),
+      videoPlayerController: VideoPlayerController.asset('assets/videos/animation_5.mp4'),
+      // videoPlayerController: VideoPlayerController.file(video)
+        // ..initialize().then((_) {
+        //   setState(() {
+
+        //   });
+        // }),
     );
   }
 
@@ -48,9 +56,8 @@ class _AnimationPageState extends State<AnimationPage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(5),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             FlickVideoPlayer(
               flickManager: flickManager,

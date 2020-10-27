@@ -1,22 +1,22 @@
 class Question {
   String type;
   String title;
-  String choice_1;
-  String choice_2;
-  String choice_3;
-  String choice_4;
+  String select_1;
+  String select_2;
+  String select_3;
+  String select_4;
   String answer;
 
-  Question({this.type, this.title, this.choice_1, this.choice_2, this.choice_3, this.choice_4, this.answer});
+  Question({this.type, this.title, this.select_1, this.select_2, this.select_3, this.select_4, this.answer});
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
       type: json['type'],
       title: json['title'],
-      choice_1: json['choice_1'],
-      choice_2: json['choice_2'],
-      choice_3: json['choice_3'],
-      choice_4: json['choice_4'],
+      select_1: json['select_1'],
+      select_2: json['select_2'],
+      select_3: json['select_3'],
+      select_4: json['select_4'],
       answer: json['answer']
     );
   }
