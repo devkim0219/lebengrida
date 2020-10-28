@@ -327,20 +327,23 @@ class _QuestionPageState extends State<QuestionPage> {
     _getQuestions();
   }
 
-  // @override
-  // void dispose() {
-  //   // _positionSubscription.cancel();
-  //   // _audioPlayerStateSubscription.cancel();
-  //   audioPlayer.stop();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    // _positionSubscription.cancel();
+    // _audioPlayerStateSubscription.cancel();
+    audioPlayer.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text(_qData[_qIdx].type),
+        title: Text(
+          _qData[_qIdx].type,
+          softWrap: true,
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context)

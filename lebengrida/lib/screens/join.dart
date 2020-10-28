@@ -15,6 +15,8 @@ class JoinPageState extends State<JoinPage> {
   final _fKey = GlobalKey<FormState>();
   
   String year;
+  bool _isShowAgree = false;
+  bool _isAgree = false;
 
   String _selectedGender = '남성';
   List<String> _gender = ['남성', '여성'];
@@ -34,7 +36,7 @@ class JoinPageState extends State<JoinPage> {
   final List<String> _ulsan = ["구/군 선택","남구","동구","북구","중구","울주군"];
   final List<String> _busan = ["구/군 선택","강서구","금정구","남구","동구","동래구","부산진구","북구","사상구","사하구","서구","수영구","연제구","영도구","중구","해운대구","기장군"];
   final List<String> _gyeonggi = ["구/군 선택","고양시","과천시","광명시","광주시","구리시","군포시","김포시","남양주시","동두천시","부천시","성남시","수원시","시흥시","안산시","안성시","안양시","양주시","오산시","용인시","의왕시","의정부시","이천시","파주시","평택시","포천시","하남시","화성시","가평군","양평군","여주군","연천군"];
-  final  List<String> _gangwon = ["구/군 선택","강릉시","동해시","삼척시","속초시","원주시","춘천시","태백시","고성군","양구군","양양군","영월군","인제군","정선군","철원군","평창군","홍천군","화천군","횡성군"];
+  final List<String> _gangwon = ["구/군 선택","강릉시","동해시","삼척시","속초시","원주시","춘천시","태백시","고성군","양구군","양양군","영월군","인제군","정선군","철원군","평창군","홍천군","화천군","횡성군"];
   final List<String> _chungbuk = ["구/군 선택","제천시","청주시","충주시","괴산군","단양군","보은군","영동군","옥천군","음성군","증평군","진천군","청원군"];
   final List<String> _chungnam = ["구/군 선택","계룡시","공주시","논산시","보령시","서산시","아산시","천안시","금산군","당진군","부여군","서천군","연기군","예산군","청양군","태안군","홍성군"];
   final List<String> _jeonbuk = ["구/군 선택","군산시","김제시","남원시","익산시","전주시","정읍시","고창군","무주군","부안군","순창군","완주군","임실군","장수군","진안군"];
@@ -115,6 +117,56 @@ class JoinPageState extends State<JoinPage> {
           );
   }
 
+  // 개인정보 수집 동의서 대화창
+  _showContent() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            '개인정보 수집·이용에 관한 동의서',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Container(
+            height: MediaQuery.of(context).size.height / 2.0,
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white,
+            child: SingleChildScrollView(
+              child: Text(
+                '주식회사 레벤그리다한국문화다양성연구원은 개인정보보호법 등 관련 법상의 개인정보보호규정을 준수하여 스마트 화행검사 서비스 또는 스마트 스피치(S-Speech) 내 이용자 식별, 회원관리 및 서비스 제공을 위해 개인정보보호법에 의거하여 개인정보를 수집·이용·제공함에 있어 아래와 같은 동의를 받고자합니다.\n'
+                + '다음과 같이 서비스 이용 및 회원들의 관리, 서비스제공 등에 따른 보호자 연락처의 보관 등과 같이 반드시 필요한 범위내에서 회원의 개인정보 수집, 이용, 보관하고 이를 제3자에게 제공하는데 동의를 받고자합니다.\n\n'
+                + '1. 개인정보 수집 목적\n'
+                + '서비스 이용, 제공, 평가, 이용자식별, 관리등, 기타 법령으로 정한 용도로의 활용 및 제3자에 대한 제공\n\n'
+                + '2. 수집항목\n'
+                + '가. 필수항목 : 이름, 성별, 주민등록번호 앞 6자리, 주소, 휴대폰번호(연락을 목적으로 사용 가능), 1차 보호자 또는 대리인 연락처\n'
+                + '나. 선택항목 : 가족관계\n\n'
+                + '3. 개인정보 보유 및 이용기간\n'
+                + '서비스 탈퇴시 1년간 보관\n\n'
+                + '4. 제3자에 대한 제공 동의\n'
+                + '가. 제공 받은 자 : 사업장의 사업주 또는 담당자\n'
+                + '나. 제공 받은 자의 목적 : 정보제공자의 서비스 이용자 관리, 평가, 서비스 제공 등\n'
+                + '다. 제공하는 항목 : 정보 주체가 제출한 개인정보에 기재된 사항 일체\n'
+                + '라. 제공 받은 자의 보유/이용기간 : 정보 주체가 해당 서비스를 이용하는 기간 동안\n'
+                + '마. 동의 거부권 : 귀 개인정보의 수집·이용에 대한 동의를 거부할 수 있으며, 동의하지 않는 경우 서비스 이용 거부로 서비스이용 및 평가에 제한 또는 거절 될 수 있습니다.\n\n'
+                + '5. 개인정보의 수집·이용에 대한 동의 거부\n'
+                + '개인정보의 수집·이용을 거부할 수 있습니다. 다만, 개인정보의 수집·이용 등에 동의하지 않을 경우 서비스 이용자 식별, 관리 서비스 평가 등의 이용이 어려울 수 있습니다.\n\n\n'
+                + '주식회사 레벤그리다한국문화다양성연구원 대표이사 귀하\n',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
+              ),
+            )
+          ),
+        );
+      }
+    );
+  }
+
   // 회원 등록 정보 입력 폼
   Widget inputForm() {
     return Form(
@@ -170,7 +222,7 @@ class JoinPageState extends State<JoinPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 20),
+            padding: EdgeInsets.only(bottom: 15),
             child: Row(
               children: [
                 SizedBox(width: 10),
@@ -256,7 +308,7 @@ class JoinPageState extends State<JoinPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 20),
+            padding: EdgeInsets.only(bottom: 15),
             child: TextFormField(
               controller: _protectorController,
               decoration: InputDecoration(
@@ -271,6 +323,57 @@ class JoinPageState extends State<JoinPage> {
                 }
                 return null;
               },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.contact_page,
+                  color: Colors.black45,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  '개인정보 수집 동의',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                FlatButton(
+                  child: Text(
+                    '내용보기',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.blueGrey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isShowAgree = true;
+                      _isAgree = true;
+                    });
+                    _showContent();
+                  },
+                ),
+                Text(
+                  '동의함',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                Checkbox(
+                  value:  _isAgree,
+                  onChanged: (value) {
+                    setState(() {
+                      _isAgree = value;
+                    });
+                  },
+                ),
+              ],
             ),
           ),
           ButtonBar(
@@ -304,6 +407,16 @@ class JoinPageState extends State<JoinPage> {
 
   // 회원 등록
   _addUser() {
+    if (!_isAgree) {
+      Fluttertoast.showToast(
+        msg: '개인정보 수집 동의에 체크해주세요.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3
+      );
+      return;
+    }
+
     if (_selectedSido == '시/도 선택' || _selectedGuGun == '구/군 선택') {
       Fluttertoast.showToast(
         msg: '주소를 선택해주세요.',
