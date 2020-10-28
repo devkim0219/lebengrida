@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/update_info.dart';
 import 'package:lebengrida/services/login_service.dart';
+import 'package:lebengrida/services/result_service.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -43,19 +44,50 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    LoginService.checkUser(mobile).then((result) {
-        if (result == 'success') {
-          Navigator.pushNamed(context, '/animation');
-        } else {
-          Fluttertoast.showToast(
-            msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 3
-          );
-        }
+    LoginServices.checkUser(mobile).then((result) {
+      if (result == 'success') {
+        Navigator.pushNamed(context, '/animation');
+      } else {
+        Fluttertoast.showToast(
+          msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
       }
-    );
+    });
+  }
+
+  // 기존 검사 여부 체크
+  _checkTested(String mobile) {
+    if (_mobileController.text.isEmpty) {
+      Fluttertoast.showToast(
+        msg: '휴대폰 번호를 입력해주세요.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3
+      );
+      return;
+    }
+
+    ResultServices.checkTested(mobile).then((result) {
+      print('result is $result');
+      
+      if (result == 'success') {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => ResultPage(mobile: mobile),
+          )
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: '검사한 내역이 없습니다. 검사를 진행한 후에 결과를 보실 수 있습니다.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+      }
+    });
   }
 
   @override
@@ -176,20 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.teal,
                         child: Text('검사 결과(Test)', style: TextStyle(color: Colors.white)),
                         onPressed: () {
-                          if (_mobileController.text.isEmpty) {
-                            Fluttertoast.showToast(
-                              msg: '휴대폰 번호를 입력해주세요.',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 3
-                            );
-                            return;
-                          }
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => ResultPage(mobile: _mobileController.text)
-                            )
-                          );
+                          _checkTested(_mobileController.text);
                         },
                       ),
                     ),

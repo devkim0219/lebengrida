@@ -329,7 +329,7 @@ class JoinPageState extends State<JoinPage> {
           Padding(
             padding: EdgeInsets.only(bottom: 15),
             child: TextFormField(
-              controller: _protectorNameController,
+              controller: _protectorMobileController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '보호자 연락처',

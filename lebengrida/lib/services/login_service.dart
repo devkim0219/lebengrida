@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 
-class LoginService {
+class LoginServices {
   static const ROOT = 'http://192.168.0.132/RestAPI/login_actions.php';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
 
