@@ -22,6 +22,7 @@ class _QuestionPageState extends State<QuestionPage> {
   CountDownController _countdownController = CountDownController();
 
   bool _isStartAnswer = false;
+  int _selectedAnswer = 0;
 
   List<Question> _qData = [];
   int _qIdx = 0;
@@ -71,7 +72,6 @@ class _QuestionPageState extends State<QuestionPage> {
     }
 
     return TextButton(
-      onPressed: () => null,
       child: Text(
         _selectText,
         style: TextStyle(
@@ -79,6 +79,19 @@ class _QuestionPageState extends State<QuestionPage> {
           color: Colors.black,
         ),
       ),
+      onPressed: () {
+        setState(() {
+          _selectedAnswer = selNum;
+          print('_selectedAnswer is $_selectedAnswer');
+
+          if (_selectedAnswer > 0) {
+            _isStartAnswer = false;
+            _qIdx++;
+            _playLocal();
+            _selectedAnswer = 0;
+          }
+        });
+      },
     );
   }
 
