@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/update_info.dart';
 import 'package:lebengrida/services/login_service.dart';
 
@@ -175,7 +176,20 @@ class _LoginPageState extends State<LoginPage> {
                         color: Colors.teal,
                         child: Text('검사 결과(Test)', style: TextStyle(color: Colors.white)),
                         onPressed: () {
-                          Navigator.pushNamed(context, '/result');
+                          if (_mobileController.text.isEmpty) {
+                            Fluttertoast.showToast(
+                              msg: '휴대폰 번호를 입력해주세요.',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 3
+                            );
+                            return;
+                          }
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ResultPage(mobile: _mobileController.text)
+                            )
+                          );
                         },
                       ),
                     ),

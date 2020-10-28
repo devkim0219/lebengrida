@@ -35,7 +35,7 @@ class UserServices {
   }
 
   // 회원 등록
-  static Future<String> addUser(String name, String birth, String gender, String address, String mobile, String protector) async {
+  static Future<String> addUser(String name, String birth, String gender, String address, String mobile, String protectorName, String protectorMobile) async {
     try {
       var map = Map<String, dynamic>();
       map['action'] = _ADD_USER_ACTION;
@@ -45,7 +45,8 @@ class UserServices {
       map['gender'] = gender;
       map['address'] = address;
       map['mobile'] = mobile;
-      map['protector'] = protector;
+      map['protector_name'] = protectorName;
+      map['protector_mobile'] = protectorMobile;
       final response = await http.post(ROOT, body: map);
       print('addUser Response: ${response.body}');
 
@@ -60,7 +61,7 @@ class UserServices {
   }
 
   // 회원 정보 수정
-  static Future<String> updateUser(String name, String birth, String gender, String address, String mobile, String protector) async {
+  static Future<String> updateUser(String name, String birth, String gender, String address, String mobile, String protectorName, String protectorMobile) async {
     try {
       var map = Map<String, dynamic>();
       map['action'] = _UPDATE_USER_ACTION;
@@ -70,7 +71,8 @@ class UserServices {
       map['gender'] = gender;
       map['address'] = address;
       map['mobile'] = mobile;
-      map['protector'] = protector;
+      map['protector_name'] = protectorName;
+      map['protector_mobile'] = protectorMobile;
       final response = await http.post(ROOT, body: map);
       print('updateUser Response: ${response.body}');
 

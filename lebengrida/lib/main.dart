@@ -13,7 +13,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  List qData;
+  final List qData = [];
 
   // This widget is the root of your application.
   @override
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         '/animation': (context) => AnimationPage(),
         '/question': (context) => QuestionPage(),
         '/guide': (context) => GuidePage(),
-        '/result': (context) => ResultPage(),
+        '/result': (context) => ResultPage(mobile: ''),
       },
     );
   }

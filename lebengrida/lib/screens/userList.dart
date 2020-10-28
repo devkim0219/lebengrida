@@ -55,7 +55,8 @@ class UserListPageState extends State<UserListPage> {
             DataColumn(label: Text('성별')),
             DataColumn(label: Text('주소')),
             DataColumn(label: Text('연락처')),
-            DataColumn(label: Text('보호자')),
+            DataColumn(label: Text('보호자명')),
+            DataColumn(label: Text('보호자 연락처')),
             DataColumn(label: Text('삭제')),
           ],
           rows: _users.map(
@@ -79,7 +80,10 @@ class UserListPageState extends State<UserListPage> {
                 Text(user.mobile),
               ),
               DataCell(
-                Text(user.protector),
+                Text(user.protectorName),
+              ),
+              DataCell(
+                Text(user.protectorMobile),
               ),
               DataCell(IconButton(
                 icon: Icon(Icons.delete),

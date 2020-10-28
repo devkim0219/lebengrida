@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:foundation_fluttify/foundation_fluttify.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/services/user_service.dart';
@@ -30,7 +29,8 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   TextEditingController _nameController;
   TextEditingController _birthController;
   TextEditingController _mobileController;
-  TextEditingController _protectorController;
+  TextEditingController _protectorNameController;
+  TextEditingController _protectorMobileController;
   User _selectedUser;
 
   // 시군구 리스트
@@ -72,7 +72,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
       _address = _selectedSido + " " + _selectedGuGun;
     }
 
-    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorController.text)
+    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
     .then((result) {
       if ('success' == result) {
         Navigator.pop(context);
@@ -117,7 +117,8 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _nameController.text = '';
     _birthController.text = '';
     _mobileController.text = '';
-    _protectorController.text = '';
+    _protectorNameController.text = '';
+    _protectorMobileController.text = '';
   }
 
   // 각 회원의 정보 조회
@@ -135,7 +136,8 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _selectedSido = _addressArr[0];
     _selectedGuGun = _addressArr[1];
     _mobileController.text = user.mobile;
-    _protectorController.text = user.protector;
+    _protectorNameController.text = user.protectorName;
+    _protectorMobileController.text = user.protectorMobile;
   }
 
   // 출생년도 선택
@@ -199,7 +201,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
             onChanged: (value) {
               setState(() {
                 _selectedGuGun = value;
-                print('selected $sido ${_selectedGuGun}');
+                print('selected $sido $_selectedGuGun');
               });
             },
           );
@@ -348,16 +350,34 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
           Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: TextFormField(
-              controller: _protectorController,
+              controller: _protectorNameController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: '보호자',
+                labelText: '보호자명',
                 hintText: '예) 홍길동',
                 prefixIcon: Icon(Icons.person_add),
               ),
               validator: (val) {
                 if (val == null || val.isEmpty) {
-                  return '보호자를 입력해주세요.';
+                  return '보호자 이름을 입력해주세요.';
+                }
+                return null;
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: TextFormField(
+              controller: _protectorMobileController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '보호자 연락처',
+                hintText: '예) 01012345678',
+                prefixIcon: Icon(Icons.phone_android),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '보호자 연락처를 입력해주세요.';
                 }
                 return null;
               },
@@ -399,7 +419,8 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _nameController = TextEditingController();
     _birthController = TextEditingController();
     _mobileController = TextEditingController();
-    _protectorController = TextEditingController();
+    _protectorNameController = TextEditingController();
+    _protectorMobileController = TextEditingController();
 
     _getUserInfo(widget.mobile);
   }

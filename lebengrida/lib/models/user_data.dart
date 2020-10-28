@@ -5,9 +5,10 @@ class User {
   final String gender;
   final String address;
   final String mobile;
-  final String protector;
+  final String protectorName;
+  final String protectorMobile;
 
-  User({this.name, this.birth, this.age, this.gender, this.address, this.mobile, this.protector});
+  User({this.name, this.birth, this.age, this.gender, this.address, this.mobile, this.protectorName, this.protectorMobile});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -17,7 +18,8 @@ class User {
       gender: json['gender'],
       address: json['address'],
       mobile: json['mobile'],
-      protector: json['protector']
+      protectorName: json['protector_name'],
+      protectorMobile: json['protector_mobile'],
     );
   }
 }

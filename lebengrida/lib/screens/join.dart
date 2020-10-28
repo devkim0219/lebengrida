@@ -24,7 +24,8 @@ class JoinPageState extends State<JoinPage> {
   TextEditingController _nameController;
   TextEditingController _birthController;
   TextEditingController _mobileController;
-  TextEditingController _protectorController;
+  TextEditingController _protectorNameController;
+  TextEditingController _protectorMobileController;
 
   // 시군구 리스트
   final List<String> _sidoGubun = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
@@ -111,7 +112,7 @@ class JoinPageState extends State<JoinPage> {
             onChanged: (value) {
               setState(() {
                 _selectedGuGun = value;
-                print('selected $sido ${_selectedGuGun}');
+                print('selected $sido $_selectedGuGun');
               });
             },
           );
@@ -308,18 +309,36 @@ class JoinPageState extends State<JoinPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 15),
+            padding: EdgeInsets.only(bottom: 20),
             child: TextFormField(
-              controller: _protectorController,
+              controller: _protectorNameController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: '보호자',
+                labelText: '보호자명',
                 hintText: '예) 홍길동',
                 prefixIcon: Icon(Icons.person_add),
               ),
               validator: (val) {
                 if (val == null || val.isEmpty) {
-                  return '보호자를 입력해주세요.';
+                  return '보호자 이름을 입력해주세요.';
+                }
+                return null;
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 15),
+            child: TextFormField(
+              controller: _protectorNameController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '보호자 연락처',
+                hintText: '예) 01012345678',
+                prefixIcon: Icon(Icons.person_add),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '보호자 연락처를 입력해주세요.';
                 }
                 return null;
               },
@@ -429,7 +448,7 @@ class JoinPageState extends State<JoinPage> {
       _address = _selectedSido + " " + _selectedGuGun;
     }
 
-    UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorController.text)
+    UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
     .then((result) {
       if ('success' == result) {
         Fluttertoast.showToast(
@@ -449,7 +468,8 @@ class JoinPageState extends State<JoinPage> {
     _nameController = TextEditingController();
     _birthController = TextEditingController();
     _mobileController = TextEditingController();
-    _protectorController = TextEditingController();
+    _protectorNameController = TextEditingController();
+    _protectorMobileController = TextEditingController();
   }
 
   @override

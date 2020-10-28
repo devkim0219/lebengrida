@@ -84,6 +84,7 @@ class _QuestionPageState extends State<QuestionPage> {
           _selectedAnswer = selNum;
           print('_selectedAnswer is $_selectedAnswer');
 
+          // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
           if (_selectedAnswer > 0) {
             _isStartAnswer = false;
             _qIdx++;
@@ -117,6 +118,7 @@ class _QuestionPageState extends State<QuestionPage> {
         selectButton(2),
         selectButton(3),
         selectButton(4),
+        // 문제 음성 파일 재생 완료 후 카운트다운 시작
         _isStartAnswer ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -320,6 +322,8 @@ class _QuestionPageState extends State<QuestionPage> {
       isTimerTextShown: true,
       onComplete: () {
         setState(() {
+
+          // 카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
           if (_qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
@@ -377,6 +381,9 @@ class _QuestionPageState extends State<QuestionPage> {
           children: <Widget>[
             Material(
               child: _buildPlayer(),
+            ),
+            Text(
+              'now playing.. sounds/sample_audio_$_qIdx.mp3',
             ),
             SizedBox(
               height: 10,
