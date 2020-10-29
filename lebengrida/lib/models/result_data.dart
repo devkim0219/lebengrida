@@ -1,24 +1,24 @@
 class Result {
-  String mobile;
-  String point_1;
-  String point_2;
-  String point_3;
-  String point_4;
-  String point_5;
-  String point_6;
-  String point_7;
-  String point_8;
-  String point_9;
-  String point_10;
-  String point_11;
-  String point_12;
-  String point_13;
-  String point_14;
-  String point_15;
-  String point_16;
-  String pointTotal;
+  final String mobile;
+  final String point_1;
+  final String point_2;
+  final String point_3;
+  final String point_4;
+  final String point_5;
+  final String point_6;
+  final String point_7;
+  final String point_8;
+  final String point_9;
+  final String point_10;
+  final String point_11;
+  final String point_12;
+  final String point_13;
+  final String point_14;
+  final String point_15;
+  final String point_16;
+  final String pointTotal;
   String resultStatus;
-  String testDate;
+  final String testDate;
 
   Result({this.mobile, this.point_1, this.point_2, this.point_3, this.point_4, this.point_5, this.point_6, this.point_7, 
             this.point_8, this.point_9, this.point_10, this.point_11, this.point_12, this.point_13, this.point_14, this.point_15, 

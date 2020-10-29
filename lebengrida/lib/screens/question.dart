@@ -28,6 +28,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
+  int _correctAnswer = 0;
   List<int> _answerList = [];
 
   List<Question> _qData = [];
@@ -88,16 +89,32 @@ class _QuestionPageState extends State<QuestionPage> {
       onPressed: () {
         setState(() {
           _selectedAnswer = selNum;
+          _correctAnswer =  int.parse(_qData[_qIdx].answer);
           print('_selectedAnswer -> $_selectedAnswer');
+          print('correct answer -> ${_qData[_qIdx].answer}');
 
           // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
           if (_selectedAnswer > 0 && _qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
+            // 1차 시도
             if (_attempt == 1) {
-              _answerList.add(2);
+              // 정답
+              if (_correctAnswer == _selectedAnswer) {
+                _answerList.add(2);
+              // 오답
+              } else {
+                _answerList.add(0);
+              }
+            // 2차 시도
             } else {
-              _answerList.add(1);
+              // 정답
+              if (_correctAnswer == _selectedAnswer) {
+                _answerList.add(1);
+              // 오답
+              } else {
+                _answerList.add(0);
+              }
             }
             _attempt = 1;
             print('selected answer.. -> _qIdx is $_qIdx, attempt is $_attempt');
@@ -140,6 +157,12 @@ class _QuestionPageState extends State<QuestionPage> {
         selectButton(2),
         selectButton(3),
         selectButton(4),
+        SizedBox(
+          height: 10,
+        ),
+        Text(
+          '문제를 다 읽은 후에 5초 안에 답을 선택하세요.'
+        ),
         // 문제 음성 파일 재생 완료 후 카운트다운 시작
         _isStartAnswer ? Column(
           mainAxisAlignment: MainAxisAlignment.center,

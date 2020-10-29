@@ -1,11 +1,11 @@
 class Question {
-  String type;
-  String title;
-  String select_1;
-  String select_2;
-  String select_3;
-  String select_4;
-  String answer;
+  final String type;
+  final String title;
+  final String select_1;
+  final String select_2;
+  final String select_3;
+  final String select_4;
+  final String answer;
 
   Question({this.type, this.title, this.select_1, this.select_2, this.select_3, this.select_4, this.answer});
 

@@ -19,6 +19,7 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   User _selectedUser;
   Result _userResult;
+  Color _resultStatusTextColor;
 
   // 각 회원 정보 조회
   _getUserInfo(String mobile) {
@@ -37,9 +38,12 @@ class _ResultPageState extends State<ResultPage> {
         _userResult = result;
 
         if (_userResult.resultStatus == 'pass') {
-          _userResult.resultStatus = '도달';
-        } else {
           _userResult.resultStatus = '미도달';
+          _resultStatusTextColor = Colors.black87;
+
+        } else {
+          _userResult.resultStatus = '도달';
+          _resultStatusTextColor = Colors.red[700];
         }
       });
       print('### selected user result -> ${result.mobile}');
@@ -85,6 +89,7 @@ class _ResultPageState extends State<ResultPage> {
               + '최근 검사일 : ${_userResult.testDate}',
               style: TextStyle(
                 fontSize: 30,
+                color: _resultStatusTextColor,
               ),
             )
           ],
