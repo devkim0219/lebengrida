@@ -61,7 +61,7 @@ class _ResultPageState extends State<ResultPage> {
         title: Text('검사 결과'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context)
+          onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
         ),
         actions: <Widget>[
           IconButton(

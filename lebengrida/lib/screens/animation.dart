@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:lebengrida/screens/question.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 
 class AnimationPage extends StatefulWidget {
+  final String mobile;
+  
+  AnimationPage({
+    Key key,
+    @required this.mobile
+  }) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _AnimationPageState();
@@ -75,7 +83,11 @@ class _AnimationPageState extends State<AnimationPage> {
                 ),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/question');
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => QuestionPage(mobile: widget.mobile),
+                  )
+                );
               },
             ),
           ],

@@ -45,4 +45,9 @@ class ResultServices {
       throw Exception('Failed to load result: $e');
     }
   }
+
+  // 검사 내역 저장
+  static Future<String> addTestResult() {
+    
+  }
 }

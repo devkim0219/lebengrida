@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
 import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -12,7 +13,9 @@ typedef void OnError(Exception exception);
 enum PlayerState { stopped, playing, paused }
 
 class QuestionPage extends StatefulWidget {
-  QuestionPage({Key key}) : super(key: key);
+  final String mobile;
+
+  QuestionPage({Key key, @required this.mobile}) : super(key: key);
 
   @override
   _QuestionPageState createState() => _QuestionPageState();
@@ -85,11 +88,19 @@ class _QuestionPageState extends State<QuestionPage> {
           print('_selectedAnswer is $_selectedAnswer');
 
           // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
-          if (_selectedAnswer > 0) {
+          if (_selectedAnswer > 0 && _qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
+            print('문제 선택 됨 -> _qIdx is $_qIdx');
             _playLocal();
             _selectedAnswer = 0;
+          } else {
+            _qIdx = 0;
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ResultPage(mobile: widget.mobile),
+              )
+            );
           }
         });
       },
@@ -322,14 +333,19 @@ class _QuestionPageState extends State<QuestionPage> {
       isTimerTextShown: true,
       onComplete: () {
         setState(() {
-
           // 카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
           if (_qIdx < 15) {
             _isStartAnswer = false;
-            _qIdx++;
             _playLocal();
+            _qIdx++;
+            print('카운트 다운 완료 -> _qIdx is $_qIdx');
           } else {
-            Navigator.pushReplacementNamed(context, '/result');
+            _qIdx = 0;
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => ResultPage(mobile: widget.mobile),
+              )
+            );
           }
         });
       },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/screens/animation.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/update_info.dart';
 import 'package:lebengrida/services/login_service.dart';
@@ -46,7 +47,11 @@ class _LoginPageState extends State<LoginPage> {
 
     LoginServices.checkUser(mobile).then((result) {
       if (result == 'success') {
-        Navigator.pushNamed(context, '/animation');
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => AnimationPage(mobile: mobile),
+          )
+        );
       } else {
         Fluttertoast.showToast(
           msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
