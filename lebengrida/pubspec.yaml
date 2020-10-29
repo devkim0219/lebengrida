@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^1.0.0
   flick_video_player: ^0.1.1
   flutter_form_builder: ^3.14.0
+  flutter_launcher_icons: ^0.8.1
   fluttertoast: ^7.1.1
   foundation_fluttify: ^0.10.0
   group_radio_button: ^1.0.1
@@ -43,6 +44,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "icon/app_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

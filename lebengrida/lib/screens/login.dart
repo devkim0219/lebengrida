@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(top: 30),
+                      padding: EdgeInsets.only(top: 10),
                       child: Image(
                         image: AssetImage('assets/images/logo.png'),
                       ),

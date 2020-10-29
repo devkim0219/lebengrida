@@ -471,7 +471,7 @@ class _QuestionPageState extends State<QuestionPage> {
               child: _buildPlayer(),
             ),
             Text(
-              'now playing.. -> sounds/sample_audio_$_qIdx.mp3\nattempt is $_attempt',
+              'now playing.. -> sounds/sample_audio_$_qIdx.mp3\nattempt -> $_attempt',
             ),
             SizedBox(
               height: 10,
