@@ -30,7 +30,7 @@ class _QuestionPageState extends State<QuestionPage> {
   List<Question> _qData = [];
   int _qIdx = 0;
   String _selectText = '';
-  int attempt = 1;
+  int _attempt = 1;
 
   Duration _duration = new Duration();
   Duration _position = new Duration();
@@ -91,7 +91,8 @@ class _QuestionPageState extends State<QuestionPage> {
           if (_selectedAnswer > 0 && _qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
-            print('문제 선택 됨 -> _qIdx is $_qIdx');
+            _attempt = 1;
+            print('selected answer.. -> _qIdx is $_qIdx, attempt is $_attempt');
             _playLocal();
             _selectedAnswer = 0;
           } else {
@@ -336,17 +337,30 @@ class _QuestionPageState extends State<QuestionPage> {
           // 카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
           if (_qIdx < 15) {
             _isStartAnswer = false;
+            if (_attempt == 2) {
+              _qIdx++;
+              _attempt = 1;
+            } else {
+              _attempt = 2;
+            }
             _playLocal();
-            _qIdx++;
-            print('카운트 다운 완료 -> _qIdx is $_qIdx');
-          } else {
-            _qIdx = 0;
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ResultPage(mobile: widget.mobile),
-              )
-            );
-          }
+            print('countdown complete.. -> _qIdx is $_qIdx, attempt is $_attempt');
+          } else if (_qIdx == 15) {
+            _isStartAnswer = false;
+            if (_attempt == 1) {
+              _playLocal();
+              _attempt = 2;
+            } else {
+              _playLocal();
+              _attempt = 1;
+              _qIdx = 0;
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ResultPage(mobile: widget.mobile),
+                )
+              );
+            }
+          } else { }
         });
       },
     );
@@ -379,7 +393,7 @@ class _QuestionPageState extends State<QuestionPage> {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context)
+          onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
         ),
         actions: <Widget>[
           IconButton(
@@ -399,7 +413,7 @@ class _QuestionPageState extends State<QuestionPage> {
               child: _buildPlayer(),
             ),
             Text(
-              'now playing.. sounds/sample_audio_$_qIdx.mp3',
+              'now playing.. -> sounds/sample_audio_$_qIdx.mp3\nattempt is $_attempt',
             ),
             SizedBox(
               height: 10,
