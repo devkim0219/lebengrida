@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
 import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:lebengrida/services/result_service.dart';
 
 typedef void OnError(Exception exception);
 
@@ -26,6 +28,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
+  List<int> _answerList = [];
 
   List<Question> _qData = [];
   int _qIdx = 0;
@@ -85,23 +88,30 @@ class _QuestionPageState extends State<QuestionPage> {
       onPressed: () {
         setState(() {
           _selectedAnswer = selNum;
-          print('_selectedAnswer is $_selectedAnswer');
+          print('_selectedAnswer -> $_selectedAnswer');
 
           // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
           if (_selectedAnswer > 0 && _qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
+            if (_attempt == 1) {
+              _answerList.add(2);
+            } else {
+              _answerList.add(1);
+            }
             _attempt = 1;
             print('selected answer.. -> _qIdx is $_qIdx, attempt is $_attempt');
             _playLocal();
+            print('answer list -> $_answerList');
             _selectedAnswer = 0;
           } else {
             _qIdx = 0;
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ResultPage(mobile: widget.mobile),
-              )
-            );
+            if (_attempt == 1) {
+              _answerList.add(2);
+            } else {
+              _answerList.add(1);
+            }
+            _saveTestResult(widget.mobile, _answerList);
           }
         });
       },
@@ -340,6 +350,8 @@ class _QuestionPageState extends State<QuestionPage> {
             if (_attempt == 2) {
               _qIdx++;
               _attempt = 1;
+              _answerList.add(0);
+              print('answer list -> $_answerList');
             } else {
               _attempt = 2;
             }
@@ -354,15 +366,38 @@ class _QuestionPageState extends State<QuestionPage> {
               _playLocal();
               _attempt = 1;
               _qIdx = 0;
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => ResultPage(mobile: widget.mobile),
-                )
-              );
+              _answerList.add(0);
+              print('answer list -> $_answerList');
+              _saveTestResult(widget.mobile, _answerList);
             }
           } else { }
         });
       },
+    );
+  }
+
+  // 검사 결과 저장
+  _saveTestResult(String mobile, List<int> answerList) {
+    String _msg = '';
+
+    ResultServices.saveTestResult(mobile, answerList)
+      .then((result) {
+        if ('success' == result) {
+          _msg = '검사 결과가 저장되었습니다.';
+        } else {
+          _msg = '오류로 인해 검사 결과가 저장되지 않았습니다.';
+        }
+        Fluttertoast.showToast(
+          msg: _msg,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+      });
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ResultPage(mobile: widget.mobile),
+      )
     );
   }
 

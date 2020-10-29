@@ -99,10 +99,10 @@ class UserServices {
         User user = User.fromJson(json.decode(response.body));
         return user;
       } else {
-        throw Exception('Failed to load user');
+        throw Exception('Failed to load userinfo');
       }
     } catch(e) {
-      throw Exception('Failed to load user: $e');
+      throw Exception('Failed to load userinfo: $e');
     }
   }
 

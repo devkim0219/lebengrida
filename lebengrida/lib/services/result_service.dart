@@ -6,6 +6,7 @@ class ResultServices {
   static const ROOT = 'http://192.168.0.132/RestAPI/result_actions.php';
   static const _GET_USERRESULT_ACTION = 'GET_USERRESULT';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
+  static const _SAVE_RESULT_ACTION = 'SAVE_RESULT';
 
   // 기존 검사 여부 체크
   static Future<String> checkTested(String mobile) async {
@@ -19,10 +20,10 @@ class ResultServices {
         return response.body;
 
       } else {
-        return 'error';
+        throw Exception('Failed to load exist test result');
       }
     } catch(e) {
-      return 'error';
+      throw Exception('Failed to load exist test result result: $e');
     }
   }
 
@@ -46,8 +47,36 @@ class ResultServices {
     }
   }
 
-  // 검사 내역 저장
-  static Future<String> addTestResult() {
-    
+  // 검사 결과 저장
+  static Future<String> saveTestResult(String mobile, List<int> answerList) async {
+    try {
+      var map = Map<String, dynamic>();
+      int totalPoint = 0;
+      // String resultStatus = '';
+
+      map['action'] = _SAVE_RESULT_ACTION;
+      map['mobile'] = mobile;
+
+      // point_1 ~ 16
+      for (var i = 0; i < answerList.length; i++) {
+        map['point_${i + 1}'] = answerList[i].toString();
+        totalPoint += answerList[i];
+      }
+      map['point_total'] = totalPoint.toString();
+      map['result_status'] = 'pass';
+
+      print('map -> $map');
+
+      final response = await http.post(ROOT, body: map);
+      print('saveTestResult Response: ${response.body}');
+
+      if (200 == response.statusCode) {
+        return response.body;
+      } else {
+        throw Exception('Failed to save result');
+      }
+    } catch(e) {
+      throw Exception('Failed to save result: $e');
+    }
   }
 }

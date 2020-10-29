@@ -16,10 +16,10 @@ class LoginServices {
         return response.body;
 
       } else {
-        return 'error';
+        throw Exception('Failed to check user');
       }
     } catch(e) {
-      return 'error';
+      throw Exception('Failed to check user: $e');
     }
   }
 }
