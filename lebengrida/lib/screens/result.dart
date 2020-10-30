@@ -38,17 +38,6 @@ class _ResultPageState extends State<ResultPage> {
       setState(() {
         _userResult = result;
 
-        // 인지 능력 저하 판단
-        // 60~69세 : 22점, 70~74세 : 22점, 75~79세 : 21점, 80세 이상 : 20점
-        if (int.parse(_selectedUser.age) >= 60 && int.parse(_selectedUser.age) <= 74 && int.parse(_userResult.pointTotal) >= 22 ||
-            int.parse(_selectedUser.age) >= 75 && int.parse(_selectedUser.age) <= 79 && int.parse(_userResult.pointTotal) >= 21 ||
-            int.parse(_selectedUser.age) >= 80 && int.parse(_userResult.pointTotal) >= 20 ) {
-          _userResult.resultStatus = 'pass';
-          
-        } else {
-          _userResult.resultStatus = 'nopass';
-        }
-
         // 인지 능력 저하 미도달/도달 에 따른 텍스트 색상 변경
         if (_userResult.resultStatus == 'pass') {
           _resultStatus = '미도달';

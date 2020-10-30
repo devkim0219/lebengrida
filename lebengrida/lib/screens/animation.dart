@@ -1,10 +1,12 @@
+import 'package:cached_video_player/cached_video_player.dart';
+import 'package:cachedflickvideoplayer/cachedflickvideoplayer.dart';
+import 'package:cachedflickvideoplayer/manager/flick_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:lebengrida/screens/question.dart';
-import 'package:video_player/video_player.dart';
-import 'package:flick_video_player/flick_video_player.dart';
 
 class AnimationPage extends StatefulWidget {
   final String mobile;
+  static const ASPECT_RATIO = 3 / 2;
   
   AnimationPage({
     Key key,
@@ -18,28 +20,22 @@ class AnimationPage extends StatefulWidget {
 }
 
 class _AnimationPageState extends State<AnimationPage> {
-  FlickManager flickManager;
+  FlickManager _flickManager;
 
   @override
   void initState() {
     super.initState();
-    // final video = File('assets/videos/animation_5.mp4');
-    flickManager = FlickManager(
-      // videoPlayerController: VideoPlayerController.network('https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'),
-      videoPlayerController: VideoPlayerController.asset('assets/videos/animation_5.mp4'),
-      // videoPlayerController: VideoPlayerController.file(video)
-        // ..initialize().then((_) {
-        //   setState(() {
+    _flickManager = FlickManager(
+      cachedVideoPlayerController: CachedVideoPlayerController.asset('assets/videos/animation_1.mp4'),
 
-        //   });
-        // }),
+      // onVideoEnd:
     );
   }
 
   @override
   void dispose() {
-    flickManager.dispose();
     super.dispose();
+    _flickManager.dispose();
   }
 
   @override
@@ -61,37 +57,44 @@ class _AnimationPageState extends State<AnimationPage> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          children: <Widget>[
-            FlickVideoPlayer(
-              flickManager: flickManager,
-              flickVideoWithControls: FlickVideoWithControls(
-                controls: FlickPortraitControls(),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            RaisedButton(
-              color: Colors.teal,
-              child: Text(
-                '문제 보기',
-                style: TextStyle(
-                  color: Colors.white
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => QuestionPage(mobile: widget.mobile),
-                  )
-                );
-              },
-            ),
-          ],
-        ),
+      body: Container(
+        height: 250,
+        child: FlickVideoPlayer(
+          flickManager: _flickManager,
+        )
+      
+      // SingleChildScrollView(
+      //   padding: EdgeInsets.all(5),
+      //   child: Column(
+      //     children: <Widget>[
+      //       FlickVideoPlayer(
+      //         flickManager: flickManager,
+      //         flickVideoWithControls: FlickVideoWithControls(
+      //           controls: FlickPortraitControls(),
+      //         ),
+      //       ),
+      //       SizedBox(
+      //         height: 30,
+      //       ),
+      //       RaisedButton(
+      //         color: Colors.teal,
+      //         child: Text(
+      //           '문제 보기',
+      //           style: TextStyle(
+      //             color: Colors.white
+      //           ),
+      //         ),
+      //         onPressed: () {
+      //           Navigator.of(context).push(
+      //             MaterialPageRoute(
+      //               builder: (context) => QuestionPage(mobile: widget.mobile),
+      //             )
+      //           );
+      //         },
+      //       ),
+      //     ],
+      //   ),
+      // ),
       ),
     );
   }
