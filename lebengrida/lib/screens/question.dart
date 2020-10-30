@@ -4,11 +4,13 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
 import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:lebengrida/services/result_service.dart';
+import 'package:lebengrida/services/user_service.dart';
 
 typedef void OnError(Exception exception);
 
@@ -25,6 +27,8 @@ class QuestionPage extends StatefulWidget {
 
 class _QuestionPageState extends State<QuestionPage> {
   CountDownController _countdownController = CountDownController();
+
+  User _user;
 
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
@@ -90,10 +94,11 @@ class _QuestionPageState extends State<QuestionPage> {
         setState(() {
           _selectedAnswer = selNum;
           _correctAnswer =  int.parse(_qData[_qIdx].answer);
-          print('_selectedAnswer -> $_selectedAnswer');
+          print('selected answer -> $_selectedAnswer');
           print('correct answer -> ${_qData[_qIdx].answer}');
 
           // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
+          // 1~15 문제
           if (_selectedAnswer > 0 && _qIdx < 15) {
             _isStartAnswer = false;
             _qIdx++;
@@ -117,16 +122,31 @@ class _QuestionPageState extends State<QuestionPage> {
               }
             }
             _attempt = 1;
-            print('selected answer.. -> _qIdx is $_qIdx, attempt is $_attempt');
+            print('index -> $_qIdx, attempt -> $_attempt');
             _playLocal();
-            print('answer list -> $_answerList');
+            print('selected answer list -> $_answerList');
             _selectedAnswer = 0;
+          // 마지막 문제
           } else {
             _qIdx = 0;
+            // 1차 시도
             if (_attempt == 1) {
-              _answerList.add(2);
+              // 정답
+              if (_correctAnswer == _selectedAnswer) {
+                _answerList.add(2);
+              // 오답
+              } else {
+                _answerList.add(0);
+              }
+            // 2차 시도
             } else {
-              _answerList.add(1);
+              // 정답
+              if (_correctAnswer == _selectedAnswer) {
+                _answerList.add(1);
+              // 오답
+              } else {
+                _answerList.add(0);
+              }
             }
             _saveTestResult(widget.mobile, _answerList);
           }
@@ -368,29 +388,35 @@ class _QuestionPageState extends State<QuestionPage> {
       onComplete: () {
         setState(() {
           // 카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
+          // 1~15 문제
           if (_qIdx < 15) {
             _isStartAnswer = false;
+            // 2차 시도
             if (_attempt == 2) {
               _qIdx++;
               _attempt = 1;
               _answerList.add(0);
-              print('answer list -> $_answerList');
+              print('selected answer list -> $_answerList');
+            // 1차 시도
             } else {
               _attempt = 2;
             }
             _playLocal();
-            print('countdown complete.. -> _qIdx is $_qIdx, attempt is $_attempt');
+            print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
           } else if (_qIdx == 15) {
+            // 마지막 문제
             _isStartAnswer = false;
+            // 1차 시도
             if (_attempt == 1) {
               _playLocal();
               _attempt = 2;
+            // 2차 시도
             } else {
               _playLocal();
               _attempt = 1;
               _qIdx = 0;
               _answerList.add(0);
-              print('answer list -> $_answerList');
+              print('selected answer list -> $_answerList');
               _saveTestResult(widget.mobile, _answerList);
             }
           } else { }
@@ -402,8 +428,26 @@ class _QuestionPageState extends State<QuestionPage> {
   // 검사 결과 저장
   _saveTestResult(String mobile, List<int> answerList) {
     String _msg = '';
+    String _resultStatus = '';
+    int _totalPoint = 0;
 
-    ResultServices.saveTestResult(mobile, answerList)
+    // 총점
+    for (var i = 0; i < answerList.length; i++) {
+        _totalPoint += answerList[i];
+    }
+
+    // 인지 능력 저하 판단
+    // 60~69세 : 22점, 70~74세 : 22점, 75~79세 : 21점, 80세 이상 : 20점
+    if (int.parse(_user.age) >= 60 && int.parse(_user.age) <= 74 && _totalPoint >= 22 ||
+        int.parse(_user.age) >= 75 && int.parse(_user.age) <= 79 && _totalPoint >= 21 ||
+        int.parse(_user.age) >= 80 && _totalPoint >= 20 ) {
+      _resultStatus = 'pass';
+      
+    } else {
+      _resultStatus = 'nopass';
+    }
+
+    ResultServices.saveTestResult(mobile, answerList, _totalPoint, _resultStatus)
       .then((result) {
         if ('success' == result) {
           _msg = '검사 결과가 저장되었습니다.';
@@ -430,6 +474,10 @@ class _QuestionPageState extends State<QuestionPage> {
     initAudioPlayer();
     isPlaying ? null : _playLocal();
     _getQuestions();
+
+    UserServices.getUserInfo(widget.mobile).then((value) {
+      _user = value;
+    });
   }
 
   @override
