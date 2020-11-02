@@ -89,6 +89,7 @@ class _ResultPageState extends State<ResultPage> {
                 color: Colors.black87,
               ),
             ),
+            SizedBox(height: 10),
             Text(
               '연락처 : ${_userResult.mobile}',
               style: TextStyle(
@@ -96,6 +97,7 @@ class _ResultPageState extends State<ResultPage> {
                 color: Colors.black87,
               ),
             ),
+            SizedBox(height: 10),
             Text(
               '나이 : ${_selectedUser.age}',
               style: TextStyle(
@@ -103,6 +105,7 @@ class _ResultPageState extends State<ResultPage> {
                 color: Colors.black87,
               ),
             ),
+            SizedBox(height: 10),
             Text(
               '총점 : ${_userResult.pointTotal}점',
               style: TextStyle(
@@ -110,6 +113,7 @@ class _ResultPageState extends State<ResultPage> {
                 color: Colors.black87,
               ),
             ),
+            SizedBox(height: 10),
             RichText(
               text: TextSpan(
                 style: TextStyle(
@@ -129,6 +133,7 @@ class _ResultPageState extends State<ResultPage> {
                 ],
               ),
             ),
+            SizedBox(height: 10),
             Text(
               '최근 검사일 : ${_userResult.testDate}',
               style: TextStyle(

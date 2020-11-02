@@ -1,6 +1,10 @@
+import 'dart:io' as io;
 import 'dart:async';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:audio_recorder/audio_recorder.dart';
+import 'package:file/file.dart';
+import 'package:file/local.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -11,6 +15,7 @@ import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 typedef void OnError(Exception exception);
 
@@ -18,8 +23,9 @@ enum PlayerState { stopped, playing, paused }
 
 class QuestionPage extends StatefulWidget {
   final String mobile;
+  final LocalFileSystem localFileSystem;
 
-  QuestionPage({Key key, @required this.mobile}) : super(key: key);
+  QuestionPage({Key key, @required this.mobile, this.localFileSystem}) : super(key: key);
 
   @override
   _QuestionPageState createState() => _QuestionPageState();
@@ -40,12 +46,14 @@ class _QuestionPageState extends State<QuestionPage> {
   String _selectText = '';
   int _attempt = 1;
 
+  Recording _recording = new Recording();
+  bool _isRecording = false;
+  TextEditingController _controller = new TextEditingController();
+
   Duration _duration = new Duration();
   Duration _position = new Duration();
   AudioPlayer audioPlayer;
   AudioCache audioCache;
-
-  String localFilePath;
 
   PlayerState playerState = PlayerState.stopped;
 
@@ -56,8 +64,8 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // bool isMuted = false;
 
-  // StreamSubscription _positionSubscription;
-  // StreamSubscription _audioPlayerStateSubscription;
+  StreamSubscription _positionSubscription;
+  StreamSubscription _audioPlayerStateSubscription;
   
   // Question ->
   // 문제 데이터 가져오기
@@ -181,14 +189,14 @@ class _QuestionPageState extends State<QuestionPage> {
           height: 10,
         ),
         Text(
-          '문제를 다 읽은 후에 5초 안에 답을 선택하세요.'
+          '문제를 다 읽은 후 5초 안에 답을 선택하세요.'
         ),
         // 문제 음성 파일 재생 완료 후 카운트다운 시작
         _isStartAnswer ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Center(
-              child: countDown(5),
+              // child: countDown(5),
             ),
           ],
         ) : Container(),
@@ -468,13 +476,59 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
+  // 오디오 녹음 시작
+  _start() async {
+    try {
+      if (await AudioRecorder.hasPermissions) {
+        if (_controller.text != null && _controller.text != '') {
+          String path = _controller.text;
+          if (!_controller.text.contains('/')) {
+            io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
+            path = appDocDirectory.path + '/' + _controller.text;
+          }
+          print('Start recording -> $path');
+          await AudioRecorder.start(
+            path: path,
+            audioOutputFormat: AudioOutputFormat.AAC
+          );
+        } else {
+          await AudioRecorder.start();
+        }
+        bool isRecording = await AudioRecorder.isRecording;
+        setState(() {
+          _recording = new Recording(duration: new Duration(), path: '');
+          _isRecording = isRecording;
+        });
+      } else {
+        
+      }
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  // 오디오 녹음 정지
+  _stop() async {
+    var recording = await AudioRecorder.stop();
+    print('Stop recording: ${recording.path}');
+    bool isRecording = await AudioRecorder.isRecording;
+    File file = widget.localFileSystem.file(recording.path);
+    print('  File length: ${await file.length()}');
+    setState(() {
+      _recording = recording;
+      _isRecording = isRecording;
+    });
+    _controller.text = recording.path;
+  }
+
   @override
   void initState() {
     super.initState();
+
+    _getQuestions();
     initAudioPlayer();
     isPlaying ? null : _playLocal();
-    _getQuestions();
-
+    
     UserServices.getUserInfo(widget.mobile).then((value) {
       _user = value;
     });
@@ -482,10 +536,10 @@ class _QuestionPageState extends State<QuestionPage> {
 
   @override
   void dispose() {
-    // _positionSubscription.cancel();
-    // _audioPlayerStateSubscription.cancel();
-    audioPlayer.stop();
     super.dispose();
+    _positionSubscription.cancel();
+    _audioPlayerStateSubscription.cancel();
+    audioPlayer.stop();
   }
 
   @override
@@ -525,6 +579,31 @@ class _QuestionPageState extends State<QuestionPage> {
               height: 10,
             ),
             _makeQuestion(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                FlatButton(
+                  onPressed: _isRecording ? null : _start,
+                  child: Text('Start'),
+                  color: Colors.green,
+                ),
+                FlatButton(
+                  onPressed: _isRecording ? _stop : null,
+                  child: Text('Stop'),
+                  color: Colors.red,
+                ),
+                TextField(
+                  controller: _controller,
+                  decoration: InputDecoration(
+                    hintText: 'Enter a custom path',
+                  ),
+                ),
+                Text('File path of the record: ${_recording.path}'),
+                Text('Format: ${_recording.audioOutputFormat}'),
+                Text('Extension: ${_recording.extension}'),
+                Text('Audio recording duration: ${_recording.duration.toString()}'),
+              ],
+            ),
           ],
         ),
       )

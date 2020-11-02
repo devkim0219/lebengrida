@@ -23,11 +23,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  audio_recorder: ^1.0.2
   audioplayer: ^0.8.1
   audioplayer_web: ^0.7.1
   audioplayers: ^0.13.2
-  cachedflickvideoplayer: ^0.0.1
   cached_video_player: ^1.0.3
+  cachedflickvideoplayer: ^0.0.1
   carousel_slider: ^2.3.1
   circular_countdown_timer: ^0.0.7
   cupertino_icons: ^1.0.0

@@ -58,43 +58,32 @@ class _AnimationPageState extends State<AnimationPage> {
         ],
       ),
       body: Container(
-        height: 250,
-        child: FlickVideoPlayer(
-          flickManager: _flickManager,
-        )
-      
-      // SingleChildScrollView(
-      //   padding: EdgeInsets.all(5),
-      //   child: Column(
-      //     children: <Widget>[
-      //       FlickVideoPlayer(
-      //         flickManager: flickManager,
-      //         flickVideoWithControls: FlickVideoWithControls(
-      //           controls: FlickPortraitControls(),
-      //         ),
-      //       ),
-      //       SizedBox(
-      //         height: 30,
-      //       ),
-      //       RaisedButton(
-      //         color: Colors.teal,
-      //         child: Text(
-      //           '문제 보기',
-      //           style: TextStyle(
-      //             color: Colors.white
-      //           ),
-      //         ),
-      //         onPressed: () {
-      //           Navigator.of(context).push(
-      //             MaterialPageRoute(
-      //               builder: (context) => QuestionPage(mobile: widget.mobile),
-      //             )
-      //           );
-      //         },
-      //       ),
-      //     ],
-      //   ),
-      // ),
+        child: Column(
+          children: <Widget>[
+            FlickVideoPlayer(
+              flickManager: _flickManager,
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            RaisedButton(
+              color: Colors.teal,
+              child: Text(
+                '문제 보기',
+                style: TextStyle(
+                  color: Colors.white
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => QuestionPage(mobile: widget.mobile),
+                  )
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
