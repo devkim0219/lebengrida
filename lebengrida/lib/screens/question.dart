@@ -2,10 +2,10 @@ import 'dart:io' as io;
 import 'dart:async';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:file/file.dart';
 import 'package:file/local.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/models/user_data.dart';
@@ -15,6 +15,7 @@ import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
+import 'package:lebengrida/services/fileupload_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 typedef void OnError(Exception exception);
@@ -23,9 +24,9 @@ enum PlayerState { stopped, playing, paused }
 
 class QuestionPage extends StatefulWidget {
   final String mobile;
-  final LocalFileSystem localFileSystem;
+  final LocalFileSystem localFileSystem = LocalFileSystem();
 
-  QuestionPage({Key key, @required this.mobile, this.localFileSystem}) : super(key: key);
+  QuestionPage({Key key, @required this.mobile, localFileSystem}) : super(key: key);
 
   @override
   _QuestionPageState createState() => _QuestionPageState();
@@ -49,6 +50,8 @@ class _QuestionPageState extends State<QuestionPage> {
   Recording _recording = new Recording();
   bool _isRecording = false;
   TextEditingController _controller = new TextEditingController();
+
+  File uploadAudioFile;
 
   Duration _duration = new Duration();
   Duration _position = new Duration();
@@ -156,6 +159,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 _answerList.add(0);
               }
             }
+            audioPlayer.stop();
             _saveTestResult(widget.mobile, _answerList);
           }
         });
@@ -196,7 +200,7 @@ class _QuestionPageState extends State<QuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Center(
-              // child: countDown(5),
+              child: countDown(5),
             ),
           ],
         ) : Container(),
@@ -247,13 +251,13 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 플레이어 정지
-  Future stop() async {
-    await audioPlayer.stop();
-    setState(() {
-      playerState = PlayerState.stopped;
-      _position = Duration();
-    });
-  }
+  // Future stop() async {
+  //   await audioPlayer.stop();
+  //   setState(() {
+  //     playerState = PlayerState.stopped;
+  //     _position = Duration();
+  //   });
+  // }
 
   // 오디오 플레이어 음소거
   // Future mute(bool muted) async {
@@ -264,11 +268,11 @@ class _QuestionPageState extends State<QuestionPage> {
   // }
 
   // 오디오 재생이 끝났을 때 플레이어 정지
-  // void onComplete() {
-  //   setState(() {
-  //     playerState = PlayerState.stopped;
-  //   });
-  // }
+  void onComplete() {
+    setState(() {
+      playerState = PlayerState.stopped;
+    });
+  }
 
   // 오디오 플레이어 생성
   Widget _buildPlayer() => Container(
@@ -411,8 +415,8 @@ class _QuestionPageState extends State<QuestionPage> {
             }
             _playLocal();
             print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
+          // 마지막 문제
           } else if (_qIdx == 15) {
-            // 마지막 문제
             _isStartAnswer = false;
             // 1차 시도
             if (_attempt == 1) {
@@ -420,14 +424,13 @@ class _QuestionPageState extends State<QuestionPage> {
               _attempt = 2;
             // 2차 시도
             } else {
-              _playLocal();
               _attempt = 1;
               _qIdx = 0;
               _answerList.add(0);
               print('selected answer list -> $_answerList');
               _saveTestResult(widget.mobile, _answerList);
             }
-          } else { }
+          } else {}
         });
       },
     );
@@ -469,6 +472,7 @@ class _QuestionPageState extends State<QuestionPage> {
           timeInSecForIosWeb: 3
         );
       });
+    
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ResultPage(mobile: widget.mobile),
@@ -477,14 +481,14 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 녹음 시작
-  _start() async {
+  _startRecord() async {
     try {
       if (await AudioRecorder.hasPermissions) {
         if (_controller.text != null && _controller.text != '') {
           String path = _controller.text;
           if (!_controller.text.contains('/')) {
-            io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
-            path = appDocDirectory.path + '/' + _controller.text;
+            io.Directory appDocymentDirectory = await getApplicationDocumentsDirectory();
+            path = appDocymentDirectory.path + '/' + _controller.text;
           }
           print('Start recording -> $path');
           await AudioRecorder.start(
@@ -492,7 +496,7 @@ class _QuestionPageState extends State<QuestionPage> {
             audioOutputFormat: AudioOutputFormat.AAC
           );
         } else {
-          await AudioRecorder.start();
+          // await AudioRecorder.start();
         }
         bool isRecording = await AudioRecorder.isRecording;
         setState(() {
@@ -500,7 +504,12 @@ class _QuestionPageState extends State<QuestionPage> {
           _isRecording = isRecording;
         });
       } else {
-        
+        Fluttertoast.showToast(
+          msg: 'You must accept permissions.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
       }
     } catch(e) {
       print(e);
@@ -508,7 +517,7 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 녹음 정지
-  _stop() async {
+  _stopRecord() async {
     var recording = await AudioRecorder.stop();
     print('Stop recording: ${recording.path}');
     bool isRecording = await AudioRecorder.isRecording;
@@ -518,7 +527,12 @@ class _QuestionPageState extends State<QuestionPage> {
       _recording = recording;
       _isRecording = isRecording;
     });
-    _controller.text = recording.path;
+    // _controller.text = recording.path;
+  }
+
+  // 오디오 녹음 파일 서버에 업로드
+  _uploadAudioFile() {
+    FileUploadServices.uploadAudioFile(uploadAudioFile);
   }
 
   @override
@@ -548,7 +562,7 @@ class _QuestionPageState extends State<QuestionPage> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
-          _qData[_qIdx].type,
+          '${_qIdx + 1}. ${_qData[_qIdx].type}',
           softWrap: true,
         ),
         leading: IconButton(
@@ -569,28 +583,36 @@ class _QuestionPageState extends State<QuestionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Material(
-              child: _buildPlayer(),
-            ),
+            // _buildPlayer(),
             Text(
-              'now playing.. -> sounds/sample_audio_$_qIdx.mp3\nattempt -> $_attempt',
+              'now playing.. question_${_qIdx + 1}.m4a\nattempt : $_attempt',
             ),
             SizedBox(
               height: 10,
             ),
             _makeQuestion(),
+            SizedBox(
+              height: 20,
+            ),
+            Text(
+              '오디오 레코드 테스트'
+            ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                FlatButton(
-                  onPressed: _isRecording ? null : _start,
-                  child: Text('Start'),
-                  color: Colors.green,
-                ),
-                FlatButton(
-                  onPressed: _isRecording ? _stop : null,
-                  child: Text('Stop'),
-                  color: Colors.red,
+                Row(
+                  children: [
+                    FlatButton(
+                      onPressed: _isRecording ? null : _startRecord,
+                      child: Text('Start'),
+                      color: Colors.green,
+                    ),
+                    FlatButton(
+                      onPressed: _isRecording ? _stopRecord : null,
+                      child: Text('Stop'),
+                      color: Colors.red,
+                    ),
+                  ],
                 ),
                 TextField(
                   controller: _controller,

@@ -26,8 +26,7 @@ class _AnimationPageState extends State<AnimationPage> {
   void initState() {
     super.initState();
     _flickManager = FlickManager(
-      cachedVideoPlayerController: CachedVideoPlayerController.asset('assets/videos/animation_1.mp4'),
-
+      cachedVideoPlayerController: CachedVideoPlayerController.asset('assets/videos/animation.mp4'),
       // onVideoEnd:
     );
   }
