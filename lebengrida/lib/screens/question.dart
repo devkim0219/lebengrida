@@ -230,7 +230,7 @@ class _QuestionPageState extends State<QuestionPage> {
   // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
     // await audioPlayer.play(localFilePath, isLocal: true);
-    await audioCache.play('sounds/sample_audio_$_qIdx.mp3');
+    await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
     setState(() => playerState = PlayerState.playing);
 
     audioPlayer.onPlayerCompletion.listen((event) {

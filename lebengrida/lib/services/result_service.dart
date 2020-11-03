@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ResultServices {
-  static const ROOT = 'http://192.168.0.132/RestAPI/result_actions.php';
+  static const ROOT = 'http://220.119.175.200:8081/RestAPI/result_actions.php';
   static const _GET_USERRESULT_ACTION = 'GET_USERRESULT';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
   static const _SAVE_RESULT_ACTION = 'SAVE_RESULT';

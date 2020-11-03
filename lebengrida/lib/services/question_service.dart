@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class QuestionServices {
-  static const ROOT = 'http://192.168.0.132/RestAPI/question_actions.php';
+  static const ROOT = 'http://220.119.175.200:8081/RestAPI/question_actions.php';
   static const _GET_ALL_ACTION = 'GET_ALL';
 
   // 문제 데이터 조회

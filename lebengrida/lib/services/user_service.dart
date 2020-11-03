@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class UserServices {
-  static const ROOT = 'http://192.168.0.132/RestAPI/user_actions.php';
+  static const ROOT = 'http://220.119.175.200:8081/RestAPI/user_actions.php';
   static const _GET_ALL_ACTION = 'GET_ALL';
   static const _ADD_USER_ACTION = 'ADD_USER';
   static const _UPDATE_USER_ACTION = 'UPDATE_USER';
