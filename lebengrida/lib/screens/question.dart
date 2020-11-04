@@ -493,7 +493,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('Start recording -> $path');
           await AudioRecorder.start(
             path: path,
-            audioOutputFormat: AudioOutputFormat.AAC
+            audioOutputFormat: AudioOutputFormat.WAV
           );
         } else {
           // await AudioRecorder.start();
@@ -584,9 +584,9 @@ class _QuestionPageState extends State<QuestionPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             // _buildPlayer(),
-            Text(
-              'now playing.. question_${_qIdx + 1}.m4a\nattempt : $_attempt',
-            ),
+            // Text(
+            //   'now playing.. question_${_qIdx + 1}.m4a\nattempt : $_attempt',
+            // ),
             SizedBox(
               height: 10,
             ),

@@ -304,6 +304,14 @@ class JoinPageState extends State<JoinPage> {
                 if (val == null || val.isEmpty) {
                   return '연락처를 입력해주세요.';
                 }
+
+                String mobilePattern = r'^01([0|1|6|7|8|9]?)([0-9]{3,4})([0-9]{4})$';
+                RegExp regex = new RegExp(mobilePattern);
+
+                if (!regex.hasMatch(val)) {
+                  return '휴대폰 번호 형식에 맞지 않습니다.';
+                }
+
                 return null;
               },
             ),
@@ -339,6 +347,13 @@ class JoinPageState extends State<JoinPage> {
               validator: (val) {
                 if (val == null || val.isEmpty) {
                   return '보호자 연락처를 입력해주세요.';
+                }
+
+                String mobilePattern = r'^01([0|1|6|7|8|9]?)([0-9]{3,4})([0-9]{4})$';
+                RegExp regex = new RegExp(mobilePattern);
+
+                if (!regex.hasMatch(val)) {
+                  return '휴대폰 번호 형식에 맞지 않습니다.';
                 }
                 return null;
               },
@@ -448,18 +463,29 @@ class JoinPageState extends State<JoinPage> {
       _address = _selectedSido + " " + _selectedGuGun;
     }
 
-    UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
-    .then((result) {
+    UserServices.checkUser(_mobileController.text).then((result) {
       if ('success' == result) {
         Fluttertoast.showToast(
-          msg: '등록이 완료되었습니다.',
+          msg: '이미 등록된 번호입니다.',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 3
         );
+      } else {
+        UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
+        .then((result) {
+          if ('success' == result) {
+            Fluttertoast.showToast(
+              msg: '등록이 완료되었습니다.',
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3
+            );
+          }
+        });
+        Navigator.popUntil(context, ModalRoute.withName('/'));
       }
     });
-    Navigator.popUntil(context, ModalRoute.withName('/'));
   }
 
   @override

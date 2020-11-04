@@ -9,6 +9,7 @@ class UserServices {
   static const _UPDATE_USER_ACTION = 'UPDATE_USER';
   static const _GET_USERINFO_ACTION = 'GET_USERINFO';
   static const _DELETE_USER_ACTION = 'DELETE_USER';
+  static const _CHECK_USER_ACTION = 'CHECK_USER';
 
   // 전체 회원 목록 조회
   static Future<List<User>> getUsers() async {
@@ -122,6 +123,25 @@ class UserServices {
       }
     } catch(e) {
       throw Exception('Failed to delete user: $e');
+    }
+  }
+
+  // 기존 등록된 회원이 있는지 확인
+  static Future<String> checkUser(String mobile) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _CHECK_USER_ACTION;
+      map['mobile'] = mobile;
+      final response = await http.post(ROOT, body: map);
+      print('checkUser Response: ${response.body}');
+
+      if (200 == response.statusCode) {
+        return response.body;
+      } else {
+        throw Exception('Failed to check user');
+      }
+    } catch(e) {
+      throw Exception('Failed to check user: $e');
     }
   }
 }

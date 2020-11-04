@@ -22,6 +22,16 @@ class AnimationPage extends StatefulWidget {
 class _AnimationPageState extends State<AnimationPage> {
   FlickManager _flickManager;
 
+  // 재생중인 영상 중지 후 문제 풀이 화면으로 이동
+  _moveToQuestionPage() {
+    _flickManager.dispose();
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => QuestionPage(mobile: widget.mobile),
+        )
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,13 +83,7 @@ class _AnimationPageState extends State<AnimationPage> {
                   color: Colors.white
                 ),
               ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => QuestionPage(mobile: widget.mobile),
-                  )
-                );
-              },
+              onPressed: () => _moveToQuestionPage(),
             ),
           ],
         ),
