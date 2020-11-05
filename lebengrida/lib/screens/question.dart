@@ -4,16 +4,17 @@ import 'dart:async';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
+import 'package:http/http.dart' as http;
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
 import 'package:lebengrida/services/question_service.dart';
-import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:circular_countdown/circular_countdown.dart';
 import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
@@ -35,8 +36,6 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  CountDownController _countdownController = CountDownController();
-
   User _user;
 
   bool _isStartAnswer = false;
@@ -51,7 +50,6 @@ class _QuestionPageState extends State<QuestionPage> {
 
   Recording _recording = new Recording();
   bool _isRecording = false;
-  TextEditingController _controller = new TextEditingController();
 
   File uploadAudioFile;
 
@@ -132,7 +130,7 @@ class _QuestionPageState extends State<QuestionPage> {
               }
             }
             _attempt = 1;
-            print('index -> $_qIdx, attempt -> $_attempt');
+            print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
             print('selected answer list -> $_answerList');
             audioPlayer.stop();
             _playLocal();
@@ -159,6 +157,8 @@ class _QuestionPageState extends State<QuestionPage> {
                 _answerList.add(0);
               }
             }
+            print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
+            print('selected answer list -> $_answerList');
             audioPlayer.stop();
             _saveTestResult(widget.mobile, _answerList);
           }
@@ -212,7 +212,7 @@ class _QuestionPageState extends State<QuestionPage> {
               '마이크에 대고 정답을 말하세요.',
               style: TextStyle(
                 fontSize: 20,
-                color: Colors.black87,
+                color: Colors.redAccent,
               ),
             ),
           ],
@@ -224,18 +224,17 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // Audio Player ->
   // 오디오 플레이어 초기화
-  void initAudioPlayer() {
-    audioPlayer = new AudioPlayer();
-    audioCache = new AudioCache(fixedPlayer: audioPlayer);
-
-    audioPlayer.durationHandler = (d) => setState(() {
-      _duration = d;
-    });
-
-    audioPlayer.positionHandler = (d) => setState(() {
-      _position = d;
-    });
-  }
+  // void initAudioPlayer() {
+  //   audioPlayer = new AudioPlayer();
+  //   audioCache = new AudioCache(fixedPlayer: audioPlayer);
+  //
+  //   audioPlayer.durationHandler = (d) => setState(() {
+  //     _duration = d;
+  //   });
+  //   audioPlayer.positionHandler = (d) => setState(() {
+  //     _position = d;
+  //   });
+  // }
 
   // Future play() async {
   //   await audioPlayer.play(kUrl);
@@ -246,14 +245,31 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
+    // 오디오 플레이어 초기화
+    audioPlayer = new AudioPlayer();
+    audioCache = new AudioCache(fixedPlayer: audioPlayer);
+    audioPlayer.durationHandler = (d) => setState(() {
+      _duration = d;
+    });
+    audioPlayer.positionHandler = (d) => setState(() {
+      _position = d;
+    });
+
     // await audioPlayer.play(localFilePath, isLocal: true);
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
     setState(() => playerState = PlayerState.playing);
 
-    audioPlayer.onPlayerCompletion.listen((event) {
-      // _startRecord();
+    // audioPlayer.onPlayerStateChanged.listen((AudioPlayerState s) => {
+    //   if (s == AudioPlayerState.COMPLETED) {
+    //     _startRecord()
+    //   }
+    // });
 
+    audioPlayer.onPlayerCompletion.listen((event) {
       setState(() {
+        if (!_isRecording) {
+          _startRecord();
+        }
         _isStartAnswer = true;
       });
     });
@@ -403,9 +419,7 @@ class _QuestionPageState extends State<QuestionPage> {
       countdownTotalColor: Colors.teal,
       countdownRemainingColor: Colors.teal[100],
       onUpdated: (unit, remainTime) {
-        setState(() {
-
-        });
+        setState(() { });
       },
       onFinished: () {
         setState(() {
@@ -442,6 +456,7 @@ class _QuestionPageState extends State<QuestionPage> {
               _qIdx = 0;
               _answerList.add(0);
               print('selected answer list -> $_answerList');
+              print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
               _saveTestResult(widget.mobile, _answerList);
             }
           } else {}
@@ -475,7 +490,6 @@ class _QuestionPageState extends State<QuestionPage> {
         int.parse(_user.age) >= 75 && int.parse(_user.age) <= 79 && _totalPoint >= 21 ||
         int.parse(_user.age) >= 80 && _totalPoint >= 20 ) {
       _resultStatus = 'pass';
-      
     } else {
       _resultStatus = 'nopass';
     }
@@ -502,27 +516,29 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
+  // -> Audio Record
   // 오디오 녹음 시작
   _startRecord() async {
     try {
       if (await AudioRecorder.hasPermissions) {
-        String path = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now()}';
+        String fileName = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now().toUtc().millisecondsSinceEpoch}';
         // String path = 'answer_${_qIdx + 1}_$_attempt';
         io.Directory externalStorageDirectory = await getExternalStorageDirectory();
-        path = externalStorageDirectory.path + '/' + path;
+        String path = externalStorageDirectory.path + '/' + fileName;
         print('Start recording -> $path');
-
         await AudioRecorder.start(
           path: path,
           audioOutputFormat: AudioOutputFormat.AAC,
         );
         bool isRecording = await AudioRecorder.isRecording;
         setState(() {
-          // _recording = new Recording(duration: new Duration(), path: '');
+          _recording = new Recording(duration: new Duration(), path: '');
           _isRecording = isRecording;
-        });
-        Future.delayed(Duration(seconds: 5), () {
-          _stopRecord();
+          if (_isRecording) {
+            Future.delayed(Duration(seconds: 5), () {
+              _stopRecord();
+            });
+          }
         });
       } else {
         Fluttertoast.showToast(
@@ -545,26 +561,24 @@ class _QuestionPageState extends State<QuestionPage> {
     File file = widget.localFileSystem.file(recording.path);
     print('File length: ${await file.length()}');
 
+    // 서버로 파일 업로드
+    // FileUploadServices.uploadAudioFile(file, recording.path, widget.mobile, _qIdx + 1, _qData[_qIdx].answer);
+    FileUploadServices.uploadAudioFile(widget.mobile, (_qIdx + 1).toString(), file, recording.path);
+
     // http패키지 MultipartRequest class
 
     setState(() {
       _recording = recording;
       _isRecording = isRecording;
     });
-    // _controller.text = recording.path;
   }
-
-  // 오디오 녹음 파일 서버에 업로드
-  _uploadAudioFile() {
-    FileUploadServices.uploadAudioFile(uploadAudioFile);
-  }
+  // <- Audio Record
 
   @override
   void initState() {
     super.initState();
-
     _getQuestions();
-    initAudioPlayer();
+    // initAudioPlayer();
     isPlaying ? null : _playLocal();
     
     UserServices.getUserInfo(widget.mobile).then((value) {
