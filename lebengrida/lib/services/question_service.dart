@@ -12,7 +12,7 @@ class QuestionServices {
       var map = Map<String, dynamic>();
       map['action'] = _GET_ALL_ACTION;
       final response = await http.post(ROOT, body: map);
-      print('getUsers Response: ${response.body}');
+      print('getQuestions Response: ${response.body}');
       
       if (200 == response.statusCode) {
         List<Question> list = parseResponse(response.body);

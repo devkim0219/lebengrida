@@ -8,10 +8,7 @@ class AnimationPage extends StatefulWidget {
   final String mobile;
   static const ASPECT_RATIO = 3 / 2;
   
-  AnimationPage({
-    Key key,
-    @required this.mobile
-  }) : super(key: key);
+  AnimationPage({Key key, @required this.mobile}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -24,7 +21,6 @@ class _AnimationPageState extends State<AnimationPage> {
 
   // 재생중인 영상 중지 후 문제 풀이 화면으로 이동
   _moveToQuestionPage() {
-    _flickManager.dispose();
     Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => QuestionPage(mobile: widget.mobile),
@@ -37,7 +33,7 @@ class _AnimationPageState extends State<AnimationPage> {
     super.initState();
     _flickManager = FlickManager(
       cachedVideoPlayerController: CachedVideoPlayerController.asset('assets/videos/animation.mp4'),
-      // onVideoEnd:
+      onVideoEnd: _moveToQuestionPage,
     );
   }
 
@@ -75,16 +71,16 @@ class _AnimationPageState extends State<AnimationPage> {
             SizedBox(
               height: 30,
             ),
-            RaisedButton(
-              color: Colors.teal,
-              child: Text(
-                '문제 보기',
-                style: TextStyle(
-                  color: Colors.white
-                ),
-              ),
-              onPressed: () => _moveToQuestionPage(),
-            ),
+            // RaisedButton(
+            //   color: Colors.teal,
+            //   child: Text(
+            //     '문제 보기',
+            //     style: TextStyle(
+            //       color: Colors.white
+            //     ),
+            //   ),
+            //   onPressed: () => _moveToQuestionPage(),
+            // ),
           ],
         ),
       ),

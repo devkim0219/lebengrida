@@ -31,6 +31,7 @@ dependencies:
   cachedflickvideoplayer: ^0.0.1
   carousel_slider: ^2.3.1
   circular_countdown_timer: ^0.0.7
+  circular_countdown: ^1.2.1
   cupertino_icons: ^1.0.0
   flutter_form_builder: ^3.14.0
   flutter_launcher_icons: ^0.8.1

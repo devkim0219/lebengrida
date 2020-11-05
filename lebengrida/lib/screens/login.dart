@@ -77,8 +77,6 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     ResultServices.checkTested(mobile).then((result) {
-      print('result is $result');
-      
       if (result == 'success') {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -216,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
                         padding: EdgeInsets.only(top: 5),
                         child:RaisedButton(
                           color: Colors.teal,
-                          child: Text('검사 결과(Test)', style: TextStyle(color: Colors.white)),
+                          child: Text('최근 검사 결과', style: TextStyle(color: Colors.white)),
                           onPressed: () {
                             _checkTested(_mobileController.text);
                           },

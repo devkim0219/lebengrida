@@ -6,6 +6,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:file/file.dart';
 import 'package:file/local.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/models/user_data.dart';
@@ -13,6 +14,7 @@ import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
 import 'package:lebengrida/services/question_service.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
 import 'package:lebengrida/services/fileupload_service.dart';
@@ -66,9 +68,6 @@ class _QuestionPageState extends State<QuestionPage> {
   get positionText => _position != null ? _position.toString().split('.').first : '';
 
   // bool isMuted = false;
-
-  StreamSubscription _positionSubscription;
-  StreamSubscription _audioPlayerStateSubscription;
   
   // Question ->
   // 문제 데이터 가져오기
@@ -134,8 +133,9 @@ class _QuestionPageState extends State<QuestionPage> {
             }
             _attempt = 1;
             print('index -> $_qIdx, attempt -> $_attempt');
-            _playLocal();
             print('selected answer list -> $_answerList');
+            audioPlayer.stop();
+            _playLocal();
             _selectedAnswer = 0;
           // 마지막 문제
           } else {
@@ -174,6 +174,14 @@ class _QuestionPageState extends State<QuestionPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
+          '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.',
+          style: TextStyle(
+            fontSize: 15,
+            color: Colors.redAccent,
+          ),
+        ),
+        SizedBox(height: 20),
+        Text(
           _qData[_qIdx].title,
           style: (
             TextStyle(
@@ -190,10 +198,7 @@ class _QuestionPageState extends State<QuestionPage> {
         selectButton(3),
         selectButton(4),
         SizedBox(
-          height: 10,
-        ),
-        Text(
-          '문제를 다 읽은 후 5초 안에 답을 선택하세요.'
+          height: 20,
         ),
         // 문제 음성 파일 재생 완료 후 카운트다운 시작
         _isStartAnswer ? Column(
@@ -201,6 +206,14 @@ class _QuestionPageState extends State<QuestionPage> {
           children: <Widget>[
             Center(
               child: countDown(5),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '마이크에 대고 정답을 말하세요.',
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.black87,
+              ),
             ),
           ],
         ) : Container(),
@@ -238,6 +251,8 @@ class _QuestionPageState extends State<QuestionPage> {
     setState(() => playerState = PlayerState.playing);
 
     audioPlayer.onPlayerCompletion.listen((event) {
+      // _startRecord();
+
       setState(() {
         _isStartAnswer = true;
       });
@@ -251,13 +266,13 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 플레이어 정지
-  // Future stop() async {
-  //   await audioPlayer.stop();
-  //   setState(() {
-  //     playerState = PlayerState.stopped;
-  //     _position = Duration();
-  //   });
-  // }
+  Future stop() async {
+    await audioPlayer.stop();
+    setState(() {
+      playerState = PlayerState.stopped;
+      _position = Duration();
+    });
+  }
 
   // 오디오 플레이어 음소거
   // Future mute(bool muted) async {
@@ -378,28 +393,23 @@ class _QuestionPageState extends State<QuestionPage> {
   // <- Audio Player
 
   // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
+  // 카운트다운과 동시에 정답 음성 입력 받음
   Widget countDown(int sec) {
-    return CircularCountDownTimer(
-      key: UniqueKey(),
-      duration: sec,
-      controller: _countdownController,
-      width: MediaQuery.of(context).size.width / 5,
-      height: MediaQuery.of(context).size.height / 5,
-      color: Colors.white,
-      fillColor: Colors.teal,
-      backgroundColor: null,
-      strokeWidth: 5.0,
-      textStyle: TextStyle(
-        fontSize: 22.0,
-        color: Colors.black87,
-        fontWeight: FontWeight.normal
-      ),
-      isReverse: true,
-      isReverseAnimation: false,
-      isTimerTextShown: true,
-      onComplete: () {
+    return TimeCircularCountdown(
+      unit: CountdownUnit.second,
+      countdownTotal: sec,
+      diameter: 60,
+      countdownCurrentColor: Colors.teal,
+      countdownTotalColor: Colors.teal,
+      countdownRemainingColor: Colors.teal[100],
+      onUpdated: (unit, remainTime) {
         setState(() {
-          // 카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
+
+        });
+      },
+      onFinished: () {
+        setState(() {
+          //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
           // 1~15 문제
           if (_qIdx < 15) {
             _isStartAnswer = false;
@@ -408,18 +418,22 @@ class _QuestionPageState extends State<QuestionPage> {
               _qIdx++;
               _attempt = 1;
               _answerList.add(0);
-              print('selected answer list -> $_answerList');
             // 1차 시도
             } else {
               _attempt = 2;
             }
+            // audioPlayer.stop();
+            // 2차 문제 음성 출력
             _playLocal();
+            print('selected answer list -> $_answerList');
             print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
           // 마지막 문제
           } else if (_qIdx == 15) {
             _isStartAnswer = false;
             // 1차 시도
             if (_attempt == 1) {
+              // audioPlayer.stop();
+              // 2차 문제 음성 출력
               _playLocal();
               _attempt = 2;
             // 2차 시도
@@ -433,8 +447,16 @@ class _QuestionPageState extends State<QuestionPage> {
           } else {}
         });
       },
+      textStyle: TextStyle(
+        color: Colors.black87,
+        fontSize: 20,
+      ),
     );
   }
+
+  // 카운트다운 시간 표시 형식
+  // String _formatTime(CountdownUnit unit, int remainingTime) =>
+  //     '$remainingTime ${describeEnum(unit)}${remainingTime > 1 ? 's' : ''}';
 
   // 검사 결과 저장
   _saveTestResult(String mobile, List<int> answerList) {
@@ -484,28 +506,27 @@ class _QuestionPageState extends State<QuestionPage> {
   _startRecord() async {
     try {
       if (await AudioRecorder.hasPermissions) {
-        if (_controller.text != null && _controller.text != '') {
-          String path = _controller.text;
-          if (!_controller.text.contains('/')) {
-            io.Directory appDocymentDirectory = await getApplicationDocumentsDirectory();
-            path = appDocymentDirectory.path + '/' + _controller.text;
-          }
-          print('Start recording -> $path');
-          await AudioRecorder.start(
-            path: path,
-            audioOutputFormat: AudioOutputFormat.WAV
-          );
-        } else {
-          // await AudioRecorder.start();
-        }
+        String path = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now()}';
+        // String path = 'answer_${_qIdx + 1}_$_attempt';
+        io.Directory externalStorageDirectory = await getExternalStorageDirectory();
+        path = externalStorageDirectory.path + '/' + path;
+        print('Start recording -> $path');
+
+        await AudioRecorder.start(
+          path: path,
+          audioOutputFormat: AudioOutputFormat.AAC,
+        );
         bool isRecording = await AudioRecorder.isRecording;
         setState(() {
-          _recording = new Recording(duration: new Duration(), path: '');
+          // _recording = new Recording(duration: new Duration(), path: '');
           _isRecording = isRecording;
+        });
+        Future.delayed(Duration(seconds: 5), () {
+          _stopRecord();
         });
       } else {
         Fluttertoast.showToast(
-          msg: 'You must accept permissions.',
+          msg: '마이크 권한 설정이 필요합니다.',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 3
@@ -522,7 +543,10 @@ class _QuestionPageState extends State<QuestionPage> {
     print('Stop recording: ${recording.path}');
     bool isRecording = await AudioRecorder.isRecording;
     File file = widget.localFileSystem.file(recording.path);
-    print('  File length: ${await file.length()}');
+    print('File length: ${await file.length()}');
+
+    // http패키지 MultipartRequest class
+
     setState(() {
       _recording = recording;
       _isRecording = isRecording;
@@ -551,8 +575,6 @@ class _QuestionPageState extends State<QuestionPage> {
   @override
   void dispose() {
     super.dispose();
-    _positionSubscription.cancel();
-    _audioPlayerStateSubscription.cancel();
     audioPlayer.stop();
   }
 
@@ -594,32 +616,26 @@ class _QuestionPageState extends State<QuestionPage> {
             SizedBox(
               height: 20,
             ),
-            Text(
-              '오디오 레코드 테스트'
-            ),
+            // Text(
+            //   '오디오 레코드 테스트'
+            // ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  children: [
-                    FlatButton(
-                      onPressed: _isRecording ? null : _startRecord,
-                      child: Text('Start'),
-                      color: Colors.green,
-                    ),
-                    FlatButton(
-                      onPressed: _isRecording ? _stopRecord : null,
-                      child: Text('Stop'),
-                      color: Colors.red,
-                    ),
-                  ],
-                ),
-                TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Enter a custom path',
-                  ),
-                ),
+                // Row(
+                //   children: [
+                //     FlatButton(
+                //       onPressed: _isRecording ? null : _startRecord,
+                //       child: Text('Start'),
+                //       color: Colors.green,
+                //     ),
+                //     FlatButton(
+                //       onPressed: _isRecording ? _stopRecord : null,
+                //       child: Text('Stop'),
+                //       color: Colors.red,
+                //     ),
+                //   ],
+                // ),
                 Text('File path of the record: ${_recording.path}'),
                 Text('Format: ${_recording.audioOutputFormat}'),
                 Text('Extension: ${_recording.extension}'),
@@ -628,7 +644,7 @@ class _QuestionPageState extends State<QuestionPage> {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }
