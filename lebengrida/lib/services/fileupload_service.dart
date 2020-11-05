@@ -1,24 +1,15 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:file/file.dart';
 
 class FileUploadServices {
-  static Future<void> uploadAudioFile(String mobile, String idx, File audioFile, String filePath) async {
+  static Future<void> uploadAudioFile(String mobile, String idx, String filePath) async {
     var client = new http.Client();
     var uri = Uri.parse('http://dl1.youtubot.co.kr/lebengrida/save.php');
 
     try {
-      // var map = Map<String, dynamic>();
-      // map['action'] = _FILE_UPLOAD_ACTION;
-      //
-      // // convert file audio to Base64 encoding
-      // List<int> audioBytes = audioFile.readAsBytesSync();
-      // String baseAudio = base64Encode(audioBytes);
-      // map['file'] = baseAudio;
-      //
-      // final response = await http.post(ROOT, body: map);
+      print('### request post parameter ###');
+      print('- mobile : $mobile');
+      print('- idx : $idx');
+      print('- filePath : $filePath');
 
       http.MultipartRequest request = new http.MultipartRequest('POST', uri)
         ..fields['rbval1'] = mobile
@@ -29,7 +20,7 @@ class FileUploadServices {
 
       if (response.statusCode == 200) {
         print('File upload successful');
-        // response.stream.toString();
+        print('### response body -> ${await response.stream.bytesToString()}');
       } else {
         print('File upload failed');
       }

@@ -4,13 +4,11 @@ import 'dart:async';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
-import 'package:http/http.dart' as http;
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart';
 import 'package:lebengrida/models/user_data.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/models/question_data.dart';
@@ -42,6 +40,7 @@ class _QuestionPageState extends State<QuestionPage> {
   int _selectedAnswer = 0;
   int _correctAnswer = 0;
   List<int> _answerList = [];
+  int _currentIdx = 0;
 
   List<Question> _qData = [];
   int _qIdx = 0;
@@ -267,6 +266,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
     audioPlayer.onPlayerCompletion.listen((event) {
       setState(() {
+        _currentIdx = _qIdx;
         if (!_isRecording) {
           _startRecord();
         }
@@ -528,7 +528,7 @@ class _QuestionPageState extends State<QuestionPage> {
         print('Start recording -> $path');
         await AudioRecorder.start(
           path: path,
-          audioOutputFormat: AudioOutputFormat.AAC,
+          audioOutputFormat: AudioOutputFormat.WAV,
         );
         bool isRecording = await AudioRecorder.isRecording;
         setState(() {
@@ -562,10 +562,7 @@ class _QuestionPageState extends State<QuestionPage> {
     print('File length: ${await file.length()}');
 
     // 서버로 파일 업로드
-    // FileUploadServices.uploadAudioFile(file, recording.path, widget.mobile, _qIdx + 1, _qData[_qIdx].answer);
-    FileUploadServices.uploadAudioFile(widget.mobile, (_qIdx + 1).toString(), file, recording.path);
-
-    // http패키지 MultipartRequest class
+    FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path);
 
     setState(() {
       _recording = recording;
@@ -650,10 +647,10 @@ class _QuestionPageState extends State<QuestionPage> {
                 //     ),
                 //   ],
                 // ),
-                Text('File path of the record: ${_recording.path}'),
-                Text('Format: ${_recording.audioOutputFormat}'),
-                Text('Extension: ${_recording.extension}'),
-                Text('Audio recording duration: ${_recording.duration.toString()}'),
+                // Text('File path of the record: ${_recording.path}'),
+                // Text('Format: ${_recording.audioOutputFormat}'),
+                // Text('Extension: ${_recording.extension}'),
+                // Text('Audio recording duration: ${_recording.duration.toString()}'),
               ],
             ),
           ],

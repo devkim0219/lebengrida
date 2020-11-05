@@ -1,4 +1,5 @@
 class Question {
+  final String idx;
   final String type;
   final String title;
   final String select_1;
@@ -7,10 +8,11 @@ class Question {
   final String select_4;
   final String answer;
 
-  Question({this.type, this.title, this.select_1, this.select_2, this.select_3, this.select_4, this.answer});
+  Question({this.idx, this.type, this.title, this.select_1, this.select_2, this.select_3, this.select_4, this.answer});
 
   factory Question.fromJson(Map<String, dynamic> json) {
     return Question(
+      idx: json['idx'],
       type: json['type'],
       title: json['title'],
       select_1: json['select_1'],
