@@ -562,7 +562,19 @@ class _QuestionPageState extends State<QuestionPage> {
     print('File length: ${await file.length()}');
 
     // 서버로 파일 업로드
-    FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path);
+    FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path).then((value) {
+      print('return result -> $value');
+      // setState(() {
+      //   if (value > 0) {
+      //     // _answerList.add(value);
+      //     // print('selected answer list -> $_answerList');
+      //     // print('return answer from server.. -> index is $_qIdx, attempt is $_attempt');
+      //     // _attempt = 2;
+      //   } else {
+      //
+      //   }
+      // });
+    });
 
     setState(() {
       _recording = recording;
