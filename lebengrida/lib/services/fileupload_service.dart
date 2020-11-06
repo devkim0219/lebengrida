@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 class FileUploadServices {
-  static Future<int> uploadAudioFile(String mobile, String idx, String filePath) async {
+  static Future<String> uploadAudioFile(String mobile, String idx, String filePath) async {
     var client = new http.Client();
     var uri = Uri.parse('http://dl1.youtubot.co.kr/lebenGrida/save.php');
 
@@ -17,14 +17,15 @@ class FileUploadServices {
         ..files.add(await http.MultipartFile.fromPath('rbfile', filePath));
 
       var response = await request.send();
+      var responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
         print('File upload successful');
-        print('### response body -> ${await response.stream.bytesToString()}');
-        return 1;
+        print('### response body -> $responseBody');
+        return responseBody;
       } else {
         print('File upload failed');
-        return 0;
+        return 'File upload failed';
       }
     } catch(e) {
       throw Exception('Failed to file upload: $e');

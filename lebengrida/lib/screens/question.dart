@@ -57,6 +57,8 @@ class _QuestionPageState extends State<QuestionPage> {
   AudioPlayer audioPlayer;
   AudioCache audioCache;
 
+  String _responseBody = '';
+
   PlayerState playerState = PlayerState.stopped;
 
   get isPlaying => playerState == PlayerState.playing;
@@ -269,6 +271,9 @@ class _QuestionPageState extends State<QuestionPage> {
         _currentIdx = _qIdx;
         if (!_isRecording) {
           _startRecord();
+
+          // 음성 인식 서버 응답 대기(2초)
+          io.sleep(const Duration(seconds: 2));
         }
         _isStartAnswer = true;
       });
@@ -563,17 +568,17 @@ class _QuestionPageState extends State<QuestionPage> {
 
     // 서버로 파일 업로드
     FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path).then((value) {
-      print('return result -> $value');
-      // setState(() {
-      //   if (value > 0) {
-      //     // _answerList.add(value);
-      //     // print('selected answer list -> $_answerList');
-      //     // print('return answer from server.. -> index is $_qIdx, attempt is $_attempt');
-      //     // _attempt = 2;
-      //   } else {
-      //
-      //   }
-      // });
+      setState(() {
+        _responseBody = value;
+        // if (value > 0) {
+        //   // _answerList.add(value);
+        //   // print('selected answer list -> $_answerList');
+        //   // print('return answer from server.. -> index is $_qIdx, attempt is $_attempt');
+        //   // _attempt = 2;
+        // } else {
+        //
+        // }
+      });
     });
 
     setState(() {
@@ -663,6 +668,8 @@ class _QuestionPageState extends State<QuestionPage> {
                 // Text('Format: ${_recording.audioOutputFormat}'),
                 // Text('Extension: ${_recording.extension}'),
                 // Text('Audio recording duration: ${_recording.duration.toString()}'),
+                Text('Response Body :'),
+                Text(_responseBody),
               ],
             ),
           ],
