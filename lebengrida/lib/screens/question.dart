@@ -18,6 +18,7 @@ import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
 import 'package:lebengrida/services/fileupload_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 typedef void OnError(Exception exception);
 
@@ -432,7 +433,7 @@ class _QuestionPageState extends State<QuestionPage> {
         });
       },
       onFinished: () {
-        Future.delayed(Duration(seconds: 5), () {
+        // Future.delayed(Duration(seconds: 5), () {
           setState(() {
             //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
             // 1~15 문제
@@ -449,7 +450,9 @@ class _QuestionPageState extends State<QuestionPage> {
               }
               // audioPlayer.stop();
               // 2차 문제 음성 출력
-              _playLocal();
+              Future.delayed(Duration(seconds: 5), () {
+                _playLocal();
+              });
               print('selected answer list -> $_answerList');
               print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
               // 마지막 문제
@@ -459,7 +462,9 @@ class _QuestionPageState extends State<QuestionPage> {
               if (_attempt == 1) {
                 // audioPlayer.stop();
                 // 2차 문제 음성 출력
-                _playLocal();
+                Future.delayed(Duration(seconds: 5), () {
+                  _playLocal();
+                });
                 _attempt = 2;
                 // 2차 시도
               } else {
@@ -472,7 +477,7 @@ class _QuestionPageState extends State<QuestionPage> {
               }
             } else {}
           });
-        });
+        // });
       },
       textStyle: TextStyle(
         color: Colors.black87,
@@ -528,38 +533,52 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
+  // 마이크 및 저장소 권한 체크
+  Future<bool> _checkPermission() async {
+    PermissionStatus storagePermissionStatus = await Permission.storage.status;
+    PermissionStatus microphonePermissionStatus = await Permission.microphone.status;
+    if (storagePermissionStatus == PermissionStatus.granted && microphonePermissionStatus == PermissionStatus.granted) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // 마이크 및 저장소 권한 요청
+  Future<bool> _requestPermission() async {
+    var storagePermissionResult = await Permission.storage.request();
+    var microphonePermissionResult = await Permission.microphone.request();
+
+    if (storagePermissionResult == PermissionStatus.granted && microphonePermissionResult == PermissionStatus.granted) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   // -> Audio Record
   // 오디오 녹음 시작
   _startRecord() async {
     try {
-      if (await AudioRecorder.hasPermissions) {
-        String fileName = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now().toUtc().millisecondsSinceEpoch}';
-        // String path = 'answer_${_qIdx + 1}_$_attempt';
-        io.Directory externalStorageDirectory = await getExternalStorageDirectory();
-        String path = externalStorageDirectory.path + '/' + fileName;
-        print('Start recording -> $path');
-        await AudioRecorder.start(
-          path: path,
-          audioOutputFormat: AudioOutputFormat.WAV,
-        );
-        bool isRecording = await AudioRecorder.isRecording;
-        setState(() {
-          _recording = new Recording(duration: new Duration(), path: '');
-          _isRecording = isRecording;
-          if (_isRecording) {
-            Future.delayed(Duration(seconds: 5), () {
-              _stopRecord();
-            });
-          }
-        });
-      } else {
-        Fluttertoast.showToast(
-          msg: '마이크 권한 설정이 필요합니다.',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3
-        );
-      }
+      String fileName = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now().toUtc().millisecondsSinceEpoch}';
+      // String path = 'answer_${_qIdx + 1}_$_attempt';
+      io.Directory externalStorageDirectory = await getExternalStorageDirectory();
+      String path = externalStorageDirectory.path + '/' + fileName;
+      print('Start recording -> $path');
+      await AudioRecorder.start(
+        path: path,
+        audioOutputFormat: AudioOutputFormat.WAV,
+      );
+      bool isRecording = await AudioRecorder.isRecording;
+      setState(() {
+        _recording = new Recording(duration: new Duration(), path: '');
+        _isRecording = isRecording;
+        if (_isRecording) {
+          Future.delayed(Duration(seconds: 5), () {
+            _stopRecord();
+          });
+        }
+      });
     } catch(e) {
       print(e);
     }

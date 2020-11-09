@@ -7,6 +7,7 @@ import 'package:lebengrida/screens/question.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/userList.dart';
 import 'package:lebengrida/screens/update_info.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,10 +15,49 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // final List qData = [];
+  bool _isGrantedPermission = false;
+
+  // 마이크 및 저장소 권한 체크
+  Future<bool> _checkPermission() async {
+    PermissionStatus storagePermissionStatus = await Permission.storage.status;
+    PermissionStatus microphonePermissionStatus = await Permission.microphone.status;
+
+    if (storagePermissionStatus == PermissionStatus.granted && microphonePermissionStatus == PermissionStatus.granted) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // 마이크 및 저장소 권한 요청
+  Future<bool> _requestPermission() async {
+    var storagePermissionResult = await Permission.storage.request();
+    var microphonePermissionResult = await Permission.microphone.request();
+
+    if (storagePermissionResult == PermissionStatus.granted && microphonePermissionResult == PermissionStatus.granted) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    // 권한 체크
+    _checkPermission().then((value) {
+      _isGrantedPermission = value;
+      print('_isGrantedPermission : $_isGrantedPermission');
+    });
+
+    // 권한 거부 시 요청
+    if (!_isGrantedPermission) {
+      _requestPermission().then((value) {
+        _isGrantedPermission = value;
+      });
+    }
+
     return MaterialApp(
       title: '스마트 화행 검사 - 레벤그리다',
       debugShowCheckedModeBanner: false,
