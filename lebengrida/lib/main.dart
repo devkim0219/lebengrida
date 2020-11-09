@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
     // 권한 체크
     _checkPermission().then((value) {
       _isGrantedPermission = value;
-      print('_isGrantedPermission : $_isGrantedPermission');
+      print('Granted Storage and Microphone Permission : $_isGrantedPermission');
     });
 
     // 권한 거부 시 요청

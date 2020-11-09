@@ -117,7 +117,7 @@ class _ResultPageState extends State<ResultPage> {
             RichText(
               text: TextSpan(
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 28,
                   color: Colors.black87
                 ),
                 children: <TextSpan>[

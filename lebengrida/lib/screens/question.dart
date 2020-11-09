@@ -18,7 +18,6 @@ import 'package:lebengrida/services/result_service.dart';
 import 'package:lebengrida/services/user_service.dart';
 import 'package:lebengrida/services/fileupload_service.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 typedef void OnError(Exception exception);
 
@@ -40,7 +39,7 @@ class _QuestionPageState extends State<QuestionPage> {
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
   int _correctAnswer = 0;
-  List<int> _answerList = [];
+  List<int> _scoreList = [];
   int _currentIdx = 0;
 
   List<Question> _qData = [];
@@ -115,24 +114,24 @@ class _QuestionPageState extends State<QuestionPage> {
             if (_attempt == 1) {
               // 정답
               if (_correctAnswer == _selectedAnswer) {
-                _answerList.add(2);
+                _scoreList.add(2);
               // 오답
               } else {
-                _answerList.add(0);
+                _scoreList.add(0);
               }
             // 2차 시도
             } else {
               // 정답
               if (_correctAnswer == _selectedAnswer) {
-                _answerList.add(1);
+                _scoreList.add(1);
               // 오답
               } else {
-                _answerList.add(0);
+                _scoreList.add(0);
               }
             }
             _attempt = 1;
             print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-            print('selected answer list -> $_answerList');
+            print('score list -> $_scoreList');
             audioPlayer.stop();
             _playLocal();
             _selectedAnswer = 0;
@@ -143,25 +142,25 @@ class _QuestionPageState extends State<QuestionPage> {
             if (_attempt == 1) {
               // 정답
               if (_correctAnswer == _selectedAnswer) {
-                _answerList.add(2);
+                _scoreList.add(2);
               // 오답
               } else {
-                _answerList.add(0);
+                _scoreList.add(0);
               }
             // 2차 시도
             } else {
               // 정답
               if (_correctAnswer == _selectedAnswer) {
-                _answerList.add(1);
+                _scoreList.add(1);
               // 오답
               } else {
-                _answerList.add(0);
+                _scoreList.add(0);
               }
             }
             print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-            print('selected answer list -> $_answerList');
+            print('score list -> $_scoreList');
             audioPlayer.stop();
-            _saveTestResult(widget.mobile, _answerList);
+            _saveTestResult(widget.mobile, _scoreList);
           }
         });
       },
@@ -206,7 +205,7 @@ class _QuestionPageState extends State<QuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Center(
-              child: countDown(5),
+              child: _countDown(5),
             ),
             SizedBox(height: 10),
             Text(
@@ -412,7 +411,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // 음성으로 문제 읽은 후 정답 입력 대기 카운트다운
   // 카운트다운과 동시에 정답 음성 입력 받음
-  Widget countDown(int sec) {
+  Widget _countDown(int sec) {
     return TimeCircularCountdown(
       unit: CountdownUnit.second,
       countdownTotal: sec,
@@ -436,46 +435,7 @@ class _QuestionPageState extends State<QuestionPage> {
         // Future.delayed(Duration(seconds: 5), () {
           setState(() {
             //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
-            // 1~15 문제
-            if (_qIdx < 15) {
-              _isStartAnswer = false;
-              // 2차 시도
-              if (_attempt == 2) {
-                _qIdx++;
-                _attempt = 1;
-                _answerList.add(0);
-                // 1차 시도
-              } else {
-                _attempt = 2;
-              }
-              // audioPlayer.stop();
-              // 2차 문제 음성 출력
-              Future.delayed(Duration(seconds: 5), () {
-                _playLocal();
-              });
-              print('selected answer list -> $_answerList');
-              print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
-              // 마지막 문제
-            } else if (_qIdx == 15) {
-              _isStartAnswer = false;
-              // 1차 시도
-              if (_attempt == 1) {
-                // audioPlayer.stop();
-                // 2차 문제 음성 출력
-                Future.delayed(Duration(seconds: 5), () {
-                  _playLocal();
-                });
-                _attempt = 2;
-                // 2차 시도
-              } else {
-                _attempt = 1;
-                _qIdx = 0;
-                _answerList.add(0);
-                print('selected answer list -> $_answerList');
-                print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
-                _saveTestResult(widget.mobile, _answerList);
-              }
-            } else {}
+            _controller.text = '';
           });
         // });
       },
@@ -485,10 +445,6 @@ class _QuestionPageState extends State<QuestionPage> {
       ),
     );
   }
-
-  // 카운트다운 시간 표시 형식
-  // String _formatTime(CountdownUnit unit, int remainingTime) =>
-  //     '$remainingTime ${describeEnum(unit)}${remainingTime > 1 ? 's' : ''}';
 
   // 검사 결과 저장
   _saveTestResult(String mobile, List<int> answerList) {
@@ -533,29 +489,6 @@ class _QuestionPageState extends State<QuestionPage> {
     );
   }
 
-  // 마이크 및 저장소 권한 체크
-  Future<bool> _checkPermission() async {
-    PermissionStatus storagePermissionStatus = await Permission.storage.status;
-    PermissionStatus microphonePermissionStatus = await Permission.microphone.status;
-    if (storagePermissionStatus == PermissionStatus.granted && microphonePermissionStatus == PermissionStatus.granted) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // 마이크 및 저장소 권한 요청
-  Future<bool> _requestPermission() async {
-    var storagePermissionResult = await Permission.storage.request();
-    var microphonePermissionResult = await Permission.microphone.request();
-
-    if (storagePermissionResult == PermissionStatus.granted && microphonePermissionResult == PermissionStatus.granted) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   // -> Audio Record
   // 오디오 녹음 시작
   _startRecord() async {
@@ -593,9 +526,97 @@ class _QuestionPageState extends State<QuestionPage> {
     print('File length: ${await file.length()}');
 
     // 서버로 파일 업로드
-    FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path).then((value) {
-      print('response body -> $value');
-      _controller.text = value;
+    FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path).then((result) {
+      print('response body -> $result');
+
+      // string parse to integer
+      // var _result = int.parse(result);
+      var _result = 4;
+
+      _controller.text = _result.toString();
+
+      // 음성 인식 서버 리턴 값에 따른 로직 처리
+      // 답을 선택했을 경우
+      if (_result >= 1 && _result <= 4) {
+        _correctAnswer = int.parse(_qData[_qIdx].answer);
+
+        // 1~15 문제
+        if (_qIdx < 15) {
+          _isStartAnswer = false;
+          _qIdx++;
+          // 1차 시도
+          if (_attempt == 1) {
+            // 정답
+            if (_correctAnswer == _result) {
+              _scoreList.add(2);
+              // 오답
+            } else {
+              _scoreList.add(0);
+            }
+          // 2차 시도
+          } else {
+            // 정답
+            if (_correctAnswer == _result) {
+              _scoreList.add(1);
+              // 오답
+            } else {
+              _scoreList.add(0);
+            }
+          }
+          _attempt = 1;
+          print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
+          print('score list -> $_scoreList');
+          audioPlayer.stop();
+          _playLocal();
+        // 마지막 문제
+        } else {
+          _qIdx = 0;
+          // 1차 시도
+          if (_attempt == 1) {
+            // 정답
+            if (_correctAnswer == _result) {
+              _scoreList.add(2);
+              // 오답
+            } else {
+              _scoreList.add(0);
+            }
+            // 2차 시도
+          } else {
+            // 정답
+            if (_correctAnswer == _result) {
+              _scoreList.add(1);
+              // 오답
+            } else {
+              _scoreList.add(0);
+            }
+          }
+          print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
+          print('stt return answer list -> $_scoreList');
+          audioPlayer.stop();
+          _saveTestResult(widget.mobile, _scoreList);
+        }
+
+      // 음성이 불분명할 경우 재요청(계속)
+      } else if (_result == 0) {
+        _attempt = 2;
+        _startRecord();
+
+      // 입력받은 음성이 없을 경우(null) 재요청(2차) -> result == 9
+      } else {
+        // 1~15 문제
+        if (_qIdx < 15) {
+          if (_attempt == 2) {
+            _scoreList.add(0);
+          }
+          // 마지막 문제
+        } else {
+          if (_attempt == 2) {
+            _scoreList.add(0);
+          }
+          audioPlayer.stop();
+          _saveTestResult(widget.mobile, _scoreList);
+        }
+      }
     });
     _recording = recording;
     _isRecording = isRecording;
@@ -686,8 +707,10 @@ class _QuestionPageState extends State<QuestionPage> {
                 TextField(
                   controller: _controller,
                   enabled: false,
-                  // autofillHints: ,
                 ),
+                SizedBox(height: 20),
+                Text('question no. : ${_qIdx + 1}, attempt : $_attempt'),
+                Text('score list : $_scoreList'),
               ],
             ),
           ],
