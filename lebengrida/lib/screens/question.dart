@@ -51,13 +51,12 @@ class _QuestionPageState extends State<QuestionPage> {
   bool _isRecording = false;
 
   File uploadAudioFile;
+  TextEditingController _controller = TextEditingController();
 
   Duration _duration = new Duration();
   Duration _position = new Duration();
   AudioPlayer audioPlayer;
   AudioCache audioCache;
-
-  String _responseBody = '';
 
   PlayerState playerState = PlayerState.stopped;
 
@@ -256,7 +255,6 @@ class _QuestionPageState extends State<QuestionPage> {
       _position = d;
     });
 
-    // await audioPlayer.play(localFilePath, isLocal: true);
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
     setState(() => playerState = PlayerState.playing);
 
@@ -267,14 +265,12 @@ class _QuestionPageState extends State<QuestionPage> {
     // });
 
     audioPlayer.onPlayerCompletion.listen((event) {
+      if (!_isRecording) {
+        _startRecord();
+      }
+
       setState(() {
         _currentIdx = _qIdx;
-        if (!_isRecording) {
-          _startRecord();
-
-          // 음성 인식 서버 응답 대기(2초)
-          io.sleep(const Duration(seconds: 2));
-        }
         _isStartAnswer = true;
       });
     });
@@ -424,47 +420,58 @@ class _QuestionPageState extends State<QuestionPage> {
       countdownTotalColor: Colors.teal,
       countdownRemainingColor: Colors.teal[100],
       onUpdated: (unit, remainTime) {
-        setState(() { });
+        setState(() {
+          if (remainTime == 1) {
+            Fluttertoast.showToast(
+                msg: '음성 인식 중입니다..',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3
+            );
+          }
+        });
       },
       onFinished: () {
-        setState(() {
-          //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
-          // 1~15 문제
-          if (_qIdx < 15) {
-            _isStartAnswer = false;
-            // 2차 시도
-            if (_attempt == 2) {
-              _qIdx++;
-              _attempt = 1;
-              _answerList.add(0);
-            // 1차 시도
-            } else {
-              _attempt = 2;
-            }
-            // audioPlayer.stop();
-            // 2차 문제 음성 출력
-            _playLocal();
-            print('selected answer list -> $_answerList');
-            print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
-          // 마지막 문제
-          } else if (_qIdx == 15) {
-            _isStartAnswer = false;
-            // 1차 시도
-            if (_attempt == 1) {
+        Future.delayed(Duration(seconds: 5), () {
+          setState(() {
+            //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
+            // 1~15 문제
+            if (_qIdx < 15) {
+              _isStartAnswer = false;
+              // 2차 시도
+              if (_attempt == 2) {
+                _qIdx++;
+                _attempt = 1;
+                _answerList.add(0);
+                // 1차 시도
+              } else {
+                _attempt = 2;
+              }
               // audioPlayer.stop();
               // 2차 문제 음성 출력
               _playLocal();
-              _attempt = 2;
-            // 2차 시도
-            } else {
-              _attempt = 1;
-              _qIdx = 0;
-              _answerList.add(0);
               print('selected answer list -> $_answerList');
               print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
-              _saveTestResult(widget.mobile, _answerList);
-            }
-          } else {}
+              // 마지막 문제
+            } else if (_qIdx == 15) {
+              _isStartAnswer = false;
+              // 1차 시도
+              if (_attempt == 1) {
+                // audioPlayer.stop();
+                // 2차 문제 음성 출력
+                _playLocal();
+                _attempt = 2;
+                // 2차 시도
+              } else {
+                _attempt = 1;
+                _qIdx = 0;
+                _answerList.add(0);
+                print('selected answer list -> $_answerList');
+                print('countdown complete.. -> index is $_qIdx, attempt is $_attempt');
+                _saveTestResult(widget.mobile, _answerList);
+              }
+            } else {}
+          });
         });
       },
       textStyle: TextStyle(
@@ -568,23 +575,11 @@ class _QuestionPageState extends State<QuestionPage> {
 
     // 서버로 파일 업로드
     FileUploadServices.uploadAudioFile(widget.mobile, (_currentIdx + 1).toString(), recording.path).then((value) {
-      setState(() {
-        _responseBody = value;
-        // if (value > 0) {
-        //   // _answerList.add(value);
-        //   // print('selected answer list -> $_answerList');
-        //   // print('return answer from server.. -> index is $_qIdx, attempt is $_attempt');
-        //   // _attempt = 2;
-        // } else {
-        //
-        // }
-      });
+      print('response body -> $value');
+      _controller.text = value;
     });
-
-    setState(() {
-      _recording = recording;
-      _isRecording = isRecording;
-    });
+    _recording = recording;
+    _isRecording = isRecording;
   }
   // <- Audio Record
 
@@ -668,8 +663,12 @@ class _QuestionPageState extends State<QuestionPage> {
                 // Text('Format: ${_recording.audioOutputFormat}'),
                 // Text('Extension: ${_recording.extension}'),
                 // Text('Audio recording duration: ${_recording.duration.toString()}'),
-                Text('Response Body :'),
-                Text(_responseBody),
+                Text('음성 인식 결과 :'),
+                TextField(
+                  controller: _controller,
+                  enabled: false,
+                  // autofillHints: ,
+                ),
               ],
             ),
           ],

@@ -25,7 +25,7 @@ class FileUploadServices {
         return responseBody;
       } else {
         print('File upload failed');
-        return 'File upload failed';
+        return 'File upload failed -> ${response.statusCode}';
       }
     } catch(e) {
       throw Exception('Failed to file upload: $e');
