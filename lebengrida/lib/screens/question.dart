@@ -445,7 +445,7 @@ class _QuestionPageState extends State<QuestionPage> {
         });
       },
       onFinished: () {
-        
+
       },
       textStyle: TextStyle(
         color: Colors.black87,
@@ -756,10 +756,10 @@ class _QuestionPageState extends State<QuestionPage> {
                 SizedBox(height: 20),
                 Text('question no. : ${_qIdx + 1}, attempt : $_attempt'),
                 Text('score list : $_scoreList'),
-                Text('_isSkipAudio : $_isSkipAudio'),
-                Text('_isStartAnswer : $_isStartAnswer'),
-                Text('countdown key : $_countdownKey'),
-                Text('body key : $_bodyKey'),
+                // Text('_isSkipAudio : $_isSkipAudio'),
+                // Text('_isStartAnswer : $_isStartAnswer'),
+                // Text('countdown key : $_countdownKey'),
+                // Text('body key : $_bodyKey'),
               ],
             ),
           ],

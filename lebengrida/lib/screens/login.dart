@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/screens/animation.dart';
+import 'package:lebengrida/screens/guide.dart';
 import 'package:lebengrida/screens/result.dart';
 import 'package:lebengrida/screens/update_info.dart';
 import 'package:lebengrida/services/login_service.dart';
@@ -50,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       if (result == 'success') {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => AnimationPage(mobile: mobile),
+            builder: (context) => GuidePage(mobile: mobile),
           )
         );
       } else {
@@ -169,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             RaisedButton(
                               color: Colors.teal,
-                              child: Text('검사 시작', style: TextStyle(color: Colors.white)),
+                              child: Text('로그인', style: TextStyle(color: Colors.white)),
                               onPressed: () {
                                 _checkUser(_mobileController.text);
                               },

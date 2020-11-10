@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
         '/userList': (context) => UserListPage(),
         '/animation': (context) => AnimationPage(mobile: ''),
         '/question': (context) => QuestionPage(mobile: ''),
-        '/guide': (context) => GuidePage(),
+        '/guide': (context) => GuidePage(mobile: ''),
         '/result': (context) => ResultPage(mobile: ''),
       },
     );
