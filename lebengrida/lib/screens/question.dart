@@ -1,5 +1,6 @@
 import 'dart:io' as io;
 import 'dart:async';
+import 'dart:math';
 
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -57,6 +58,9 @@ class _QuestionPageState extends State<QuestionPage> {
   Duration _position = new Duration();
   AudioPlayer audioPlayer;
   AudioCache audioCache;
+
+  bool _isSkipAudio = false;
+  Key _key;
 
   PlayerState playerState = PlayerState.stopped;
 
@@ -236,15 +240,18 @@ class _QuestionPageState extends State<QuestionPage> {
   //   });
   // }
 
-  // Future play() async {
-  //   await audioPlayer.play(kUrl);
-  //   setState(() {
-  //     playerState = PlayerState.playing;
-  //   });
-  // }
+  // 랜덤 문자열 키 생성
+  String generateRandomString(int len) {
+    var r = Random();
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  }
 
   // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
+    setState(() {
+      _key = new Key(generateRandomString(5));
+    });
     // 오디오 플레이어 초기화
     audioPlayer = new AudioPlayer();
     audioCache = new AudioCache(fixedPlayer: audioPlayer);
@@ -256,22 +263,22 @@ class _QuestionPageState extends State<QuestionPage> {
     });
 
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
-    setState(() => playerState = PlayerState.playing);
-
-    // audioPlayer.onPlayerStateChanged.listen((AudioPlayerState s) => {
-    //   if (s == AudioPlayerState.COMPLETED) {
-    //     _startRecord()
-    //   }
-    // });
+    setState(() {
+      if (!_isSkipAudio) {
+        playerState = PlayerState.playing;
+      } else {
+        audioPlayer.stop();
+      }
+    });
 
     audioPlayer.onPlayerCompletion.listen((event) {
       if (!_isRecording) {
         _startRecord();
       }
-
       setState(() {
         _currentIdx = _qIdx;
         _isStartAnswer = true;
+        _controller.text = '';
       });
     });
   }
@@ -413,6 +420,7 @@ class _QuestionPageState extends State<QuestionPage> {
   // 카운트다운과 동시에 정답 음성 입력 받음
   Widget _countDown(int sec) {
     return TimeCircularCountdown(
+      key: _key,
       unit: CountdownUnit.second,
       countdownTotal: sec,
       diameter: 60,
@@ -432,12 +440,12 @@ class _QuestionPageState extends State<QuestionPage> {
         });
       },
       onFinished: () {
-        // Future.delayed(Duration(seconds: 5), () {
-          setState(() {
-            //카운트다운 5초 후(2차) 자동으로 다음 문제로 전환
-            _controller.text = '';
-          });
-        // });
+        setState(() {
+          if (_isSkipAudio) {
+            _startRecord();
+            _isSkipAudio = false;
+          }
+        });
       },
       textStyle: TextStyle(
         color: Colors.black87,
@@ -454,7 +462,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
     // 총점
     for (var i = 0; i < answerList.length; i++) {
-        _totalPoint += answerList[i];
+      _totalPoint += answerList[i];
     }
 
     // 인지 능력 저하 판단
@@ -531,13 +539,13 @@ class _QuestionPageState extends State<QuestionPage> {
 
       // string parse to integer
       // var _result = int.parse(result);
-      var _result = 4;
-
+      var _result = 9;
       _controller.text = _result.toString();
 
       // 음성 인식 서버 리턴 값에 따른 로직 처리
       // 답을 선택했을 경우
       if (_result >= 1 && _result <= 4) {
+        _isSkipAudio = false;
         _correctAnswer = int.parse(_qData[_qIdx].answer);
 
         // 1~15 문제
@@ -598,23 +606,59 @@ class _QuestionPageState extends State<QuestionPage> {
 
       // 음성이 불분명할 경우 재요청(계속)
       } else if (_result == 0) {
-        _attempt = 2;
-        _startRecord();
+        Fluttertoast.showToast(
+          msg: '다시 한 번 마이크에 대고 말해주세요.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+        _isSkipAudio = true;
+        _playLocal();
 
-      // 입력받은 음성이 없을 경우(null) 재요청(2차) -> result == 9
+        // 입력받은 음성이 없을 경우(null) 재요청(2차) -> _result == 9
       } else {
-        // 1~15 문제
+        _isSkipAudio = true;
+        // 1~15번 문제
         if (_qIdx < 15) {
+          _isStartAnswer = true;
+          // 2차 시도
           if (_attempt == 2) {
             _scoreList.add(0);
-          }
-          // 마지막 문제
-        } else {
-          if (_attempt == 2) {
-            _scoreList.add(0);
+            _qIdx++;
+            _attempt = 1;
+            _isSkipAudio = false;
+            _isStartAnswer = false;
+          } else {
+            Fluttertoast.showToast(
+                msg: '다시 한 번 마이크에 대고 말해주세요.',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3
+            );
+            _attempt = 2;
           }
           audioPlayer.stop();
-          _saveTestResult(widget.mobile, _scoreList);
+          _playLocal();
+          // 마지막 문제
+        } else {
+          // 1차 시도
+          if (_attempt == 1) {
+            Fluttertoast.showToast(
+                msg: '다시 한 번 마이크에 대고 말해주세요.',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3
+            );
+            _attempt = 2;
+            audioPlayer.stop();
+            _playLocal();
+            // 2차 시도
+          } else {
+            _scoreList.add(0);
+            _attempt = 1;
+            audioPlayer.stop();
+            _saveTestResult(widget.mobile, _scoreList);
+          }
         }
       }
     });
@@ -711,6 +755,9 @@ class _QuestionPageState extends State<QuestionPage> {
                 SizedBox(height: 20),
                 Text('question no. : ${_qIdx + 1}, attempt : $_attempt'),
                 Text('score list : $_scoreList'),
+                Text('_isSkipAudio : $_isSkipAudio'),
+                Text('_isStartAnswer : $_isStartAnswer'),
+                Text('key : $_key'),
               ],
             ),
           ],
