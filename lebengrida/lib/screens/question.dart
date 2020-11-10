@@ -60,7 +60,8 @@ class _QuestionPageState extends State<QuestionPage> {
   AudioCache audioCache;
 
   bool _isSkipAudio = false;
-  Key _key;
+  Key _countdownKey;
+  Key _bodyKey;
 
   PlayerState playerState = PlayerState.stopped;
 
@@ -249,10 +250,10 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // 오디오 플레이어 로컬 파일 재생
   Future _playLocal() async {
-    setState(() {
-      _key = new Key(generateRandomString(5));
-    });
-    // 오디오 플레이어 초기화
+    _countdownKey = new Key(generateRandomString(5));
+    _bodyKey = new Key(generateRandomString(5));
+
+      // 오디오 플레이어 초기화
     audioPlayer = new AudioPlayer();
     audioCache = new AudioCache(fixedPlayer: audioPlayer);
     audioPlayer.durationHandler = (d) => setState(() {
@@ -270,6 +271,10 @@ class _QuestionPageState extends State<QuestionPage> {
         audioPlayer.stop();
       }
     });
+
+    if (_isSkipAudio) {
+      _startRecord();
+    }
 
     audioPlayer.onPlayerCompletion.listen((event) {
       if (!_isRecording) {
@@ -420,7 +425,7 @@ class _QuestionPageState extends State<QuestionPage> {
   // 카운트다운과 동시에 정답 음성 입력 받음
   Widget _countDown(int sec) {
     return TimeCircularCountdown(
-      key: _key,
+      key: _countdownKey,
       unit: CountdownUnit.second,
       countdownTotal: sec,
       diameter: 60,
@@ -431,21 +436,16 @@ class _QuestionPageState extends State<QuestionPage> {
         setState(() {
           if (remainTime == 1) {
             Fluttertoast.showToast(
-                msg: '음성 인식 중입니다..',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3
+              msg: '음성 인식 중입니다..',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 3
             );
           }
         });
       },
       onFinished: () {
-        setState(() {
-          if (_isSkipAudio) {
-            _startRecord();
-            _isSkipAudio = false;
-          }
-        });
+        
       },
       textStyle: TextStyle(
         color: Colors.black87,
@@ -538,8 +538,7 @@ class _QuestionPageState extends State<QuestionPage> {
       print('response body -> $result');
 
       // string parse to integer
-      // var _result = int.parse(result);
-      var _result = 9;
+      var _result = int.parse(result);
       _controller.text = _result.toString();
 
       // 음성 인식 서버 리턴 값에 따른 로직 처리
@@ -708,6 +707,7 @@ class _QuestionPageState extends State<QuestionPage> {
         ],
       ),
       body: SingleChildScrollView(
+        key: _bodyKey,
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -747,6 +747,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 // Text('Format: ${_recording.audioOutputFormat}'),
                 // Text('Extension: ${_recording.extension}'),
                 // Text('Audio recording duration: ${_recording.duration.toString()}'),
+                // SizedBox(height: 20),
                 Text('음성 인식 결과 :'),
                 TextField(
                   controller: _controller,
@@ -757,7 +758,8 @@ class _QuestionPageState extends State<QuestionPage> {
                 Text('score list : $_scoreList'),
                 Text('_isSkipAudio : $_isSkipAudio'),
                 Text('_isStartAnswer : $_isStartAnswer'),
-                Text('key : $_key'),
+                Text('countdown key : $_countdownKey'),
+                Text('body key : $_bodyKey'),
               ],
             ),
           ],
