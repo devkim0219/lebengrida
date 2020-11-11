@@ -305,13 +305,12 @@ class JoinPageState extends State<JoinPage> {
                   return '연락처를 입력해주세요.';
                 }
 
-                String mobilePattern = r'^01([0|1|6|7|8|9]?)([0-9]{3,4})([0-9]{4})$';
+                Pattern mobilePattern = r'^01(?:0|1|[6-9])([0-9]{3}|[0-9]{4})([0-9]{4})$';
                 RegExp regex = new RegExp(mobilePattern);
 
                 if (!regex.hasMatch(val)) {
                   return '휴대폰 번호 형식에 맞지 않습니다.';
                 }
-
                 return null;
               },
             ),
@@ -349,7 +348,7 @@ class JoinPageState extends State<JoinPage> {
                   return '보호자 연락처를 입력해주세요.';
                 }
 
-                String mobilePattern = r'^01([0|1|6|7|8|9]?)([0-9]{3,4})([0-9]{4})$';
+                Pattern mobilePattern = r'^01(?:0|1|[6-9])([0-9]{3}|[0-9]{4})([0-9]{4})$';
                 RegExp regex = new RegExp(mobilePattern);
 
                 if (!regex.hasMatch(val)) {
