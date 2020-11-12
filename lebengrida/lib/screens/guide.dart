@@ -24,6 +24,8 @@ class _GuidePageState extends State<GuidePage> {
   List<String> description = List();
   List<String> imageNames = List();
 
+  int _idx = 1;
+
   // 안내 음성 멘트 재생
   Future _playLocal(String filePath) async {
     // 오디오 플레이어 초기화
@@ -33,7 +35,13 @@ class _GuidePageState extends State<GuidePage> {
     await audioCache.play('sounds/$filePath.m4a');
 
     audioPlayer.onPlayerCompletion.listen((event) {
-      audioPlayer.stop();
+      _idx++;
+
+      if (_idx >= 1 && _idx <= 6) {
+        _playLocal('cushion_$_idx');
+      } else {
+        audioPlayer.stop();
+      }
     });
   }
 
@@ -98,7 +106,7 @@ class _GuidePageState extends State<GuidePage> {
 
   @override
   void initState() {
-    _playLocal('01_스마트 인지검사는');
+    _playLocal('cushion_1');
     initializeData();
   }
 
@@ -130,10 +138,11 @@ class _GuidePageState extends State<GuidePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        label: Text('검사하기'),
+        label: Text('시작'),
         icon: Icon(Icons.skip_next),
         backgroundColor: Colors.teal,
         onPressed: () {
+          audioPlayer.stop();
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => AnimationPage(mobile: widget.mobile),
