@@ -79,20 +79,20 @@ class _QuestionPageState extends State<QuestionPage> {
       setState(() {
         _qData = questions;
       });
-      print('Length ${questions.length}');
+      print('question length : ${questions.length}');
     });
   }
 
   // 문제 선택지
   Widget selectButton(int selNum) {
     if (selNum == 1) {
-      _selectText = '$selNum. ' + _qData[_qIdx].select_1;
+      _selectText = '$selNum. ' + (_qData.length > 0 ? _qData[_qIdx].select_1 : '');
     } else if (selNum == 2) {
-      _selectText = '$selNum. ' + _qData[_qIdx].select_2;
+      _selectText = '$selNum. ' + (_qData.length > 0 ? _qData[_qIdx].select_2 : '');
     } else if (selNum == 3) {
-      _selectText = '$selNum. ' + _qData[_qIdx].select_3;
+      _selectText = '$selNum. ' + (_qData.length > 0 ? _qData[_qIdx].select_3 : '');
     } else {
-      _selectText = '$selNum. ' + _qData[_qIdx].select_4;
+      _selectText = '$selNum. ' + (_qData.length > 0 ? _qData[_qIdx].select_4 : '');
     }
 
     return TextButton(
@@ -187,7 +187,7 @@ class _QuestionPageState extends State<QuestionPage> {
         ),
         SizedBox(height: 20),
         Text(
-          _qData[_qIdx].title,
+          _qData.length > 0 ? _qData[_qIdx].title : '',
           style: (
             TextStyle(
               fontSize: 23,
@@ -253,7 +253,7 @@ class _QuestionPageState extends State<QuestionPage> {
     _countdownKey = new Key(generateRandomString(5));
     _bodyKey = new Key(generateRandomString(5));
 
-      // 오디오 플레이어 초기화
+    // 오디오 플레이어 초기화
     audioPlayer = new AudioPlayer();
     audioCache = new AudioCache(fixedPlayer: audioPlayer);
     audioPlayer.durationHandler = (d) => setState(() {
@@ -467,7 +467,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
     // 인지 능력 저하 판단
     // 60~69세 : 22점, 70~74세 : 22점, 75~79세 : 21점, 80세 이상 : 20점
-    if (int.parse(_user.age) >= 60 && int.parse(_user.age) <= 74 && _totalPoint >= 22 ||
+    if (int.parse(_user.age) <= 74 && _totalPoint >= 22 ||
         int.parse(_user.age) >= 75 && int.parse(_user.age) <= 79 && _totalPoint >= 21 ||
         int.parse(_user.age) >= 80 && _totalPoint >= 20 ) {
       _resultStatus = 'pass';
@@ -670,9 +670,7 @@ class _QuestionPageState extends State<QuestionPage> {
   void initState() {
     super.initState();
     _getQuestions();
-    // initAudioPlayer();
     isPlaying ? null : _playLocal();
-    
     UserServices.getUserInfo(widget.mobile).then((value) {
       _user = value;
     });
@@ -690,7 +688,7 @@ class _QuestionPageState extends State<QuestionPage> {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(
-          '${_qIdx + 1}. ${_qData[_qIdx].type}',
+          _qData.length > 0 ? '${_qIdx + 1}. ${_qData[_qIdx].type}' : '',
           softWrap: true,
         ),
         leading: IconButton(
