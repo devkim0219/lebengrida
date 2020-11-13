@@ -37,6 +37,7 @@ class QuestionPage extends StatefulWidget {
 class _QuestionPageState extends State<QuestionPage> {
   User _user;
 
+  bool _isShowQuestion = false;
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
   int _correctAnswer = 0;
@@ -48,7 +49,6 @@ class _QuestionPageState extends State<QuestionPage> {
   String _selectText = '';
   int _attempt = 1;
 
-  Recording _recording = new Recording();
   bool _isRecording = false;
 
   File uploadAudioFile;
@@ -138,7 +138,7 @@ class _QuestionPageState extends State<QuestionPage> {
             print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
             print('score list -> $_scoreList');
             audioPlayer.stop();
-            _playLocal();
+            _playQuestionAudio();
             _selectedAnswer = 0;
           // 마지막 문제
           } else {
@@ -165,6 +165,7 @@ class _QuestionPageState extends State<QuestionPage> {
             print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
             print('score list -> $_scoreList');
             audioPlayer.stop();
+            _playEndingAudio();
             _saveTestResult(widget.mobile, _scoreList);
           }
         });
@@ -174,96 +175,97 @@ class _QuestionPageState extends State<QuestionPage> {
 
   // 문제 생성
   Widget _makeQuestion() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.',
-          style: TextStyle(
-            fontSize: 15,
-            color: Colors.redAccent,
-          ),
-        ),
-        SizedBox(height: 20),
-        Text(
-          _qData.length > 0 ? _qData[_qIdx].title : '',
-          style: (
-            TextStyle(
-              fontSize: 23,
-              fontWeight: FontWeight.bold
-            )
-          ),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        selectButton(1),
-        selectButton(2),
-        selectButton(3),
-        selectButton(4),
-        SizedBox(
-          height: 20,
-        ),
-        // 문제 음성 파일 재생 완료 후 카운트다운 시작
-        _isStartAnswer ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: _countDown(5),
+    if (_isShowQuestion) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.',
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.redAccent,
             ),
-            SizedBox(height: 10),
-            Text(
-              '마이크에 대고 정답을 말하세요.',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.redAccent,
+          ),
+          SizedBox(height: 20),
+          Text(
+            _qData.length > 0 ? _qData[_qIdx].title : '',
+            style: (
+                TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold
+                )
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          selectButton(1),
+          selectButton(2),
+          selectButton(3),
+          selectButton(4),
+          SizedBox(
+            height: 20,
+          ),
+          // 문제 음성 파일 재생 완료 후 카운트다운 시작
+          _isStartAnswer ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Center(
+                child: _countDown(5),
               ),
-            ),
-          ],
-        ) : Container(),
-      ]
-    );
+              SizedBox(height: 10),
+              Text(
+                '마이크에 대고 정답을 말하세요.',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.redAccent,
+                ),
+              ),
+            ],
+          ) : Container(),
+        ]
+      );
+    } else {
+      return Text(
+        '안내 음성이 끝난 후 문제가 나옵니다.',
+        style: TextStyle(
+          fontSize: 20,
+        ),
+      );
+    }
   }
   // <- Question
 
   // Audio Player ->
   // 오디오 플레이어 초기화
-  // void initAudioPlayer() {
-  //   audioPlayer = new AudioPlayer();
-  //   audioCache = new AudioCache(fixedPlayer: audioPlayer);
-  //
-  //   audioPlayer.durationHandler = (d) => setState(() {
-  //     _duration = d;
-  //   });
-  //   audioPlayer.positionHandler = (d) => setState(() {
-  //     _position = d;
-  //   });
-  // }
-
-  // 랜덤 문자열 키 생성
-  String generateRandomString(int len) {
-    var r = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
-  }
-
-  // 오디오 플레이어 로컬 파일 재생
-  Future _playLocal() async {
-    _countdownKey = new Key(generateRandomString(5));
-    _bodyKey = new Key(generateRandomString(5));
-
-    // 오디오 플레이어 초기화
+  void _initAudioPlayer() {
     audioPlayer = new AudioPlayer();
     audioCache = new AudioCache(fixedPlayer: audioPlayer);
+
     audioPlayer.durationHandler = (d) => setState(() {
       _duration = d;
     });
     audioPlayer.positionHandler = (d) => setState(() {
       _position = d;
     });
+  }
 
+  // 랜덤 문자열 키 생성
+  String _generateRandomString(int len) {
+    var r = Random();
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+  }
+
+  // 문제 음성 재생
+  Future _playQuestionAudio() async {
+    _countdownKey = new Key(_generateRandomString(5));
+    _bodyKey = new Key(_generateRandomString(5));
+
+    _initAudioPlayer();
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
+
     setState(() {
       if (!_isSkipAudio) {
         playerState = PlayerState.playing;
@@ -285,6 +287,46 @@ class _QuestionPageState extends State<QuestionPage> {
         _isStartAnswer = true;
         _controller.text = '';
       });
+    });
+  }
+
+  // 안내 음성 멘트 재생
+  var _idx = 8;
+  Future _playGuideAudio() async {
+    _initAudioPlayer();
+    await audioCache.play('sounds/cushion_$_idx.m4a');
+
+    audioPlayer.onPlayerCompletion.listen((event) {
+      _idx++;
+
+      if (_idx >= 8 && _idx <= 11) {
+        _playGuideAudio();
+      } else {
+        setState(() {
+          _isShowQuestion = true;
+        });
+        _playQuestionAudio();
+      }
+    });
+  }
+
+  // 2차 문제 음성 재생
+  Future _play2ndQuestionAudio() async {
+    _initAudioPlayer();
+    await audioCache.play('sounds/cushion_12.m4a');
+
+    audioPlayer.onPlayerCompletion.listen((event) {
+      _playQuestionAudio();
+    });
+  }
+
+  // 검사 종료 안내 음성 재생
+  Future _playEndingAudio() async {
+    _initAudioPlayer();
+    await audioCache.play('sounds/cushion_13.m4a');
+
+    audioPlayer.onPlayerCompletion.listen((event) {
+      audioPlayer.stop();
     });
   }
 
@@ -319,52 +361,52 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 플레이어 생성
-  Widget _buildPlayer() => Container(
-    padding: EdgeInsets.all(16.0),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Row(mainAxisSize: MainAxisSize.min, children: [
-        //   IconButton(
-        //     onPressed: isPlaying ? null : () => _playLocal(),
-        //     iconSize: 30.0,
-        //     icon: Icon(Icons.play_arrow),
-        //     color: Colors.cyan,
-        //   ),
-        //   IconButton(
-        //     onPressed: isPlaying ? () => pause() : null,
-        //     iconSize: 30.0,
-        //     icon: Icon(Icons.pause),
-        //     color: Colors.cyan,
-        //   ),
-        //   IconButton(
-        //     onPressed: isPlaying || isPaused ? () => stop() : null,
-        //     iconSize: 30.0,
-        //     icon: Icon(Icons.stop),
-        //     color: Colors.cyan,
-        //   ),
-        // ]),
-        if (_duration != null) _slider(),
-        // if (position != null) _buildMuteButtons(),
-        if (_position != null) _buildProgressView(),
-      ],
-    ),
-  );
+  // Widget _buildPlayer() => Container(
+  //   padding: EdgeInsets.all(16.0),
+  //   child: Column(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       Row(mainAxisSize: MainAxisSize.min, children: [
+  //         IconButton(
+  //           onPressed: isPlaying ? null : () => _playLocal(),
+  //           iconSize: 30.0,
+  //           icon: Icon(Icons.play_arrow),
+  //           color: Colors.cyan,
+  //         ),
+  //         IconButton(
+  //           onPressed: isPlaying ? () => pause() : null,
+  //           iconSize: 30.0,
+  //           icon: Icon(Icons.pause),
+  //           color: Colors.cyan,
+  //         ),
+  //         IconButton(
+  //           onPressed: isPlaying || isPaused ? () => stop() : null,
+  //           iconSize: 30.0,
+  //           icon: Icon(Icons.stop),
+  //           color: Colors.cyan,
+  //         ),
+  //       ]),
+  //       if (_duration != null) _slider(),
+  //       // if (position != null) _buildMuteButtons(),
+  //       if (_position != null) _buildProgressView(),
+  //     ],
+  //   ),
+  // );
 
   // 오디오 플레이어 슬라이더
-  Widget _slider() {
-    return Slider(
-      value: _position.inSeconds.toDouble(),
-      min: 0.0,
-      max: _duration.inSeconds.toDouble(),
-      onChanged: (double value) {
-        setState(() {
-          seekToSecond(value.toInt());
-          value = value;
-        });
-      },
-    );
-  }
+  // Widget _slider() {
+  //   return Slider(
+  //     value: _position.inSeconds.toDouble(),
+  //     min: 0.0,
+  //     max: _duration.inSeconds.toDouble(),
+  //     onChanged: (double value) {
+  //       setState(() {
+  //         seekToSecond(value.toInt());
+  //         value = value;
+  //       });
+  //     },
+  //   );
+  // }
 
   // 오디오 플레이어 시간 찾기
   void seekToSecond(int second) {
@@ -373,28 +415,28 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 오디오 플레이어 진행상태
-  Row _buildProgressView() => Row(
-    mainAxisSize: MainAxisSize.min, 
-    children: [
-      Padding(
-        padding: EdgeInsets.all(12.0),
-        child: CircularProgressIndicator(
-          value: _position != null && _position.inMilliseconds > 0
-              ? (_position?.inMilliseconds?.toDouble() ?? 0.0) /
-                  (_duration?.inMilliseconds?.toDouble() ?? 0.0)
-              : 0.0,
-          valueColor: AlwaysStoppedAnimation(Colors.teal),
-          backgroundColor: Colors.grey.shade400,
-        ),
-      ),
-      Text(
-        _position != null
-            ? "${positionText ?? ''} / ${durationText ?? ''}"
-            : _duration != null ? durationText : '',
-        style: TextStyle(fontSize: 20.0),
-      )
-    ]
-  );
+  // Row _buildProgressView() => Row(
+  //   mainAxisSize: MainAxisSize.min,
+  //   children: [
+  //     Padding(
+  //       padding: EdgeInsets.all(12.0),
+  //       child: CircularProgressIndicator(
+  //         value: _position != null && _position.inMilliseconds > 0
+  //             ? (_position?.inMilliseconds?.toDouble() ?? 0.0) /
+  //                 (_duration?.inMilliseconds?.toDouble() ?? 0.0)
+  //             : 0.0,
+  //         valueColor: AlwaysStoppedAnimation(Colors.teal),
+  //         backgroundColor: Colors.grey.shade400,
+  //       ),
+  //     ),
+  //     Text(
+  //       _position != null
+  //           ? "${positionText ?? ''} / ${durationText ?? ''}"
+  //           : _duration != null ? durationText : '',
+  //       style: TextStyle(fontSize: 20.0),
+  //     )
+  //   ]
+  // );
 
   // 오디오 플레이어 음소거 버튼
   // Row _buildMuteButtons() {
@@ -444,9 +486,7 @@ class _QuestionPageState extends State<QuestionPage> {
           }
         });
       },
-      onFinished: () {
-
-      },
+      onFinished: () { },
       textStyle: TextStyle(
         color: Colors.black87,
         fontSize: 20,
@@ -512,7 +552,6 @@ class _QuestionPageState extends State<QuestionPage> {
       );
       bool isRecording = await AudioRecorder.isRecording;
       setState(() {
-        _recording = new Recording(duration: new Duration(), path: '');
         _isRecording = isRecording;
         if (_isRecording) {
           Future.delayed(Duration(seconds: 5), () {
@@ -574,7 +613,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
           print('score list -> $_scoreList');
           audioPlayer.stop();
-          _playLocal();
+          _playQuestionAudio();
         // 마지막 문제
         } else {
           _qIdx = 0;
@@ -600,6 +639,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
           print('stt return answer list -> $_scoreList');
           audioPlayer.stop();
+          _playEndingAudio();
           _saveTestResult(widget.mobile, _scoreList);
         }
 
@@ -612,56 +652,46 @@ class _QuestionPageState extends State<QuestionPage> {
           timeInSecForIosWeb: 3
         );
         _isSkipAudio = true;
-        _playLocal();
+        audioPlayer.stop();
+        _playQuestionAudio();
 
         // 입력받은 음성이 없을 경우(null) 재요청(2차) -> _result == 9
       } else {
-        _isSkipAudio = true;
+        _isSkipAudio = false;
+        _isStartAnswer = false;
         // 1~15번 문제
         if (_qIdx < 15) {
-          _isStartAnswer = true;
           // 2차 시도
           if (_attempt == 2) {
             _scoreList.add(0);
             _qIdx++;
             _attempt = 1;
-            _isSkipAudio = false;
-            _isStartAnswer = false;
+            audioPlayer.stop();
+            _playQuestionAudio();
           } else {
-            Fluttertoast.showToast(
-                msg: '다시 한 번 마이크에 대고 말해주세요.',
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3
-            );
             _attempt = 2;
+            audioPlayer.stop();
+            _play2ndQuestionAudio();
           }
-          audioPlayer.stop();
-          _playLocal();
+
           // 마지막 문제
         } else {
           // 1차 시도
           if (_attempt == 1) {
-            Fluttertoast.showToast(
-                msg: '다시 한 번 마이크에 대고 말해주세요.',
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3
-            );
             _attempt = 2;
             audioPlayer.stop();
-            _playLocal();
+            _play2ndQuestionAudio();
             // 2차 시도
           } else {
             _scoreList.add(0);
             _attempt = 1;
             audioPlayer.stop();
+            _playEndingAudio();
             _saveTestResult(widget.mobile, _scoreList);
           }
         }
       }
     });
-    _recording = recording;
     _isRecording = isRecording;
   }
   // <- Audio Record
@@ -670,7 +700,7 @@ class _QuestionPageState extends State<QuestionPage> {
   void initState() {
     super.initState();
     _getQuestions();
-    isPlaying ? null : _playLocal();
+    isPlaying ? 'null' : _playGuideAudio();
     UserServices.getUserInfo(widget.mobile).then((value) {
       _user = value;
     });

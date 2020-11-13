@@ -157,7 +157,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
             width: MediaQuery.of(context).size.width,
             color: Colors.grey[200],
             child: YearPicker(
-              selectedDate: DateTime(year),
+              selectedDate: DateTime(int.parse(_birthController.text)),
               firstDate: DateTime(year - 100),
               lastDate: DateTime(year),
               onChanged: (value) {

@@ -14,9 +14,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // final List qData = [];
-  bool _isGrantedPermission = false;
-
   // 마이크 및 저장소 권한 체크
   Future<bool> _checkPermission() async {
     PermissionStatus storagePermissionStatus = await Permission.storage.status;
@@ -44,6 +41,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    bool _isGrantedPermission = false;
 
     // 권한 체크
     _checkPermission().then((value) {

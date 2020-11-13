@@ -45,6 +45,18 @@ class _GuidePageState extends State<GuidePage> {
     });
   }
 
+  Future _playLocal2(String filePath) async {
+    // 오디오 플레이어 초기화
+    audioPlayer = new AudioPlayer();
+    audioCache = new AudioCache(fixedPlayer: audioPlayer);
+
+    await audioCache.play('sounds/$filePath.m4a');
+
+    audioPlayer.onPlayerCompletion.listen((event) {
+      audioPlayer.stop();
+    });
+  }
+
   // 슬라이드 이미지 초기화
   void initializeData() {
     // login.png
@@ -64,7 +76,7 @@ class _GuidePageState extends State<GuidePage> {
 
     // result.png
     titles.add('검사 결과');
-    description.add('1. 1차: 2점, 2차: 1점, 오답: 0점\n    (총점 32점)\n2. 연령대와 총점에 따라 인지 능력 저하\n    판단');
+    description.add('1. 1차: 2점, 2차: 1점, 오답: 0점\n    (총점 32점)\n2. 연령대와 총점에 따라 인지 능력 판단');
     imageNames.add('assets/images/result.png');
   }
 
@@ -118,12 +130,16 @@ class _GuidePageState extends State<GuidePage> {
         title: Text('사용 방법 안내'),
         leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
+            onPressed: () {
+              audioPlayer.stop();
+              Navigator.popUntil(context, ModalRoute.withName('/'));
+            }
         ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
+              audioPlayer.stop();
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           ),
@@ -143,11 +159,14 @@ class _GuidePageState extends State<GuidePage> {
         backgroundColor: Colors.teal,
         onPressed: () {
           audioPlayer.stop();
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => AnimationPage(mobile: widget.mobile),
-            )
-          );
+          _playLocal2('cushion_7');
+          Future.delayed(Duration(seconds: 2), () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => AnimationPage(mobile: widget.mobile),
+              )
+            );
+          });
         },
       ),
     );

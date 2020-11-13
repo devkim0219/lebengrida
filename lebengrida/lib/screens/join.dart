@@ -15,7 +15,6 @@ class JoinPageState extends State<JoinPage> {
   final _fKey = GlobalKey<FormState>();
   
   String year;
-  bool _isShowAgree = false;
   bool _isAgree = false;
 
   String _selectedGender = '남성';
@@ -385,7 +384,6 @@ class JoinPageState extends State<JoinPage> {
                   ),
                   onPressed: () {
                     setState(() {
-                      _isShowAgree = true;
                       _isAgree = true;
                     });
                     _showContent();
