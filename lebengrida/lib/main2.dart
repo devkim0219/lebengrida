@@ -1,22 +1,27 @@
 import 'package:ff_navigation_bar/ff_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:lebengrida/data/join_or_login.dart';
 import 'package:lebengrida/screen/join_screen.dart';
 import 'package:lebengrida/screen/home_screen.dart';
 import 'package:lebengrida/screen/result_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: '스마트 화행 검사 - 레벤그리다',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+    return ChangeNotifierProvider<JoinOrLogin>.value(
+      value : JoinOrLogin(),
+      child: MaterialApp(
+        title: '스마트 화행 검사 - 레벤그리다',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.teal,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: MyHomePage(title: '스마트 스피치(S-Speech)'),
       ),
-      home: MyHomePage(title: '스마트 스피치(S-Speech)'),
     );
   }
 }

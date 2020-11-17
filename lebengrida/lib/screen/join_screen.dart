@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:group_radio_button/group_radio_button.dart';
+import 'package:lebengrida/screen/home_screen.dart';
 import 'package:lebengrida/service/user_service.dart';
 
 class JoinPage extends StatefulWidget {
@@ -488,7 +489,11 @@ class _JoinPageState extends State<JoinPage> {
               );
             }
         });
-        Navigator.popUntil(context, ModalRoute.withName('/'));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
       }
     });
   }

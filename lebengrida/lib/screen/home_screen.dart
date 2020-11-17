@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/data/join_or_login.dart';
 import 'package:lebengrida/screen/guide.dart';
 import 'package:lebengrida/service/login_service.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -82,44 +84,66 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       SizedBox(height: 60),
-                      TextField(
-                        controller: _mobileController,
-                        decoration: InputDecoration(
-                          hintText: '휴대폰 번호를 입력하세요.'
-                        ),
+                      Consumer<JoinOrLogin>(
+                        builder: (context, joinOrLogin, child) =>
+                          joinOrLogin.isLogin
+                            ? SizedBox(height: 48)
+                            : TextField(
+                                controller: _mobileController,
+                                decoration: InputDecoration(
+                                    hintText: '휴대폰 번호를 입력하세요.'
+                                ),
+                              )
                       ),
                       SizedBox(height: 35),
-                      RaisedButton(
-                        color: Colors.teal,
-                        child: Text('로그인', style: TextStyle(color: Colors.white)),
-                        onPressed: () {
-                          if (_mobileController.text.isEmpty) {
-                            Fluttertoast.showToast(
-                              msg: '휴대폰 번호를 입력해주세요.',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 3
-                            );
-                            return;
-                          }
-                          _checkUser(_mobileController.text).then((value) {
-                            if (value == 'success') {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => GuidePage(mobile: _mobileController.text),
-                                ),
-                              );
-                            } else {
+                      Consumer<JoinOrLogin>(
+                        builder: (context, joinOrLogin, child) =>
+                        RaisedButton(
+                          color: Colors.teal,
+                          child: Text(joinOrLogin.isLogin ? '검사시작' : '로그인', style: TextStyle(color: Colors.white)),
+                          onPressed: () {
+                            if (_mobileController.text.isEmpty) {
                               Fluttertoast.showToast(
-                                msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
+                                msg: '휴대폰 번호를 입력해주세요.',
                                 toastLength: Toast.LENGTH_SHORT,
                                 gravity: ToastGravity.BOTTOM,
                                 timeInSecForIosWeb: 3
                               );
                               return;
                             }
-                          });
-                        },
+                            _checkUser(_mobileController.text).then((value) {
+                              if (value == 'success') {
+                                joinOrLogin.toggle();
+                                if (joinOrLogin.isLogin) {
+                                  Fluttertoast.showToast(
+                                      msg: '로그인 성공',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 3
+                                  );
+                                  return;
+                                }
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 3
+                                );
+                                return;
+                              }
+                            });
+                            if (joinOrLogin.isLogin) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => GuidePage(mobile: _mobileController.text),
+                                ),
+                              );
+                            } else {
+                              Navigator.popUntil(context, ModalRoute.withName('/'));
+                            }
+                          },
+                        ),
                       ),
                     ],
                   ),
