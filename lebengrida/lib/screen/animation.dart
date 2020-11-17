@@ -2,7 +2,7 @@ import 'package:cached_video_player/cached_video_player.dart';
 import 'package:cachedflickvideoplayer/cachedflickvideoplayer.dart';
 import 'package:cachedflickvideoplayer/manager/flick_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:lebengrida/screens/question.dart';
+import 'package:lebengrida/screen/question.dart';
 
 class AnimationPage extends StatefulWidget {
   final String mobile;

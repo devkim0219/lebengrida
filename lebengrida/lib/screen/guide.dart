@@ -1,6 +1,6 @@
 import 'package:carousel_widget/carousel_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:lebengrida/screens/animation.dart';
+import 'package:lebengrida/screen/animation.dart';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -66,7 +66,7 @@ class _GuidePageState extends State<GuidePage> {
 
     // animation.png
     titles.add('동화 구연');
-    description.add('1. 일시정지\n2. 일시정지 및 음소거\n3. 전체화면');
+    description.add('1. 재생 및 일시정지\n2. 일시정지 및 음소거\n3. 전체화면');
     imageNames.add('assets/images/animation.png');
 
     // question.png

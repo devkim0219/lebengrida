@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:lebengrida/screens/guide.dart';
-import 'package:lebengrida/screens/result.dart';
-import 'package:lebengrida/screens/update_info.dart';
-import 'package:lebengrida/services/login_service.dart';
-import 'package:lebengrida/services/result_service.dart';
+import 'package:lebengrida/screen/guide.dart';
+import 'package:lebengrida/screen/result.dart';
+import 'package:lebengrida/screen/update_info.dart';
+import 'package:lebengrida/service/login_service.dart';
+import 'package:lebengrida/service/result_service.dart';
 
 class LoginPage extends StatefulWidget {
   @override

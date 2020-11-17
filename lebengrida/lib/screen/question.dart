@@ -10,14 +10,14 @@ import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:lebengrida/models/user_data.dart';
-import 'package:lebengrida/screens/result.dart';
-import 'package:lebengrida/models/question_data.dart';
-import 'package:lebengrida/services/question_service.dart';
+import 'package:lebengrida/model/user_data.dart';
+import 'package:lebengrida/screen/result.dart';
+import 'package:lebengrida/model/question_data.dart';
+import 'package:lebengrida/service/question_service.dart';
 import 'package:circular_countdown/circular_countdown.dart';
-import 'package:lebengrida/services/result_service.dart';
-import 'package:lebengrida/services/user_service.dart';
-import 'package:lebengrida/services/fileupload_service.dart';
+import 'package:lebengrida/service/result_service.dart';
+import 'package:lebengrida/service/user_service.dart';
+import 'package:lebengrida/service/fileupload_service.dart';
 import 'package:path_provider/path_provider.dart';
 
 typedef void OnError(Exception exception);
@@ -95,81 +95,89 @@ class _QuestionPageState extends State<QuestionPage> {
       _selectText = '$selNum. ' + (_qData.length > 0 ? _qData[_qIdx].select_4 : '');
     }
 
-    return TextButton(
-      child: Text(
-        _selectText,
-        style: TextStyle(
-          fontSize: 20,
-          color: Colors.black,
+    return SizedBox(
+      width: double.infinity,
+      child: TextButton(
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(_selectText),
         ),
-      ),
-      onPressed: () {
-        setState(() {
-          _selectedAnswer = selNum;
-          _correctAnswer =  int.parse(_qData[_qIdx].answer);
-          print('selected answer -> $_selectedAnswer');
-          print('correct answer -> ${_qData[_qIdx].answer}');
+        style: TextButton.styleFrom(
+          primary: Colors.black87,
+          backgroundColor: Colors.teal[100],
+          textStyle: TextStyle(
+            fontSize: 20,
+            color: Colors.black87,
+          ),
+        ),
+        onPressed: () {
+          setState(() {
+            _selectedAnswer = selNum;
+            _correctAnswer =  int.parse(_qData[_qIdx].answer);
+            print('selected answer -> $_selectedAnswer');
+            print('correct answer -> ${_qData[_qIdx].answer}');
 
-          // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
-          // 1~15 문제
-          if (_selectedAnswer > 0 && _qIdx < 15) {
-            _isStartAnswer = false;
-            _qIdx++;
-            // 1차 시도
-            if (_attempt == 1) {
-              // 정답
-              if (_correctAnswer == _selectedAnswer) {
-                _scoreList.add(2);
-              // 오답
+            // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
+            // 1~15 문제
+            if (_selectedAnswer > 0 && _qIdx < 15) {
+              _isStartAnswer = false;
+              _qIdx++;
+              // 1차 시도
+              if (_attempt == 1) {
+                // 정답
+                if (_correctAnswer == _selectedAnswer) {
+                  _scoreList.add(2);
+                  // 오답
+                } else {
+                  _scoreList.add(0);
+                }
+                // 2차 시도
               } else {
-                _scoreList.add(0);
+                // 정답
+                if (_correctAnswer == _selectedAnswer) {
+                  _scoreList.add(1);
+                  // 오답
+                } else {
+                  _scoreList.add(0);
+                }
               }
-            // 2차 시도
+              _attempt = 1;
+              print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
+              print('score list -> $_scoreList');
+              audioPlayer.stop();
+              _playQuestionAudio();
+              _selectedAnswer = 0;
+              // 마지막 문제
             } else {
-              // 정답
-              if (_correctAnswer == _selectedAnswer) {
-                _scoreList.add(1);
-              // 오답
+              _qIdx = 0;
+              // 1차 시도
+              if (_attempt == 1) {
+                // 정답
+                if (_correctAnswer == _selectedAnswer) {
+                  _scoreList.add(2);
+                  // 오답
+                } else {
+                  _scoreList.add(0);
+                }
+                // 2차 시도
               } else {
-                _scoreList.add(0);
+                // 정답
+                if (_correctAnswer == _selectedAnswer) {
+                  _scoreList.add(1);
+                  // 오답
+                } else {
+                  _scoreList.add(0);
+                }
               }
+              print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
+              print('score list -> $_scoreList');
+              audioPlayer.stop();
+              _playEndingAudio();
+              _saveTestResult(widget.mobile, _scoreList);
             }
-            _attempt = 1;
-            print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-            print('score list -> $_scoreList');
-            audioPlayer.stop();
-            _playQuestionAudio();
-            _selectedAnswer = 0;
-          // 마지막 문제
-          } else {
-            _qIdx = 0;
-            // 1차 시도
-            if (_attempt == 1) {
-              // 정답
-              if (_correctAnswer == _selectedAnswer) {
-                _scoreList.add(2);
-              // 오답
-              } else {
-                _scoreList.add(0);
-              }
-            // 2차 시도
-            } else {
-              // 정답
-              if (_correctAnswer == _selectedAnswer) {
-                _scoreList.add(1);
-              // 오답
-              } else {
-                _scoreList.add(0);
-              }
-            }
-            print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-            print('score list -> $_scoreList');
-            audioPlayer.stop();
-            _playEndingAudio();
-            _saveTestResult(widget.mobile, _scoreList);
-          }
-        });
-      },
+          });
+        },
+      ),
     );
   }
 
@@ -731,7 +739,7 @@ class _QuestionPageState extends State<QuestionPage> {
             onPressed: () {
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(

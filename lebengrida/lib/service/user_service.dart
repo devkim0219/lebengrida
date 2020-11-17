@@ -1,4 +1,4 @@
-import 'package:lebengrida/models/user_data.dart';
+import 'package:lebengrida/model/user_data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

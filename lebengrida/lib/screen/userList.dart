@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lebengrida/models/user_data.dart';
-import 'package:lebengrida/services/user_service.dart';
+import 'package:lebengrida/model/user_data.dart';
+import 'package:lebengrida/service/user_service.dart';
 
 class UserListPage extends StatefulWidget {
   UserListPage() : super();

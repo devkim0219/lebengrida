@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:lebengrida/screens/guide.dart';
-import 'package:lebengrida/screens/animation.dart';
-import 'package:lebengrida/screens/join.dart';
-import 'package:lebengrida/screens/login.dart';
-import 'package:lebengrida/screens/question.dart';
-import 'package:lebengrida/screens/result.dart';
-import 'package:lebengrida/screens/userList.dart';
-import 'package:lebengrida/screens/update_info.dart';
+import 'package:lebengrida/screen/guide.dart';
+import 'package:lebengrida/screen/animation.dart';
+import 'package:lebengrida/screen/join.dart';
+import 'package:lebengrida/screen/login.dart';
+import 'package:lebengrida/screen/question.dart';
+import 'package:lebengrida/screen/result.dart';
+import 'package:lebengrida/screen/userList.dart';
+import 'package:lebengrida/screen/update_info.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
