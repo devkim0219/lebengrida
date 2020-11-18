@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:group_radio_button/group_radio_button.dart';
+import 'package:lebengrida/model/user_data.dart';
 import 'package:lebengrida/service/user_service.dart';
 
-class JoinPage extends StatefulWidget {
+class UpdateInfoPage extends StatefulWidget {
+  final String mobile;
+
+  UpdateInfoPage({
+    Key key,
+    @required this.mobile
+  }) : super(key: key);
+
   @override
-  _JoinPageState createState() => _JoinPageState();
+  UpdateInfoPageState createState() => UpdateInfoPageState();
 }
 
-class _JoinPageState extends State<JoinPage> {
+class UpdateInfoPageState extends State<UpdateInfoPage> {
   final _focusNode = FocusScopeNode();
   final _fKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -16,16 +24,17 @@ class _JoinPageState extends State<JoinPage> {
   DateTime currentBackPressTime;
 
   String year;
-  bool _isAgree = false;
 
   String _selectedGender = '남성';
   List<String> _gender = ['남성', '여성'];
 
+  GlobalKey<ScaffoldState> _scaffoldKey;
   TextEditingController _nameController;
   TextEditingController _birthController;
   TextEditingController _mobileController;
   TextEditingController _protectorNameController;
   TextEditingController _protectorMobileController;
+  User _selectedUser;
 
   // 뒤로가기 버튼 두 번 터치 시 종료
   bool onPressBackButton() {
@@ -65,18 +74,88 @@ class _JoinPageState extends State<JoinPage> {
   String _selectedGuGun = '구/군 선택';
   List<String> _selectedGuGunList = [];
   String _address;
+  List<String> _addressArr = [];
 
-  // 입력 폼 초기화
-  _clearFormData() {
+  // 회원 정보 수정
+  _updateUser(User user) {
+    if (_selectedSido == '시/도 선택' || _selectedGuGun == '구/군 선택') {
+      Fluttertoast.showToast(
+        msg: '주소를 선택해주세요.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3
+      );
+      return;
+    } else {
+      _address = _selectedSido + " " + _selectedGuGun;
+    }
+
+    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
+        .then((result) {
+      if ('success' == result) {
+        Navigator.pop(context);
+        Fluttertoast.showToast(
+          msg: '회원 정보가 수정되었습니다.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3
+        );
+      }
+    });
+  }
+
+  // 회원 정보 수정을 위한 해당 회원의 정보 조회
+  _getUserInfo(String mobile) {
+    UserServices.getUserInfo(mobile).then((user) {
+      setState(() {
+        _selectedUser = user;
+      });
+      print('### selected user info -> ${user.mobile}');
+      _showValues(_selectedUser);
+    });
+  }
+
+  // 회원 정보 삭제(탈퇴)
+  // _deleteUser(User user) {
+  //   UserServices.deleteUser(user.mobile).then((result) {
+  //     if ('success' == result) {
+  //       Navigator.pushNamed(context, '/');
+  //       Fluttertoast.showToast(
+  //         msg: '회원 탈퇴가 완료되었습니다.',
+  //         toastLength: Toast.LENGTH_SHORT,
+  //         gravity: ToastGravity.BOTTOM,
+  //         timeInSecForIosWeb: 3
+  //       );
+  //     }
+  //   });
+  // }
+
+  // 입력값 초기화
+  _clearValues() {
     _nameController.text = '';
     _birthController.text = '';
-    _selectedGender = '남성';
-    _selectedSido = '시/도 선택';
-    _selectedGuGun = '구/군 선택';
     _mobileController.text = '';
     _protectorNameController.text = '';
     _protectorMobileController.text = '';
-    _isAgree = false;
+  }
+
+  // 각 회원의 정보 조회
+  _showValues(User user) {
+    _nameController.text = user.name;
+    _birthController.text = user.birth;
+
+    if (user.gender == 'm') {
+      _selectedGender = '남성';
+    } else {
+      _selectedGender = '여성';
+    }
+
+    _addressArr = user.address.split(' ');
+    _selectedSido = _addressArr[0];
+    _selectedGuGun = _addressArr[1];
+    _mobileController.text = user.mobile;
+    _protectorNameController.text = user.protectorName;
+    _protectorMobileController.text = user.protectorMobile;
   }
 
   // 출생년도 선택
@@ -96,7 +175,7 @@ class _JoinPageState extends State<JoinPage> {
             width: MediaQuery.of(context).size.width,
             color: Colors.grey[200],
             child: YearPicker(
-              selectedDate: DateTime(year),
+              selectedDate: DateTime(int.parse(_birthController.text)),
               firstDate: DateTime(year - 100),
               lastDate: DateTime(year),
               onChanged: (value) {
@@ -106,7 +185,7 @@ class _JoinPageState extends State<JoinPage> {
             ),
           ),
         );
-      }
+      },
     );
   }
 
@@ -146,58 +225,8 @@ class _JoinPageState extends State<JoinPage> {
     );
   }
 
-  // 개인정보 수집 동의서
-  _showContent() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(
-            '개인정보 수집·이용에 관한 동의서',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          content: Container(
-              height: MediaQuery.of(context).size.height / 2.0,
-              width: MediaQuery.of(context).size.width,
-              color: Colors.white,
-              child: SingleChildScrollView(
-                child: Text(
-                  '주식회사 레벤그리다한국문화다양성연구원은 개인정보보호법 등 관련 법상의 개인정보보호규정을 준수하여 스마트 화행검사 서비스 또는 스마트 스피치(S-Speech) 내 이용자 식별, 회원관리 및 서비스 제공을 위해 개인정보보호법에 의거하여 개인정보를 수집·이용·제공함에 있어 아래와 같은 동의를 받고자합니다.\n'
-                  + '다음과 같이 서비스 이용 및 회원들의 관리, 서비스제공 등에 따른 보호자 연락처의 보관 등과 같이 반드시 필요한 범위내에서 회원의 개인정보 수집, 이용, 보관하고 이를 제3자에게 제공하는데 동의를 받고자합니다.\n\n'
-                  + '1. 개인정보 수집 목적\n'
-                  + '서비스 이용, 제공, 평가, 이용자식별, 관리등, 기타 법령으로 정한 용도로의 활용 및 제3자에 대한 제공\n\n'
-                  + '2. 수집항목\n'
-                  + '가. 필수항목 : 이름, 성별, 주민등록번호 앞 6자리, 주소, 휴대폰번호(연락을 목적으로 사용 가능), 1차 보호자 또는 대리인 연락처\n'
-                  + '나. 선택항목 : 가족관계\n\n'
-                  + '3. 개인정보 보유 및 이용기간\n'
-                  + '서비스 탈퇴시 1년간 보관\n\n'
-                  + '4. 제3자에 대한 제공 동의\n'
-                  + '가. 제공 받은 자 : 사업장의 사업주 또는 담당자\n'
-                  + '나. 제공 받은 자의 목적 : 정보제공자의 서비스 이용자 관리, 평가, 서비스 제공 등\n'
-                  + '다. 제공하는 항목 : 정보 주체가 제출한 개인정보에 기재된 사항 일체\n'
-                  + '라. 제공 받은 자의 보유/이용기간 : 정보 주체가 해당 서비스를 이용하는 기간 동안\n'
-                  + '마. 동의 거부권 : 귀 개인정보의 수집·이용에 대한 동의를 거부할 수 있으며, 동의하지 않는 경우 서비스 이용 거부로 서비스이용 및 평가에 제한 또는 거절 될 수 있습니다.\n\n'
-                  + '5. 개인정보의 수집·이용에 대한 동의 거부\n'
-                  + '개인정보의 수집·이용을 거부할 수 있습니다. 다만, 개인정보의 수집·이용 등에 동의하지 않을 경우 서비스 이용자 식별, 관리 서비스 평가 등의 이용이 어려울 수 있습니다.\n\n\n'
-                  + '주식회사 레벤그리다한국문화다양성연구원 대표이사 귀하\n',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black87,
-                  ),
-                ),
-              )
-          ),
-        );
-      }
-    );
-  }
-
-  // 회원 등록 정보 입력 폼
-  Widget inputForm() {
+  // 회원 정보 수정 입력 폼
+  Widget updateForm() {
     return Form(
       key: _fKey,
       child: Column(
@@ -332,13 +361,6 @@ class _JoinPageState extends State<JoinPage> {
                 if (val == null || val.isEmpty) {
                   return '연락처를 입력해주세요.';
                 }
-
-                Pattern mobilePattern = r'^01(?:0|1|[6-9])([0-9]{3}|[0-9]{4})([0-9]{4})$';
-                RegExp regex = new RegExp(mobilePattern);
-
-                if (!regex.hasMatch(val)) {
-                  return '휴대폰 번호 형식에 맞지 않습니다.';
-                }
                 return null;
               },
             ),
@@ -362,101 +384,42 @@ class _JoinPageState extends State<JoinPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.only(bottom: 15),
+            padding: EdgeInsets.only(bottom: 20),
             child: TextFormField(
               controller: _protectorMobileController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: '보호자 연락처',
                 hintText: '예) 01012345678',
-                prefixIcon: Icon(Icons.person_add),
+                prefixIcon: Icon(Icons.phone_android),
               ),
               validator: (val) {
                 if (val == null || val.isEmpty) {
                   return '보호자 연락처를 입력해주세요.';
                 }
-
-                Pattern mobilePattern = r'^01(?:0|1|[6-9])([0-9]{3}|[0-9]{4})([0-9]{4})$';
-                RegExp regex = new RegExp(mobilePattern);
-
-                if (!regex.hasMatch(val)) {
-                  return '휴대폰 번호 형식에 맞지 않습니다.';
-                }
                 return null;
               },
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  Icons.contact_page,
-                  color: Colors.black45,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  '개인정보 수집 동의',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                FlatButton(
-                  child: Text(
-                    '내용보기',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.blueGrey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isAgree = true;
-                    });
-                    _showContent();
-                  },
-                ),
-                Text(
-                  '동의함',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                Checkbox(
-                  value:  _isAgree,
-                  onChanged: (value) {
-                    setState(() {
-                      _isAgree = value;
-                    });
-                  },
-                ),
-              ],
             ),
           ),
           ButtonBar(
             children: <Widget>[
               FlatButton(
-                child: Text('초기화'),
+                child: Text('취소'),
                 onPressed: () {
-                  setState(() {
-                    _clearFormData();
-                  });
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
                 },
               ),
               RaisedButton(
                 color: Colors.teal,
                 child: Text(
-                  '등록',
+                  '수정',
                   style: TextStyle(
                       color: Colors.white
                   ),
                 ),
                 onPressed: () {
                   if (_fKey.currentState.validate()) {
-                    _addUser();
+                    _updateUser(_selectedUser);
                   }
                 },
               ),
@@ -467,94 +430,64 @@ class _JoinPageState extends State<JoinPage> {
     );
   }
 
-  // 회원 등록
-  _addUser() {
-    if (!_isAgree) {
-      Fluttertoast.showToast(
-        msg: '개인정보 수집 동의에 체크해주세요.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3
-      );
-      return;
-    }
-
-    if (_selectedSido == '시/도 선택' || _selectedGuGun == '구/군 선택') {
-      Fluttertoast.showToast(
-        msg: '주소를 선택해주세요.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3
-      );
-      return;
-    } else {
-      _address = _selectedSido + " " + _selectedGuGun;
-    }
-
-    UserServices.checkUser(_mobileController.text).then((result) {
-      if ('success' == result) {
-        Fluttertoast.showToast(
-          msg: '이미 등록된 번호입니다.',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3
-        );
-      } else {
-        UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
-          .then((result) {
-            if ('success' == result) {
-              Fluttertoast.showToast(
-                msg: '등록이 완료되었습니다.',
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 3
-              );
-            }
-        });
-        Navigator.of(context).popUntil((route) => false);
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (context) => MyApp(),
-        //   ),
-        // );
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
+    _scaffoldKey = GlobalKey();
     _nameController = TextEditingController();
     _birthController = TextEditingController();
     _mobileController = TextEditingController();
     _protectorNameController = TextEditingController();
     _protectorMobileController = TextEditingController();
+
+    _getUserInfo(widget.mobile);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: GestureDetector(
-        onTap: () {
-          _focusNode.unfocus();
-        },
-        child: FocusScope(
-          node: _focusNode,
-          child: WillPopScope(
-            onWillPop: () async {
-              bool result = onPressBackButton();
-              return await Future.value(result);
-            },
-            child: Scaffold(
-              appBar: AppBar(title: Text('회원 등록')),
-              body: SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(30.0),
-                  child: inputForm(),
+    return GestureDetector(
+      onTap: () {
+        _focusNode.unfocus();
+      },
+      child: FocusScope(
+        node: _focusNode,
+        child: WillPopScope(
+          onWillPop: () async {
+            bool result = onPressBackButton();
+            return await Future.value(result);
+          },
+          child: Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text('회원 정보 수정'),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.popUntil(context, ModalRoute.withName('/'));
+                  },
                 ),
+                IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () {
+                    _clearValues();
+                  },
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(30.0),
+                child: updateForm(),
               ),
             ),
           ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     _addUser();
+          //   },
+          //   child: Icon(Icons.add),
+          // ),
         ),
       ),
     );
