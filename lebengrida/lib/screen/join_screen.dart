@@ -20,11 +20,11 @@ class _JoinPageState extends State<JoinPage> {
   String _selectedGender = '남성';
   List<String> _gender = ['남성', '여성'];
 
-  TextEditingController _nameController = new TextEditingController();
-  TextEditingController _birthController = new TextEditingController();
-  TextEditingController _mobileController = new TextEditingController();
-  TextEditingController _protectorNameController = new TextEditingController();
-  TextEditingController _protectorMobileController = new TextEditingController();
+  TextEditingController _nameController;
+  TextEditingController _birthController;
+  TextEditingController _mobileController;
+  TextEditingController _protectorNameController;
+  TextEditingController _protectorMobileController;
 
   // 시군구 리스트
   final List<String> _sidoGubun = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
@@ -506,11 +506,11 @@ class _JoinPageState extends State<JoinPage> {
   @override
   void initState() {
     super.initState();
-    // _nameController = TextEditingController();
-    // _birthController = TextEditingController();
-    // _mobileController = TextEditingController();
-    // _protectorNameController = TextEditingController();
-    // _protectorMobileController = TextEditingController();
+    _nameController = TextEditingController();
+    _birthController = TextEditingController();
+    _mobileController = TextEditingController();
+    _protectorNameController = TextEditingController();
+    _protectorMobileController = TextEditingController();
   }
 
   @override

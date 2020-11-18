@@ -1,13 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:lebengrida/data/login_auth.dart';
-import 'package:lebengrida/main.dart';
 import 'package:lebengrida/model/result_data.dart';
 import 'package:lebengrida/model/user_data.dart';
-import 'package:lebengrida/screen/home_screen.dart';
 import 'package:lebengrida/service/result_service.dart';
 import 'package:lebengrida/service/user_service.dart';
-import 'package:provider/provider.dart';
 
 class ResultPage extends StatefulWidget {
   final String mobile;

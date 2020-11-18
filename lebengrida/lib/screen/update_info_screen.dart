@@ -116,10 +116,13 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   //   });
   // }
 
-  // 입력값 초기화
-  _clearValues() {
+  // 입력 폼 초기화
+  _clearFormData() {
     _nameController.text = '';
     _birthController.text = '';
+    _selectedGender = '남성';
+    _selectedSido = '시/도 선택';
+    _selectedGuGun = '구/군 선택';
     _mobileController.text = '';
     _protectorNameController.text = '';
     _protectorMobileController.text = '';
@@ -392,7 +395,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
               // FlatButton(
               //   child: Text('초기화'),
               //   onPressed: () {
-              //     _clearValues();
+              //     _clearFormData();
               //   },
               // ),
               RaisedButton(
