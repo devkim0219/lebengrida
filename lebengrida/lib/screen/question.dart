@@ -5,16 +5,16 @@ import 'dart:math';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
+import 'package:circular_countdown/circular_countdown.dart';
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lebengrida/model/user_data.dart';
-import 'package:lebengrida/screen/result.dart';
 import 'package:lebengrida/model/question_data.dart';
+import 'package:lebengrida/screen/result_screen.dart';
 import 'package:lebengrida/service/question_service.dart';
-import 'package:circular_countdown/circular_countdown.dart';
 import 'package:lebengrida/service/result_service.dart';
 import 'package:lebengrida/service/user_service.dart';
 import 'package:lebengrida/service/fileupload_service.dart';
@@ -71,7 +71,7 @@ class _QuestionPageState extends State<QuestionPage> {
   get positionText => _position != null ? _position.toString().split('.').first : '';
 
   // bool isMuted = false;
-  
+
   // Question ->
   // 문제 데이터 가져오기
   _getQuestions() {
@@ -198,23 +198,20 @@ class _QuestionPageState extends State<QuestionPage> {
           SizedBox(height: 20),
           Text(
             _qData.length > 0 ? _qData[_qIdx].title : '',
-            style: (
-                TextStyle(
-                    fontSize: 23,
-                    fontWeight: FontWeight.bold
-                )
+            style: TextStyle(
+              fontSize: 23,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 15),
           selectButton(1),
+          SizedBox(height: 3),
           selectButton(2),
+          SizedBox(height: 3),
           selectButton(3),
+          SizedBox(height: 3),
           selectButton(4),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           // 문제 음성 파일 재생 완료 후 카운트다운 시작
           _isStartAnswer ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -232,7 +229,7 @@ class _QuestionPageState extends State<QuestionPage> {
               ),
             ],
           ) : Container(),
-        ]
+        ],
       );
     } else {
       return Text(
@@ -275,6 +272,7 @@ class _QuestionPageState extends State<QuestionPage> {
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
 
     setState(() {
+      Future.delayed(Duration(seconds: 3), () => _controller.text = '');
       if (!_isSkipAudio) {
         playerState = PlayerState.playing;
       } else {
@@ -486,10 +484,10 @@ class _QuestionPageState extends State<QuestionPage> {
         setState(() {
           if (remainTime == 1) {
             Fluttertoast.showToast(
-              msg: '음성 인식 중입니다..',
-              toastLength: Toast.LENGTH_LONG,
-              gravity: ToastGravity.BOTTOM,
-              timeInSecForIosWeb: 3
+                msg: '음성 인식 중입니다..',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 3
             );
           }
         });
@@ -523,25 +521,24 @@ class _QuestionPageState extends State<QuestionPage> {
       _resultStatus = 'nopass';
     }
 
-    ResultServices.saveTestResult(mobile, answerList, _totalPoint, _resultStatus)
-      .then((result) {
-        if ('success' == result) {
-          _msg = '검사 결과가 저장되었습니다.';
-        } else {
-          _msg = '오류로 인해 검사 결과가 저장되지 않았습니다.';
-        }
-        Fluttertoast.showToast(
+    ResultServices.saveTestResult(mobile, answerList, _totalPoint, _resultStatus).then((result) {
+      if ('success' == result) {
+        _msg = '검사 결과가 저장되었습니다.';
+      } else {
+        _msg = '오류로 인해 검사 결과가 저장되지 않았습니다.';
+      }
+      Fluttertoast.showToast(
           msg: _msg,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 3
-        );
-      });
-    
+      );
+    });
+
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ResultPage(mobile: widget.mobile),
-      )
+        MaterialPageRoute(
+          builder: (context) => ResultPage(mobile: widget.mobile),
+        )
     );
   }
 
@@ -607,7 +604,7 @@ class _QuestionPageState extends State<QuestionPage> {
             } else {
               _scoreList.add(0);
             }
-          // 2차 시도
+            // 2차 시도
           } else {
             // 정답
             if (_correctAnswer == _result) {
@@ -622,7 +619,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('score list -> $_scoreList');
           audioPlayer.stop();
           _playQuestionAudio();
-        // 마지막 문제
+          // 마지막 문제
         } else {
           _qIdx = 0;
           // 1차 시도
@@ -651,13 +648,13 @@ class _QuestionPageState extends State<QuestionPage> {
           _saveTestResult(widget.mobile, _scoreList);
         }
 
-      // 음성이 불분명할 경우 재요청(계속)
+        // 음성이 불분명할 경우 재요청(계속)
       } else if (_result == 0) {
         Fluttertoast.showToast(
-          msg: '다시 한 번 마이크에 대고 말해주세요.',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3
+            msg: '다시 한 번 마이크에 대고 말해주세요.',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3
         );
         _isSkipAudio = true;
         audioPlayer.stop();
@@ -730,8 +727,8 @@ class _QuestionPageState extends State<QuestionPage> {
           softWrap: true,
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
         ),
         actions: <Widget>[
           IconButton(
@@ -784,10 +781,14 @@ class _QuestionPageState extends State<QuestionPage> {
                 // Text('Extension: ${_recording.extension}'),
                 // Text('Audio recording duration: ${_recording.duration.toString()}'),
                 // SizedBox(height: 20),
+                Text('결과 값 테스트용(하단 부분 삭제 예정)'),
                 Text('음성 인식 결과 :'),
                 TextField(
                   controller: _controller,
                   enabled: false,
+                  decoration: InputDecoration(
+                    hintText: '1~4: 선택한 답, 0: 인식 불분명, 9: 무응답',
+                  ),
                 ),
                 SizedBox(height: 20),
                 Text('question no. : ${_qIdx + 1}, attempt : $_attempt'),

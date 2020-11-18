@@ -13,8 +13,8 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<JoinOrLogin>.value(
-      value : JoinOrLogin(),
+    return ChangeNotifierProvider<LoginAuth>.value(
+      value : LoginAuth(),
       child: MaterialApp(
         title: '스마트 화행 검사 - 레벤그리다',
         debugShowCheckedModeBanner: false,
@@ -37,14 +37,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _currentIndex = 0;
+  // int _currentIndex = 0;
   String _mobile = '';
+
+  final _focusNode = FocusScopeNode();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
+  DateTime currentBackPressTime;
+
+  // 뒤로가기 버튼 두 번 터치 시 종료
+  bool onPressBackButton() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null || now.difference(currentBackPressTime) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      scaffoldKey.currentState
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+            content: Text('뒤로가기 버튼을 한 번더 누르시면 종료됩니다.'))
+        );
+      return false;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
     setState(() {
-      _mobile = Provider.of<JoinOrLogin>(context).mobile;
-      print('_mobile -> $_mobile');
+      _mobile = Provider.of<LoginAuth>(context).mobile;
     });
 
     final List<Widget> _children = [
@@ -60,50 +79,65 @@ class _MyHomePageState extends State<MyHomePage> {
       // Container()
     ];
 
-    return Consumer<JoinOrLogin>(
-      builder: (context, joinOrLogin, child) =>
-        Scaffold(
-          body: joinOrLogin.isLogin ? _children2[_currentIndex] : _children[_currentIndex],
-          bottomNavigationBar: FFNavigationBar(
-            theme: FFNavigationBarTheme(
-              barBackgroundColor: Colors.teal,
-              selectedItemBorderColor: Colors.teal[300],
-              selectedItemBackgroundColor: Colors.teal[400],
-              unselectedItemIconColor: Colors.white,
-              selectedItemLabelColor: Colors.white,
-              unselectedItemLabelColor: Colors.white70,
-              showSelectedItemShadow: false,
-              itemWidth: 54,
-              barHeight: 70,
-            ),
-            selectedIndex: _currentIndex,
-            onSelectTab: (index) {
-              print('_isLogin -> ${joinOrLogin.isLogin}');
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            items: [
-              FFNavigationBarItem(
-                iconData: Icons.home,
-                label: '홈',
+    return FocusScope(
+      node: _focusNode,
+      child: WillPopScope(
+        onWillPop: () async {
+          bool result = onPressBackButton();
+          return await Future.value(result);
+        },
+        child: Consumer<LoginAuth>(
+          builder: (context, joinOrLogin, child) =>
+            Scaffold(
+              body: SafeArea(
+                top: false,
+                child: IndexedStack(
+                    index: joinOrLogin.currentIndex,
+                    children: joinOrLogin.isLogin ? _children2 : _children
+                ),
               ),
-              joinOrLogin.isLogin
-                ? FFNavigationBarItem(
+              // joinOrLogin.isLogin ? _children2[_currentIndex] : _children[_currentIndex],
+              bottomNavigationBar: FFNavigationBar(
+                theme: FFNavigationBarTheme(
+                  barBackgroundColor: Colors.teal,
+                  selectedItemBorderColor: Colors.teal[300],
+                  selectedItemBackgroundColor: Colors.teal[400],
+                  unselectedItemIconColor: Colors.white,
+                  selectedItemLabelColor: Colors.white,
+                  unselectedItemLabelColor: Colors.white70,
+                  showSelectedItemShadow: false,
+                  itemWidth: 54,
+                  barHeight: 70,
+                ),
+                selectedIndex: joinOrLogin.currentIndex,
+                onSelectTab: (index) {
+                  setState(() {
+                    joinOrLogin.setCurrentIndex(index);
+                  });
+                },
+                items: [
+                  FFNavigationBarItem(
+                    iconData: Icons.home,
+                    label: '홈',
+                  ),
+                  joinOrLogin.isLogin
+                      ? FFNavigationBarItem(
                     iconData: Icons.person,
                     label: '회원정보수정',
                   )
-                : FFNavigationBarItem(
+                      : FFNavigationBarItem(
                     iconData: Icons.person,
                     label: '회원등록',
                   ),
-              FFNavigationBarItem(
-                iconData: Icons.search,
-                label: '검사결과',
+                  FFNavigationBarItem(
+                    iconData: Icons.search,
+                    label: '검사결과',
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
         ),
+      ),
     );
   }
 }

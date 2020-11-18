@@ -203,16 +203,15 @@ class _QuestionPageState extends State<QuestionPage> {
                 fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 15),
           selectButton(1),
+          SizedBox(height: 3),
           selectButton(2),
+          SizedBox(height: 3),
           selectButton(3),
+          SizedBox(height: 3),
           selectButton(4),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           // 문제 음성 파일 재생 완료 후 카운트다운 시작
           _isStartAnswer ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -273,6 +272,7 @@ class _QuestionPageState extends State<QuestionPage> {
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
 
     setState(() {
+      Future.delayed(Duration(seconds: 3), () => _controller.text = '');
       if (!_isSkipAudio) {
         playerState = PlayerState.playing;
       } else {
@@ -749,13 +749,9 @@ class _QuestionPageState extends State<QuestionPage> {
             // Text(
             //   'now playing.. question_${_qIdx + 1}.m4a\nattempt : $_attempt',
             // ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             _makeQuestion(),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
             // Text(
             //   '오디오 레코드 테스트'
             // ),
@@ -781,10 +777,14 @@ class _QuestionPageState extends State<QuestionPage> {
                 // Text('Extension: ${_recording.extension}'),
                 // Text('Audio recording duration: ${_recording.duration.toString()}'),
                 // SizedBox(height: 20),
+                Text('결과 값 테스트용(하단 부분 삭제 예정)'),
                 Text('음성 인식 결과 :'),
                 TextField(
                   controller: _controller,
                   enabled: false,
+                  decoration: InputDecoration(
+                    hintText: '1~4: 선택한 답, 0: 인식 불분명, 9: 무응답',
+                  ),
                 ),
                 SizedBox(height: 20),
                 Text('question no. : ${_qIdx + 1}, attempt : $_attempt'),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:group_radio_button/group_radio_button.dart';
+import 'package:lebengrida/data/login_auth.dart';
 import 'package:lebengrida/service/user_service.dart';
+import 'package:provider/provider.dart';
 
 class JoinPage extends StatefulWidget {
   @override
@@ -21,11 +23,11 @@ class _JoinPageState extends State<JoinPage> {
   String _selectedGender = '남성';
   List<String> _gender = ['남성', '여성'];
 
-  TextEditingController _nameController;
-  TextEditingController _birthController;
-  TextEditingController _mobileController;
-  TextEditingController _protectorNameController;
-  TextEditingController _protectorMobileController;
+  TextEditingController _nameController = new TextEditingController();
+  TextEditingController _birthController = new TextEditingController();
+  TextEditingController _mobileController = new TextEditingController();
+  TextEditingController _protectorNameController = new TextEditingController();
+  TextEditingController _protectorMobileController = new TextEditingController();
 
   // 뒤로가기 버튼 두 번 터치 시 종료
   bool onPressBackButton() {
@@ -511,12 +513,10 @@ class _JoinPageState extends State<JoinPage> {
               );
             }
         });
-        Navigator.of(context).popUntil((route) => false);
-        // Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (context) => MyApp(),
-        //   ),
-        // );
+        setState(() {
+          _clearFormData();
+          Provider.of<LoginAuth>(context, listen: false).setCurrentIndex(0);
+        });
       }
     });
   }
@@ -524,11 +524,11 @@ class _JoinPageState extends State<JoinPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _birthController = TextEditingController();
-    _mobileController = TextEditingController();
-    _protectorNameController = TextEditingController();
-    _protectorMobileController = TextEditingController();
+    // _nameController = TextEditingController();
+    // _birthController = TextEditingController();
+    // _mobileController = TextEditingController();
+    // _protectorNameController = TextEditingController();
+    // _protectorMobileController = TextEditingController();
   }
 
   @override
@@ -540,18 +540,12 @@ class _JoinPageState extends State<JoinPage> {
         },
         child: FocusScope(
           node: _focusNode,
-          child: WillPopScope(
-            onWillPop: () async {
-              bool result = onPressBackButton();
-              return await Future.value(result);
-            },
-            child: Scaffold(
-              appBar: AppBar(title: Text('회원 등록')),
-              body: SingleChildScrollView(
-                child: Container(
-                  padding: EdgeInsets.all(30.0),
-                  child: inputForm(),
-                ),
+          child: Scaffold(
+            appBar: AppBar(title: Text('회원 등록')),
+            body: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(30.0),
+                child: inputForm(),
               ),
             ),
           ),

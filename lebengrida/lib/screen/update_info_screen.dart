@@ -3,6 +3,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:lebengrida/model/user_data.dart';
 import 'package:lebengrida/service/user_service.dart';
+import 'package:provider/provider.dart';
+import 'package:lebengrida/data/login_auth.dart';
 
 class UpdateInfoPage extends StatefulWidget {
   final String mobile;
@@ -93,7 +95,6 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
         .then((result) {
       if ('success' == result) {
-        Navigator.pop(context);
         Fluttertoast.showToast(
           msg: '회원 정보가 수정되었습니다.',
           toastLength: Toast.LENGTH_SHORT,
@@ -101,6 +102,9 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
           timeInSecForIosWeb: 3
         );
       }
+    });
+    setState(() {
+      Provider.of<LoginAuth>(context, listen: false).setCurrentIndex(0);
     });
   }
 
@@ -403,12 +407,12 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
           ),
           ButtonBar(
             children: <Widget>[
-              FlatButton(
-                child: Text('취소'),
-                onPressed: () {
-                  Navigator.popUntil(context, ModalRoute.withName('/'));
-                },
-              ),
+              // FlatButton(
+              //   child: Text('초기화'),
+              //   onPressed: () {
+              //     _clearValues();
+              //   },
+              // ),
               RaisedButton(
                 color: Colors.teal,
                 child: Text(
@@ -460,20 +464,6 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
             key: _scaffoldKey,
             appBar: AppBar(
               title: Text('회원 정보 수정'),
-              actions: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.home),
-                  onPressed: () {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.refresh),
-                  onPressed: () {
-                    _clearValues();
-                  },
-                ),
-              ],
             ),
             body: SingleChildScrollView(
               child: Container(

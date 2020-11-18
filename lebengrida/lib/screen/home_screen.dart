@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       SizedBox(height: 60),
-                      Consumer<JoinOrLogin>(
+                      Consumer<LoginAuth>(
                         builder: (context, joinOrLogin, child) =>
                           joinOrLogin.isLogin
                             ? SizedBox(height: 48)
@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                               )
                       ),
                       SizedBox(height: 35),
-                      Consumer<JoinOrLogin>(
+                      Consumer<LoginAuth>(
                         builder: (context, joinOrLogin, child) =>
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,

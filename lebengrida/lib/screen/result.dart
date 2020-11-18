@@ -133,9 +133,7 @@ class _ResultPageState extends State<ResultPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
-            onPressed: () {
-              Navigator.popUntil(context, ModalRoute.withName('/'));
-            },
+            onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
           )
         ],
       ),
