@@ -37,7 +37,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // int _currentIndex = 0;
   String _mobile = '';
 
   final _focusNode = FocusScopeNode();
@@ -89,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Consumer<LoginAuth>(
           builder: (context, joinOrLogin, child) =>
             Scaffold(
+              key: scaffoldKey,
               body: SafeArea(
                 top: false,
                 child: IndexedStack(

@@ -21,9 +21,6 @@ class UpdateInfoPage extends StatefulWidget {
 class UpdateInfoPageState extends State<UpdateInfoPage> {
   final _focusNode = FocusScopeNode();
   final _fKey = GlobalKey<FormState>();
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  DateTime currentBackPressTime;
 
   String year;
 
@@ -37,21 +34,6 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   TextEditingController _protectorNameController;
   TextEditingController _protectorMobileController;
   User _selectedUser;
-
-  // 뒤로가기 버튼 두 번 터치 시 종료
-  bool onPressBackButton() {
-    DateTime now = DateTime.now();
-    if (currentBackPressTime == null || now.difference(currentBackPressTime) > Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      scaffoldKey.currentState
-        ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-            content: Text('뒤로가기 버튼을 한 번더 누르시면 종료됩니다.'))
-        );
-      return false;
-    }
-    return true;
-  }
 
   // 시군구 리스트
   final List<String> _sidoGubun = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
@@ -455,30 +437,24 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
       },
       child: FocusScope(
         node: _focusNode,
-        child: WillPopScope(
-          onWillPop: () async {
-            bool result = onPressBackButton();
-            return await Future.value(result);
-          },
-          child: Scaffold(
-            key: _scaffoldKey,
-            appBar: AppBar(
-              title: Text('회원 정보 수정'),
-            ),
-            body: SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.all(30.0),
-                child: updateForm(),
-              ),
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            title: Text('회원 정보 수정'),
+          ),
+          body: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.all(30.0),
+              child: updateForm(),
             ),
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {
-          //     _addUser();
-          //   },
-          //   child: Icon(Icons.add),
-          // ),
         ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () {
+        //     _addUser();
+        //   },
+        //   child: Icon(Icons.add),
+        // ),
       ),
     );
   }
