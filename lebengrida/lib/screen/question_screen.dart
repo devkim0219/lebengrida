@@ -6,11 +6,13 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:audio_recorder/audio_recorder.dart';
 import 'package:circular_countdown/circular_countdown.dart';
+import 'package:date_format/date_format.dart';
 import 'package:file/file.dart';
 import 'package:file/local.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lebengrida/data/login_auth.dart';
 import 'package:lebengrida/model/user_data.dart';
 import 'package:lebengrida/model/question_data.dart';
 import 'package:lebengrida/screen/result_screen.dart';
@@ -19,6 +21,7 @@ import 'package:lebengrida/service/result_service.dart';
 import 'package:lebengrida/service/user_service.dart';
 import 'package:lebengrida/service/fileupload_service.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 
 typedef void OnError(Exception exception);
 
@@ -523,6 +526,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
     ResultServices.saveTestResult(mobile, answerList, _totalPoint, _resultStatus).then((result) {
       if ('success' == result) {
+        Provider.of<LoginAuth>(context, listen: false).setTestDate(formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]));
         _msg = '검사 결과가 저장되었습니다.';
       } else {
         _msg = '오류로 인해 검사 결과가 저장되지 않았습니다.';

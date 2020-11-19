@@ -17,9 +17,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _focusNode = FocusScopeNode();
 
-  User _selectedUser;
-  Result _userResult;
-
   TextEditingController _mobileController;
 
   // 회원 등록 여부 체크
@@ -57,16 +54,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final loginAuth = Provider.of<LoginAuth>(context);
-    if (loginAuth.isLogin) {
-      _getUserInfo(loginAuth.mobile).then((value) {
-        _selectedUser = value;
-      });
-      _getUserResult(loginAuth.mobile).then((value) {
-        _userResult = value;
-      });
-    }
-
     return Container(
       child: GestureDetector(
         onTap: () {
@@ -97,13 +84,18 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: 60),
                     Consumer<LoginAuth>(
-                      builder: (context, joinOrLogin, child) =>
-                        joinOrLogin.isLogin
+                      builder: (context, loginAuth, child) =>
+                      loginAuth.isLogin
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
+                                // FutureBuilder(
+                                //   future: ,
+                                // ),
                                 Text(
-                                  '${_selectedUser.name}님 반갑습니다.\n최근 검사일은 ${_userResult.testDate}입니다.',
+                                  loginAuth.testDate.startsWith('-')
+                                    ? '${loginAuth.name}님 반갑습니다.\n최근에 검사한 이력이 없습니다.'
+                                    : '${loginAuth.name}님 반갑습니다.\n최근 검사일은 ${loginAuth.testDate}입니다.',
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
@@ -119,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     SizedBox(height: 35),
                     Consumer<LoginAuth>(
-                      builder: (context, joinOrLogin, child) =>
+                      builder: (context, loginAuth, child) =>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -128,9 +120,9 @@ class _HomePageState extends State<HomePage> {
                               height: 40,
                               child: RaisedButton(
                                 color: Colors.teal,
-                                child: Text(joinOrLogin.isLogin ? '검사시작' : '로그인', style: TextStyle(color: Colors.white)),
+                                child: Text(loginAuth.isLogin ? '검사시작' : '로그인', style: TextStyle(color: Colors.white)),
                                 onPressed: () {
-                                  if(!joinOrLogin.isLogin) {
+                                  if(!loginAuth.isLogin) {
                                     if (_mobileController.text.isEmpty) {
                                       Fluttertoast.showToast(
                                           msg: '휴대폰 번호를 입력해주세요.',
@@ -142,17 +134,28 @@ class _HomePageState extends State<HomePage> {
                                     }
                                     _checkUser(_mobileController.text).then((value) {
                                       if (value == 'success') {
-                                        joinOrLogin.toggle();
-                                        joinOrLogin.setMobile(_mobileController.text);
-                                        if (joinOrLogin.isLogin) {
-                                          Fluttertoast.showToast(
-                                              msg: '로그인 성공',
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.BOTTOM,
-                                              timeInSecForIosWeb: 3
-                                          );
-                                          return;
-                                        }
+                                        loginAuth.toggle();
+                                        loginAuth.setMobile(_mobileController.text);
+
+                                        _getUserInfo(_mobileController.text).then((value) {
+                                          setState(() {
+                                            loginAuth.setName(value.name);
+                                          });
+                                        });
+
+                                        _getUserResult(_mobileController.text).then((value) {
+                                          setState(() {
+                                            loginAuth.setTestDate(value.testDate);
+                                          });
+                                        });
+
+                                        Fluttertoast.showToast(
+                                            msg: '로그인 성공',
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 3
+                                        );
+                                        return;
                                       } else {
                                         Fluttertoast.showToast(
                                             msg: '등록된 사용자가 아닙니다. 회원등록 후 이용해주세요.',
@@ -164,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                                       }
                                     });
                                   }
-                                  if (joinOrLogin.isLogin) {
+                                  if (loginAuth.isLogin) {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) => GuidePage(mobile: _mobileController.text),
@@ -176,7 +179,7 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                             ),
-                            joinOrLogin.isLogin
+                            loginAuth.isLogin
                               ? Padding(
                                   padding: EdgeInsets.only(left: 15),
                                   child: SizedBox(
@@ -186,7 +189,9 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.teal,
                                       child: Text('로그아웃', style: TextStyle(color: Colors.white)),
                                       onPressed: () {
-                                        joinOrLogin.toggle();
+                                        loginAuth.toggle();
+                                        loginAuth.setName('');
+                                        loginAuth.setTestDate('-');
                                       },
                                     ),
                                   ),

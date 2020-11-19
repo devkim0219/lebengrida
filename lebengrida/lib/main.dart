@@ -86,17 +86,17 @@ class _MyHomePageState extends State<MyHomePage> {
           return await Future.value(result);
         },
         child: Consumer<LoginAuth>(
-          builder: (context, joinOrLogin, child) =>
+          builder: (context, loginAuth, child) =>
             Scaffold(
               key: scaffoldKey,
               body: SafeArea(
                 top: false,
                 child: IndexedStack(
-                    index: joinOrLogin.currentIndex,
-                    children: joinOrLogin.isLogin ? _children2 : _children
+                    index: loginAuth.currentIndex,
+                    children: loginAuth.isLogin ? _children2 : _children
                 ),
               ),
-              // joinOrLogin.isLogin ? _children2[_currentIndex] : _children[_currentIndex],
+              // loginAuth.isLogin ? _children2[_currentIndex] : _children[_currentIndex],
               bottomNavigationBar: FFNavigationBar(
                 theme: FFNavigationBarTheme(
                   barBackgroundColor: Colors.teal,
@@ -109,10 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemWidth: 54,
                   barHeight: 70,
                 ),
-                selectedIndex: joinOrLogin.currentIndex,
+                selectedIndex: loginAuth.currentIndex,
                 onSelectTab: (index) {
                   setState(() {
-                    joinOrLogin.setCurrentIndex(index);
+                    loginAuth.setCurrentIndex(index);
                   });
                 },
                 items: [
@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     iconData: Icons.home,
                     label: '홈',
                   ),
-                  joinOrLogin.isLogin
+                  loginAuth.isLogin
                       ? FFNavigationBarItem(
                     iconData: Icons.person,
                     label: '회원정보수정',

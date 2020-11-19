@@ -6,9 +6,17 @@ class LoginAuth extends ChangeNotifier {
   bool get isLogin => _isLogin;
   // set isLogin(bool isJoin) => _isLogin = isJoin;
 
-  // 로그인 정보 : 휴대폰 번호
+  // 로그인 정보 - 휴대폰 번호
   String _mobile = '';
   String get mobile => _mobile;
+
+  // 로그인 정보 - 이름
+  String _name = '';
+  String get name => _name;
+
+  // 최근 검사일
+  String _testDate = '-';
+  String get testDate => _testDate;
 
   // 현재 탭 페이지 인덱스
   int _currentIndex = 0;
@@ -21,6 +29,16 @@ class LoginAuth extends ChangeNotifier {
 
   void setMobile(String mobile) {
     _mobile = mobile;
+    notifyListeners();
+  }
+
+  void setName(String name) {
+    _name = name;
+    notifyListeners();
+  }
+
+  void setTestDate(String testDate) {
+    _testDate = testDate;
     notifyListeners();
   }
 

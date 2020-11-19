@@ -9,7 +9,7 @@ class NoResultPage extends StatelessWidget {
         padding: EdgeInsets.all(60.0),
         alignment: Alignment.center,
         child: Text(
-          '로그인 후 검사결과를 확인하실 수 있습니다.',
+          '로그인 후 검사 결과를 확인하실 수 있습니다.',
           style: TextStyle(
             fontSize: 30,
           ),
