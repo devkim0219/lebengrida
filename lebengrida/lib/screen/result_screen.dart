@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:lebengrida/model/result_data.dart';
@@ -226,7 +227,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      '최근 검사일 : ${_userResult.testDate}',
+                      '최근 검사일 : ${formatDate(DateTime.parse(_userResult.testDate), [yyyy, '-', mm, '-', dd])}',
                       style: TextStyle(
                         fontSize: 25,
                         color: Colors.black87,

@@ -15,7 +15,7 @@ class LoginAuth extends ChangeNotifier {
   String get name => _name;
 
   // 최근 검사일
-  String _testDate = '-';
+  String _testDate = '0000-00-00 00:00:00';
   String get testDate => _testDate;
 
   // 현재 탭 페이지 인덱스

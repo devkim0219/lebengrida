@@ -8,6 +8,7 @@ import 'package:lebengrida/service/login_service.dart';
 import 'package:lebengrida/service/result_service.dart';
 import 'package:lebengrida/service/user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:date_format/date_format.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -46,6 +47,21 @@ class _HomePageState extends State<HomePage> {
     return _result;
   }
 
+  // 최근 검사일이 6개월 지났는지 체크
+  bool _checkLatestTest(String testDate) {
+    bool _isRetest = false;
+    DateTime _latestTestDate = DateTime.parse(testDate);
+    DateTime _currentDate = DateTime.now();
+
+    var _differenceDay = _currentDate.toUtc().difference(_latestTestDate).inDays;
+
+    if (_differenceDay >= 180) {
+      _isRetest = true;
+    }
+
+    return _isRetest;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -69,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(height: 50),
+                    SizedBox(height: 30),
                     Image(
                       image: AssetImage('assets/images/logo.png'),
                     ),
@@ -79,27 +95,34 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 30,
-                        color: Colors.teal,
+                        color: Colors.teal[800],
                       ),
                     ),
-                    SizedBox(height: 60),
+                    SizedBox(height: 50),
                     Consumer<LoginAuth>(
                       builder: (context, loginAuth, child) =>
                       loginAuth.isLogin
                           ? Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // FutureBuilder(
-                                //   future: ,
-                                // ),
                                 Text(
-                                  loginAuth.testDate.startsWith('-')
+                                  loginAuth.testDate.startsWith('0')
                                     ? '${loginAuth.name}님 반갑습니다.\n최근에 검사한 이력이 없습니다.'
                                     : '${loginAuth.name}님 반갑습니다.\n최근 검사일은 ${loginAuth.testDate}입니다.',
                                   style: TextStyle(
                                     fontSize: 16,
                                   ),
                                 ),
+                                _checkLatestTest(loginAuth.testDate)
+                                  ? Text(
+                                      '\n검사한 지 6개월이 지나 재검사가\n필요합니다.',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    )
+                                  : Container()
                               ],
                             )
                           : TextField(
@@ -145,7 +168,7 @@ class _HomePageState extends State<HomePage> {
 
                                         _getUserResult(_mobileController.text).then((value) {
                                           setState(() {
-                                            loginAuth.setTestDate(value.testDate);
+                                            loginAuth.setTestDate(formatDate(DateTime.parse(value.testDate), [yyyy, '-', mm, '-', dd]));
                                           });
                                         });
 
@@ -191,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                                       onPressed: () {
                                         loginAuth.toggle();
                                         loginAuth.setName('');
-                                        loginAuth.setTestDate('-');
+                                        loginAuth.setTestDate('0000-00-00 00:00:00');
                                       },
                                     ),
                                   ),
