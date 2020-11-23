@@ -6,6 +6,7 @@ import 'package:lebengrida/screen/home_screen.dart';
 import 'package:lebengrida/screen/no_result_screen.dart';
 import 'package:lebengrida/screen/result_screen.dart';
 import 'package:lebengrida/screen/update_info_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
@@ -37,12 +38,42 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isCheckedPermission = false;
+
   String _mobile = '';
 
   final _focusNode = FocusScopeNode();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   DateTime currentBackPressTime;
+
+  // 권한 체크
+  Future<bool> _checkPermission() async {
+    PermissionStatus storagePermissionStatus = await Permission.storage.status;
+    PermissionStatus microphonePermissionStatus = await Permission.microphone.status;
+
+    if (storagePermissionStatus == PermissionStatus.granted && microphonePermissionStatus == PermissionStatus.granted) {
+      print('Storage and microphone permission is granted.');
+      return true;
+    } else {
+      print('Storage and microphone permission is not granted.');
+      return false;
+    }
+  }
+
+  // 권한 요청
+  Future<bool> _requestPermission() async {
+    var storagePermissionResult = await Permission.storage.request();
+    var microphonePermissionResult = await Permission.microphone.request();
+
+    if (storagePermissionResult == PermissionStatus.granted && microphonePermissionResult == PermissionStatus.granted) {
+      print('Storage and microphone permission is granted.');
+      return true;
+    } else {
+      print('Storage and microphone permission is not granted.');
+      return false;
+    }
+  }
 
   // 뒤로가기 버튼 두 번 터치 시 종료
   bool onPressBackButton() {
@@ -61,6 +92,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // 권한 체크
+    _checkPermission().then((value) => _isCheckedPermission = value);
+    
+    // 권한 없을 시 요청
+    if (!_isCheckedPermission) {
+      _requestPermission().then((value) => _isCheckedPermission = value);
+    }
+
     setState(() {
       _mobile = Provider.of<LoginAuth>(context).mobile;
     });
