@@ -33,6 +33,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
   TextEditingController _mobileController;
   TextEditingController _protectorNameController;
   TextEditingController _protectorMobileController;
+  TextEditingController _instructorController;
   User _selectedUser;
 
   // 시군구 리스트
@@ -74,7 +75,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
       _address = _selectedSido + " " + _selectedGuGun;
     }
 
-    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
+    UserServices.updateUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text, _instructorController.text)
         .then((result) {
       if ('success' == result) {
         Fluttertoast.showToast(
@@ -126,6 +127,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _mobileController.text = '';
     _protectorNameController.text = '';
     _protectorMobileController.text = '';
+    _instructorController.text = '';
   }
 
   // 각 회원의 정보 조회
@@ -145,6 +147,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _mobileController.text = user.mobile;
     _protectorNameController.text = user.protectorName;
     _protectorMobileController.text = user.protectorMobile;
+    _instructorController.text = user.instructor;
   }
 
   // 출생년도 선택
@@ -390,6 +393,24 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
               },
             ),
           ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: TextFormField(
+              controller: _instructorController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '담당강사 고유번호',
+                hintText: '예) 10001',
+                prefixIcon: Icon(Icons.person),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '담당강사 고유번호를 입력해주세요.';
+                }
+                return null;
+              },
+            ),
+          ),
           ButtonBar(
             children: <Widget>[
               // FlatButton(
@@ -428,6 +449,7 @@ class UpdateInfoPageState extends State<UpdateInfoPage> {
     _mobileController = TextEditingController();
     _protectorNameController = TextEditingController();
     _protectorMobileController = TextEditingController();
+    _instructorController = TextEditingController();
 
     _getUserInfo(widget.mobile);
   }

@@ -25,6 +25,7 @@ class _JoinPageState extends State<JoinPage> {
   TextEditingController _mobileController;
   TextEditingController _protectorNameController;
   TextEditingController _protectorMobileController;
+  TextEditingController _instructorController;
 
   // 시군구 리스트
   final List<String> _sidoGubun = ["시/도 선택","서울특별시","인천광역시","대전광역시","광주광역시","대구광역시","울산광역시","부산광역시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도","경상남도","제주도"];
@@ -60,6 +61,7 @@ class _JoinPageState extends State<JoinPage> {
     _mobileController.text = '';
     _protectorNameController.text = '';
     _protectorMobileController.text = '';
+    _instructorController.text = '';
     _isAgree = false;
   }
 
@@ -372,6 +374,24 @@ class _JoinPageState extends State<JoinPage> {
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 20),
+            child: TextFormField(
+              controller: _instructorController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: '담당강사 고유번호',
+                hintText: '예) 10001',
+                prefixIcon: Icon(Icons.person),
+              ),
+              validator: (val) {
+                if (val == null || val.isEmpty) {
+                  return '담당강사 고유번호를 입력해주세요.';
+                }
+                return null;
+              },
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 20),
             child: Row(
               children: <Widget>[
                 Icon(
@@ -484,7 +504,7 @@ class _JoinPageState extends State<JoinPage> {
           timeInSecForIosWeb: 3
         );
       } else {
-        UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text)
+        UserServices.addUser(_nameController.text, _birthController.text, _selectedGender, _address, _mobileController.text, _protectorNameController.text, _protectorMobileController.text, _instructorController.text)
           .then((result) {
             if ('success' == result) {
               Fluttertoast.showToast(
@@ -511,6 +531,7 @@ class _JoinPageState extends State<JoinPage> {
     _mobileController = TextEditingController();
     _protectorNameController = TextEditingController();
     _protectorMobileController = TextEditingController();
+    _instructorController = TextEditingController();
   }
 
   @override
