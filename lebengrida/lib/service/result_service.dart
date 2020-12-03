@@ -4,7 +4,8 @@ import 'dart:convert';
 
 class ResultServices {
   static const ROOT = 'http://220.119.175.200:8081/RestAPI/result_actions.php';
-  static const _GET_USERRESULT_ACTION = 'GET_USERRESULT';
+  static const _GET_USERRESULTS_ACTION = 'GET_USERRESULTS';
+  static const _GET_LASTRESULT_ACTION = 'GET_LASTRESULT';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
   static const _SAVE_RESULT_ACTION = 'SAVE_RESULT';
 
@@ -28,10 +29,35 @@ class ResultServices {
   }
 
   // 각 회원별 검사 결과 정보 조회
-  static Future<Result> getUserResult(String mobile) async {
+  static Future<List<Result>> getUserResults(String mobile) async {
     try {
       var map = Map<String, dynamic>();
-      map['action'] = _GET_USERRESULT_ACTION;
+      map['action'] = _GET_USERRESULTS_ACTION;
+      map['mobile'] = mobile;
+      final response = await http.post(ROOT, body: map);
+      print('getUserResult Response: ${response.body}');
+
+      if (200 == response.statusCode) {
+        List<Result> results = parseResponse(response.body);
+        return results;
+      } else {
+        throw Exception('Failed to load result');
+      }
+    } catch(e) {
+      throw Exception('Failed to load result: $e');
+    }
+  }
+
+  static List<Result> parseResponse(String responseBody) {
+    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+    return parsed.map<Result>((json) => Result.fromJson(json)).toList();
+  }
+
+  // 각 회원별 가장 최근 검사 결과 정보 조회
+  static Future<Result> getLastResult(String mobile) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _GET_LASTRESULT_ACTION;
       map['mobile'] = mobile;
       final response = await http.post(ROOT, body: map);
       print('getUserResult Response: ${response.body}');

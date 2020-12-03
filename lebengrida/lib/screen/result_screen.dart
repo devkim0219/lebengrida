@@ -1,10 +1,12 @@
 import 'package:date_format/date_format.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:lebengrida/data/login_auth.dart';
 import 'package:lebengrida/model/result_data.dart';
 import 'package:lebengrida/model/user_data.dart';
 import 'package:lebengrida/service/result_service.dart';
 import 'package:lebengrida/service/user_service.dart';
+import 'package:provider/provider.dart';
 
 class ResultPage extends StatefulWidget {
   final String mobile;
@@ -21,6 +23,8 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   User _selectedUser;
   Result _userResult;
+  List<String> _testDateList = ['날짜 선택'];
+  String _selectedDate = '날짜 선택';
   String _resultStatus = '';
   Color _resultStatusTextColor;
 
@@ -54,9 +58,9 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   // 각 회원별 검사 결과 정보 조회
-  Future<Result> _getUserResult(String mobile) async {
+  Future<List<Result>> _getUserResults(String mobile) async {
     var _result;
-    await ResultServices.getUserResult(mobile).then((result) {
+    await ResultServices.getUserResults(mobile).then((result) {
       _result = result;
     });
     return _result;
@@ -121,6 +125,12 @@ class _ResultPageState extends State<ResultPage> {
   @override
   void initState() {
     super.initState();
+
+    _getUserResults(widget.mobile).then((value) {
+      for (var i = 0; i < value.length; i ++) {
+        _testDateList.add('${i + 1}차: ${value[i].testDate.substring(0, 10)}');
+      }
+    });
   }
 
   @override
@@ -130,8 +140,9 @@ class _ResultPageState extends State<ResultPage> {
         _selectedUser = value;
       });
 
-      _getUserResult(widget.mobile).then((value) {
-        _userResult = value;
+      _getUserResults(widget.mobile).then((value) {
+        print('######### ${Provider.of<LoginAuth>(context, listen: false).currentTestDateIndex}');
+        _userResult = value[Provider.of<LoginAuth>(context, listen: false).currentTestDateIndex];
 
         // 인지 능력 저하 미도달/도달 에 따른 텍스트 색상 변경
         if (_userResult.resultStatus == 'pass') {
@@ -144,6 +155,7 @@ class _ResultPageState extends State<ResultPage> {
         }
       });
     });
+
     return FocusScope(
       node: _focusNode,
       child: WillPopScope(
@@ -232,6 +244,38 @@ class _ResultPageState extends State<ResultPage> {
                         fontSize: 25,
                         color: Colors.black87,
                       ),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '지난 검사 결과 확인',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        DropdownButton(
+                          value: _selectedDate,
+                          items: _testDateList.map((value) {
+                            return DropdownMenuItem(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            String selectedValue = value;
+                            setState(() {
+                              _selectedDate = value;
+                              if(_selectedDate.startsWith('날')) {
+                                return;
+                              } else {
+                                Provider.of<LoginAuth>(context, listen: false).setCurrentTestDateIndex(int.parse(selectedValue.substring(0, 1)) - 1);
+                              }
+                            });
+                          },
+                        ),
+                      ],
                     ),
                     SizedBox(height: 30),
                     AspectRatio(
@@ -356,6 +400,32 @@ class _ResultPageState extends State<ResultPage> {
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 25),
+                    Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.mode_comment_outlined,
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          '담당강사 검사결과 평가',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 5),
+                    Card(
+                      color: Colors.white,
+                      child: Text(
+                        _userResult.comment,
+                        style: TextStyle(
+                          fontSize: 20,
                         ),
                       ),
                     ),

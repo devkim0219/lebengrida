@@ -18,11 +18,12 @@ class Result {
   final String point_16;
   final String pointTotal;
   String resultStatus;
+  final String comment;
   final String testDate;
 
   Result({this.mobile, this.point_1, this.point_2, this.point_3, this.point_4, this.point_5, this.point_6, this.point_7, 
             this.point_8, this.point_9, this.point_10, this.point_11, this.point_12, this.point_13, this.point_14, this.point_15, 
-            this.point_16, this.pointTotal, this.resultStatus, this.testDate});
+            this.point_16, this.pointTotal, this.resultStatus, this.comment, this.testDate});
 
   factory Result.fromJson(Map<String, dynamic> json) {
     return Result(
@@ -45,6 +46,7 @@ class Result {
       point_16: json['point_16'],
       pointTotal: json['point_total'],
       resultStatus: json['result_status'],
+      comment: json['comment'],
       testDate: json['test_date'],
     );
   }

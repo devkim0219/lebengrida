@@ -22,6 +22,10 @@ class LoginAuth extends ChangeNotifier {
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;
 
+  // 지난 검사 날짜 인데스
+  int _currentTestDateIndex = 0;
+  int get currentTestDateIndex => _currentTestDateIndex;
+
   void toggle() {
     _isLogin = !_isLogin;
     notifyListeners();
@@ -44,6 +48,11 @@ class LoginAuth extends ChangeNotifier {
 
   void setCurrentIndex(int index) {
     _currentIndex = index;
+    notifyListeners();
+  }
+
+  void setCurrentTestDateIndex(int index) {
+    _currentTestDateIndex = index;
     notifyListeners();
   }
 }

@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   // 각 회원별 검사 결과 정보 조회
   Future<Result> _getUserResult(String mobile) async {
     var _result;
-    await ResultServices.getUserResult(mobile).then((result) {
+    await ResultServices.getLastResult(mobile).then((result) {
       _result = result;
     });
     return _result;
