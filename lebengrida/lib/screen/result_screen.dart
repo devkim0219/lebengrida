@@ -127,8 +127,8 @@ class _ResultPageState extends State<ResultPage> {
     super.initState();
 
     _getUserResults(widget.mobile).then((value) {
-      for (var i = 0; i < value.length; i ++) {
-        _testDateList.add('${i + 1}차: ${value[i].testDate.substring(0, 10)}');
+      for (var i = value.length - 1; i > -1; i --) {
+        _testDateList.add('${value.length - i}차: ${value[i].testDate.substring(0, 10)}');
       }
     });
   }
@@ -141,7 +141,6 @@ class _ResultPageState extends State<ResultPage> {
       });
 
       _getUserResults(widget.mobile).then((value) {
-        print('######### ${Provider.of<LoginAuth>(context, listen: false).currentTestDateIndex}');
         _userResult = value[Provider.of<LoginAuth>(context, listen: false).currentTestDateIndex];
 
         // 인지 능력 저하 미도달/도달 에 따른 텍스트 색상 변경
@@ -270,7 +269,7 @@ class _ResultPageState extends State<ResultPage> {
                               if(_selectedDate.startsWith('날')) {
                                 return;
                               } else {
-                                Provider.of<LoginAuth>(context, listen: false).setCurrentTestDateIndex(int.parse(selectedValue.substring(0, 1)) - 1);
+                                Provider.of<LoginAuth>(context, listen: false).setCurrentTestDateIndex(_testDateList.length - 1 - int.parse(selectedValue.substring(0, 1)));
                               }
                             });
                           },
