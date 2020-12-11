@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ResultServices {
-  static const ROOT = 'http://220.119.175.200:8081/RestAPI/result_actions.php';
+  // static const ROOT = 'http://220.119.175.200:8081/RestAPI/result_actions.php';
+  static const ROOT = 'http://lebengrida.youtunet.co.kr/RestAPI/result_actions.php';
   static const _GET_USERRESULTS_ACTION = 'GET_USERRESULTS';
   static const _GET_LASTRESULT_ACTION = 'GET_LASTRESULT';
   static const _USER_CHECK_ACTION = 'USER_CHECK';
