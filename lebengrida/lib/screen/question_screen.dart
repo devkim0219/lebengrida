@@ -121,8 +121,8 @@ class _QuestionPageState extends State<QuestionPage> {
             print('correct answer -> ${_qData[_qIdx].answer}');
 
             // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
-            // 1~15 문제
-            if (_selectedAnswer > 0 && _qIdx < 15) {
+            // 1~20 문제
+            if (_selectedAnswer > 0 && _qIdx < _qData.length - 1) {
               _isStartAnswer = false;
               _qIdx++;
               // 1차 시도
@@ -515,10 +515,10 @@ class _QuestionPageState extends State<QuestionPage> {
     }
 
     // 인지 능력 저하 판단
-    // 60~69세 : 22점, 70~74세 : 22점, 75~79세 : 21점, 80세 이상 : 20점
-    if (int.parse(_user.age) <= 74 && _totalPoint >= 22 ||
-        int.parse(_user.age) >= 75 && int.parse(_user.age) <= 79 && _totalPoint >= 21 ||
-        int.parse(_user.age) >= 80 && _totalPoint >= 20 ) {
+    // 60~69세 : 30점, 70~74세 : 30점, 75~79세 : 29점, 80세 이상 : 28점
+    if (int.parse(_user.age) <= 74 && _totalPoint >= 30 ||
+        int.parse(_user.age) >= 75 && int.parse(_user.age) <= 79 && _totalPoint >= 29 ||
+        int.parse(_user.age) >= 80 && _totalPoint >= 28 ) {
       _resultStatus = 'pass';
     } else {
       _resultStatus = 'nopass';
@@ -595,8 +595,8 @@ class _QuestionPageState extends State<QuestionPage> {
         _isSkipAudio = false;
         _correctAnswer = int.parse(_qData[_qIdx].answer);
 
-        // 1~15 문제
-        if (_qIdx < 15) {
+        // 1~19 문제
+        if (_qIdx < _qData.length - 1) {
           _isStartAnswer = false;
           _qIdx++;
           // 1차 시도
@@ -668,8 +668,8 @@ class _QuestionPageState extends State<QuestionPage> {
       } else {
         _isSkipAudio = false;
         _isStartAnswer = false;
-        // 1~15번 문제
-        if (_qIdx < 15) {
+        // 1~19번 문제
+        if (_qIdx < _qData.length - 1) {
           // 2차 시도
           if (_attempt == 2) {
             _scoreList.add(0);

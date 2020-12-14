@@ -82,7 +82,7 @@ class ResultServices {
       map['action'] = _SAVE_RESULT_ACTION;
       map['mobile'] = mobile;
 
-      // point_1 ~ 16
+      // point_1 ~ 20
       for (var i = 0; i < answerList.length; i++) {
         map['point_${i + 1}'] = answerList[i].toString();
       }
