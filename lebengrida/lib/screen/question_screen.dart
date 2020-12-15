@@ -121,7 +121,7 @@ class _QuestionPageState extends State<QuestionPage> {
             print('correct answer -> ${_qData[_qIdx].answer}');
 
             // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
-            // 1~20 문제
+            // 1~19 문제
             if (_selectedAnswer > 0 && _qIdx < _qData.length - 1) {
               _isStartAnswer = false;
               _qIdx++;

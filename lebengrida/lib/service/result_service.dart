@@ -81,6 +81,7 @@ class ResultServices {
 
       map['action'] = _SAVE_RESULT_ACTION;
       map['mobile'] = mobile;
+      map['comment'] = '';
 
       // point_1 ~ 20
       for (var i = 0; i < answerList.length; i++) {
@@ -89,7 +90,7 @@ class ResultServices {
       map['point_total'] = totalPoint.toString();
       map['result_status'] = resultStatus;
 
-      print('map -> $map');
+      print('save result map -> $map');
 
       final response = await http.post(ROOT, body: map);
       print('saveTestResult Response: ${response.body}');
