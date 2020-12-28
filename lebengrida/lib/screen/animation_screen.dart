@@ -23,11 +23,10 @@ class _AnimationPageState extends State<AnimationPage> {
   void initState() {
     super.initState();
 
-    // _playLocal('cushion_7');
-
     _flickManager =  FlickManager(
       cachedVideoPlayerController: CachedVideoPlayerController.asset('assets/videos/animation.mp4'),
       onVideoEnd: () {
+        Navigator.of(context).pop();
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => QuestionPage(mobile: widget.mobile),
@@ -82,6 +81,7 @@ class _AnimationPageState extends State<AnimationPage> {
         backgroundColor: Colors.teal,
         onPressed: () {
           _flickManager.flickControlManager.pause();
+          Navigator.of(context).pop();
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => QuestionPage(mobile: widget.mobile),

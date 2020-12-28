@@ -37,6 +37,7 @@ class _ResultPageState extends State<ResultPage> {
   String _bResult = '당신은 질문화행 점수가 낮습니다.\n기본 대화에 대한 인식이 떨어져서 인물들이 대화에서 주고 받는 정보에 대한 판단에 대한 인지능력이 부족해보입니다.\n선생님과의 프로그램을 통한 대화정보파악학습으로 점수를 올릴수 있습니다.';
   String _cResult = '당신은 단언화행의 점수가 낮습니다.\n기본 대화에 대한 인식이 떨어져서 동화에서 대화하는 인물들의 말에 대한 의도파악과 관련하여 인지능력이 부족해보입니다.\n선생님과의 프로그램을 통해 인물대사 의도파악학습으로 점수를 올릴 수 있습니다.';
   String _dResult = '당신은 의례화화행 점수가 낮습니다.\n기본 대화에 대한 인식이 떨어져서 동화에서 인물들이 상황에 맞는 자신의 감정을 표현하는 말에 대한 인지능력이 부족해보입니다.\n선생님과의 프로그램을 통해  인물들의 상황 및 정서 파악 학습으로 점수를 올릴 수 있습니다.';
+  String _maxResult = '당신은 모든 영역(직접화행, 간접화행, 질문화행, 단언화행, 의례화화행)에 좋은 점수를 얻었습니다. 현재는 인지기능 정상입니다.\n하지만 유지하기 위해서 꾸준한 학습과 교육을 통한 관리가 필요합니다.';
   List<double> _totalScoreArray = [];
   List<String> _resultTextArray = [];
 
@@ -81,17 +82,20 @@ class _ResultPageState extends State<ResultPage> {
   Widget makeResultText() {
     String returnText = '';
     double minVal = 10;
-    int minIdx = 0;
 
-    for (int i = 0; i < _totalScoreArray.length; i ++) {
-      if (_totalScoreArray[i] < minVal) {
-        minVal = _totalScoreArray[i];
+    if (_userResult.pointTotal == '40') {
+      returnText = _maxResult + '\n';
+    } else {
+      for (int i = 0; i < _totalScoreArray.length; i ++) {
+        if (_totalScoreArray[i] < minVal) {
+          minVal = _totalScoreArray[i];
+        }
       }
-    }
 
-    for (int j = 0; j < _totalScoreArray.length; j++) {
-      if (_totalScoreArray[j] == minVal) {
-        returnText += _resultTextArray[j] + '\n\n';
+      for (int j = 0; j < _totalScoreArray.length; j++) {
+        if (_totalScoreArray[j] == minVal) {
+          returnText += _resultTextArray[j] + '\n\n';
+        }
       }
     }
 
@@ -309,13 +313,12 @@ class _ResultPageState extends State<ResultPage> {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            String selectedValue = value;
                             setState(() {
                               _selectedDate = value;
                               if(_selectedDate.startsWith('날')) {
                                 return;
                               } else {
-                                Provider.of<LoginAuth>(context, listen: false).setCurrentTestDateIndex(_testDateList.length - 1 - int.parse(selectedValue.substring(0, 1)));
+                                Provider.of<LoginAuth>(context, listen: false).setCurrentTestDateIndex(_testDateList.length - 1 - _testDateList.indexOf(value));
                               }
                             });
                           },
@@ -467,6 +470,7 @@ class _ResultPageState extends State<ResultPage> {
                     SizedBox(height: 40),
                     Row(
                       children: <Widget>[
+
                         Icon(
                           Icons.search,
                         ),
@@ -499,7 +503,7 @@ class _ResultPageState extends State<ResultPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 10),
                     Text(
                       _userResult.comment,
                       style: TextStyle(

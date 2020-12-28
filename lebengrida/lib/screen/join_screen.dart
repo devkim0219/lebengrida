@@ -80,7 +80,7 @@ class _JoinPageState extends State<JoinPage> {
           content: Container(
             height: MediaQuery.of(context).size.height / 4.0,
             width: MediaQuery.of(context).size.width,
-            color: Colors.grey[200],
+            color: Colors.teal[100],
             child: YearPicker(
               selectedDate: DateTime(year),
               firstDate: DateTime(year - 100),
@@ -269,6 +269,7 @@ class _JoinPageState extends State<JoinPage> {
           Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: Row(
+              mainAxisSize: MainAxisSize.max,
               children: [
                 SizedBox(width: 10),
                 Icon(
@@ -393,6 +394,7 @@ class _JoinPageState extends State<JoinPage> {
           Padding(
             padding: EdgeInsets.only(bottom: 20),
             child: Row(
+              mainAxisSize: MainAxisSize.max,
               children: <Widget>[
                 Icon(
                   Icons.contact_page,

@@ -53,6 +53,8 @@ class _QuestionPageState extends State<QuestionPage> {
   int _attempt = 1;
 
   bool _isRecording = false;
+  bool _ignoreTouch = false;
+  bool _isSkipRecording = false;
 
   File uploadAudioFile;
   TextEditingController _controller = TextEditingController();
@@ -100,86 +102,92 @@ class _QuestionPageState extends State<QuestionPage> {
 
     return SizedBox(
       width: double.infinity,
-      child: TextButton(
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(_selectText),
-        ),
-        style: TextButton.styleFrom(
-          primary: Colors.black87,
-          backgroundColor: Colors.teal[100],
-          textStyle: TextStyle(
-            fontSize: 20,
-            color: Colors.black87,
+      child: IgnorePointer(
+        ignoring: _ignoreTouch,
+        child: TextButton(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(_selectText),
           ),
-        ),
-        onPressed: () {
-          setState(() {
-            _selectedAnswer = selNum;
-            _correctAnswer =  int.parse(_qData[_qIdx].answer);
-            print('selected answer -> $_selectedAnswer');
-            print('correct answer -> ${_qData[_qIdx].answer}');
+          style: TextButton.styleFrom(
+            primary: Colors.black87,
+            backgroundColor: Colors.teal[100],
+            textStyle: TextStyle(
+              fontSize: 20,
+              color: Colors.black87,
+            ),
+          ),
+          onPressed: () {
+            setState(() {
+              if (_isRecording) {
+                AudioRecorder.stop();
+              }
+              _selectedAnswer = selNum;
+              _correctAnswer =  int.parse(_qData[_qIdx].answer);
+              print('selected answer -> $_selectedAnswer');
+              print('correct answer -> ${_qData[_qIdx].answer}');
 
-            // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
-            // 1~19 문제
-            if (_selectedAnswer > 0 && _qIdx < _qData.length - 1) {
-              _isStartAnswer = false;
-              _qIdx++;
-              // 1차 시도
-              if (_attempt == 1) {
-                // 정답
-                if (_correctAnswer == _selectedAnswer) {
-                  _scoreList.add(2);
-                  // 오답
+              // 선택지 선택 시(터치 or 음성) 다음 문제로 전환
+              // 1~19 문제
+              if (_selectedAnswer > 0 && _qIdx < _qData.length - 1) {
+                _isStartAnswer = false;
+                _qIdx++;
+                // 1차 시도
+                if (_attempt == 1) {
+                  // 정답
+                  if (_correctAnswer == _selectedAnswer) {
+                    _scoreList.add(2);
+                    // 오답
+                  } else {
+                    _scoreList.add(0);
+                  }
+                  // 2차 시도
                 } else {
-                  _scoreList.add(0);
+                  // 정답
+                  if (_correctAnswer == _selectedAnswer) {
+                    _scoreList.add(1);
+                    // 오답
+                  } else {
+                    _scoreList.add(0);
+                  }
                 }
-                // 2차 시도
+                _attempt = 1;
+                print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
+                print('score list -> $_scoreList');
+                audioPlayer.stop();
+                _playQuestionAudio();
+                _selectedAnswer = 0;
+                // 마지막 문제
               } else {
-                // 정답
-                if (_correctAnswer == _selectedAnswer) {
-                  _scoreList.add(1);
-                  // 오답
+                _qIdx = 0;
+                // 1차 시도
+                if (_attempt == 1) {
+                  // 정답
+                  if (_correctAnswer == _selectedAnswer) {
+                    _scoreList.add(2);
+                    // 오답
+                  } else {
+                    _scoreList.add(0);
+                  }
+                  // 2차 시도
                 } else {
-                  _scoreList.add(0);
+                  // 정답
+                  if (_correctAnswer == _selectedAnswer) {
+                    _scoreList.add(1);
+                    // 오답
+                  } else {
+                    _scoreList.add(0);
+                  }
                 }
+                print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
+                print('score list -> $_scoreList');
+                audioPlayer.stop();
+                _playEndingAudio();
+                _saveTestResult(widget.mobile, _scoreList);
               }
-              _attempt = 1;
-              print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-              print('score list -> $_scoreList');
-              audioPlayer.stop();
-              _playQuestionAudio();
-              _selectedAnswer = 0;
-              // 마지막 문제
-            } else {
-              _qIdx = 0;
-              // 1차 시도
-              if (_attempt == 1) {
-                // 정답
-                if (_correctAnswer == _selectedAnswer) {
-                  _scoreList.add(2);
-                  // 오답
-                } else {
-                  _scoreList.add(0);
-                }
-                // 2차 시도
-              } else {
-                // 정답
-                if (_correctAnswer == _selectedAnswer) {
-                  _scoreList.add(1);
-                  // 오답
-                } else {
-                  _scoreList.add(0);
-                }
-              }
-              print('selected answer.. index -> $_qIdx, attempt -> $_attempt');
-              print('score list -> $_scoreList');
-              audioPlayer.stop();
-              _playEndingAudio();
-              _saveTestResult(widget.mobile, _scoreList);
-            }
-          });
-        },
+            });
+          },
+        ),
       ),
     );
   }
@@ -193,6 +201,7 @@ class _QuestionPageState extends State<QuestionPage> {
         children: [
           Text(
             '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.',
+            // '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.\n음성 인식 중에는 터치가 지원되지 않습니다.',
             style: TextStyle(
               fontSize: 15,
               color: Colors.redAccent,
@@ -239,6 +248,7 @@ class _QuestionPageState extends State<QuestionPage> {
         '안내 음성이 끝난 후 문제가 나옵니다.',
         style: TextStyle(
           fontSize: 20,
+          color: Colors.redAccent,
         ),
       );
     }
@@ -275,7 +285,8 @@ class _QuestionPageState extends State<QuestionPage> {
     await audioCache.play('sounds/question_${_qIdx + 1}.m4a');
 
     setState(() {
-      Future.delayed(Duration(seconds: 3), () => _controller.text = '');
+      _ignoreTouch = false;
+      Future.delayed(Duration(seconds: 2), () => _controller.text = '');
       if (!_isSkipAudio) {
         playerState = PlayerState.playing;
       } else {
@@ -288,6 +299,7 @@ class _QuestionPageState extends State<QuestionPage> {
     }
 
     audioPlayer.onPlayerCompletion.listen((event) {
+      // _ignoreTouch = true;
       if (!_isRecording) {
         _startRecord();
       }
@@ -307,7 +319,6 @@ class _QuestionPageState extends State<QuestionPage> {
 
     audioPlayer.onPlayerCompletion.listen((event) {
       _idx++;
-
       if (_idx >= 8 && _idx <= 11) {
         _playGuideAudio();
       } else {
@@ -484,18 +495,28 @@ class _QuestionPageState extends State<QuestionPage> {
       countdownTotalColor: Colors.teal,
       countdownRemainingColor: Colors.teal[100],
       onUpdated: (unit, remainTime) {
-        setState(() {
-          if (remainTime == 1) {
-            Fluttertoast.showToast(
+        // setState(() {
+        //   if (remainTime == 1) {
+        //     Fluttertoast.showToast(
+        //       msg: '음성 인식 중입니다..',
+        //       toastLength: Toast.LENGTH_LONG,
+        //       gravity: ToastGravity.BOTTOM,
+        //       timeInSecForIosWeb: 3
+        //     );
+        //   }
+        // });
+      },
+      onFinished: () {
+        if (_isRecording) {
+          Fluttertoast.showToast(
               msg: '음성 인식 중입니다..',
-              toastLength: Toast.LENGTH_LONG,
+              toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.BOTTOM,
               timeInSecForIosWeb: 3
-            );
-          }
-        });
+          );
+          _stopRecord();
+        }
       },
-      onFinished: () { },
       textStyle: TextStyle(
         color: Colors.black87,
         fontSize: 20,
@@ -551,23 +572,21 @@ class _QuestionPageState extends State<QuestionPage> {
   _startRecord() async {
     try {
       String fileName = 'answer_${_qIdx + 1}_${_attempt}_${DateTime.now().toUtc().millisecondsSinceEpoch}';
-      // String path = 'answer_${_qIdx + 1}_$_attempt';
       io.Directory externalStorageDirectory = await getExternalStorageDirectory();
       String path = externalStorageDirectory.path + '/' + fileName;
       print('Start recording -> $path');
+
       await AudioRecorder.start(
         path: path,
         audioOutputFormat: AudioOutputFormat.WAV,
       );
       bool isRecording = await AudioRecorder.isRecording;
-      setState(() {
-        _isRecording = isRecording;
-        if (_isRecording) {
-          Future.delayed(Duration(seconds: 5), () {
-            _stopRecord();
-          });
-        }
-      });
+      _isRecording = isRecording;
+      // if (_isRecording) {
+      //   Future.delayed(Duration(seconds: 5), () {
+      //     _stopRecord();
+      //   });
+      // }
     } catch(e) {
       print(e);
     }
@@ -587,7 +606,7 @@ class _QuestionPageState extends State<QuestionPage> {
 
       // string parse to integer
       var _result = int.parse(result);
-      _controller.text = _result.toString();
+      _controller.text = result;
 
       // 음성 인식 서버 리턴 값에 따른 로직 처리
       // 답을 선택했을 경우
@@ -623,6 +642,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('score list -> $_scoreList');
           audioPlayer.stop();
           _playQuestionAudio();
+
           // 마지막 문제
         } else {
           _qIdx = 0;
@@ -655,10 +675,10 @@ class _QuestionPageState extends State<QuestionPage> {
         // 음성이 불분명할 경우 재요청(계속)
       } else if (_result == 0) {
         Fluttertoast.showToast(
-          msg: '다시 한 번 마이크에 대고 말해주세요.',
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3
+            msg: '다시 한 번 마이크에 대고 말해주세요.',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 3
         );
         _isSkipAudio = true;
         audioPlayer.stop();

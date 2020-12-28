@@ -25,6 +25,7 @@ class _GuidePageState extends State<GuidePage> {
   List<String> imageNames = List();
 
   int _idx = 1;
+  bool _ignoreTouch = false;
 
   // 안내 음성 멘트 재생
   Future _playLocal(String filePath) async {
@@ -71,12 +72,12 @@ class _GuidePageState extends State<GuidePage> {
 
     // question.png
     titles.add('화행 검사 문제');
-    description.add('1. 문제(16문항)\n2. 터치 또는 음성으로 선택가능\n3. 5초 이내에 음성 입력\n    (1차에 입력 없을시 2차 진행)');
+    description.add('1. 문제(20문항)\n2. 터치 또는 음성으로 선택가능\n3. 5초 이내에 음성 입력\n    (1차에 입력 없을시 2차 진행)');
     imageNames.add('assets/images/question.png');
 
     // result.png
     titles.add('검사 결과');
-    description.add('1. 1차: 2점, 2차: 1점, 오답: 0점\n    (총점 32점)\n2. 연령대와 총점에 따라 인지 능력 판단');
+    description.add('1. 1차: 2점, 2차: 1점, 오답: 0점\n    (총점 40점)\n2. 연령대와 총점에 따라 인지 능력 판단');
     imageNames.add('assets/images/result.png');
   }
 
@@ -153,21 +154,28 @@ class _GuidePageState extends State<GuidePage> {
           Fragment(child: getScreen(3)),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('시작'),
-        icon: Icon(Icons.skip_next),
-        backgroundColor: Colors.teal,
-        onPressed: () {
-          audioPlayer.stop();
-          _playLocal2('cushion_7');
-          Future.delayed(Duration(seconds: 2), () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => AnimationPage(mobile: widget.mobile),
-              ),
-            );
-          });
-        },
+      floatingActionButton: IgnorePointer(
+        child: FloatingActionButton.extended(
+          label: Text('시작'),
+          icon: Icon(Icons.skip_next),
+          backgroundColor: Colors.teal,
+          onPressed: () {
+            setState(() {
+              _ignoreTouch = true;
+            });
+            audioPlayer.stop();
+            _playLocal2('cushion_7');
+            Future.delayed(Duration(seconds: 2), () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AnimationPage(mobile: widget.mobile),
+                ),
+              );
+            });
+          },
+        ),
+        ignoring: _ignoreTouch,
       ),
     );
   }
