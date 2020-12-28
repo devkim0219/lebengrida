@@ -54,7 +54,6 @@ class _QuestionPageState extends State<QuestionPage> {
 
   bool _isRecording = false;
   bool _ignoreTouch = false;
-  bool _isSkipRecording = false;
 
   File uploadAudioFile;
   TextEditingController _controller = TextEditingController();
@@ -200,8 +199,7 @@ class _QuestionPageState extends State<QuestionPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.',
-            // '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.\n음성 인식 중에는 터치가 지원되지 않습니다.',
+            '문제를 다 들은 후 5초 안에 정답을 말하거나 터치하세요.\n음성 인식 중에는 정답 터치가 되지 않습니다.',
             style: TextStyle(
               fontSize: 15,
               color: Colors.redAccent,
@@ -507,6 +505,9 @@ class _QuestionPageState extends State<QuestionPage> {
         // });
       },
       onFinished: () {
+        setState(() {
+          _ignoreTouch = true;
+        });
         if (_isRecording) {
           Fluttertoast.showToast(
               msg: '음성 인식 중입니다..',
