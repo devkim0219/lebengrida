@@ -118,6 +118,7 @@ class _QuestionPageState extends State<QuestionPage> {
           ),
           onPressed: () {
             setState(() {
+              _ignoreTouch = true;
               if (_isRecording) {
                 AudioRecorder.stop();
               }
@@ -753,12 +754,22 @@ class _QuestionPageState extends State<QuestionPage> {
         ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.popUntil(context, ModalRoute.withName('/'))
+          onPressed: () {
+            audioPlayer.stop();
+            if(_isRecording) {
+              AudioRecorder.stop();
+            }
+            Navigator.popUntil(context, ModalRoute.withName('/'));
+          }
         ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
             onPressed: () {
+              audioPlayer.stop();
+              if(_isRecording) {
+                AudioRecorder.stop();
+              }
               Navigator.popUntil(context, ModalRoute.withName('/'));
             },
           ),
