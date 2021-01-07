@@ -75,7 +75,7 @@ class ResultServices {
   }
 
   // 검사 결과 저장
-  static Future<String> saveTestResult(String mobile, List<int> answerList, int totalPoint, String resultStatus) async {
+  static Future<String> saveTestResult(String mobile, List<int> selectList, List<int> pointList, int totalPoint, String resultStatus) async {
     try {
       var map = Map<String, dynamic>();
 
@@ -83,10 +83,16 @@ class ResultServices {
       map['mobile'] = mobile;
       map['comment'] = '';
 
-      // point_1 ~ 20
-      for (var i = 0; i < answerList.length; i++) {
-        map['point_${i + 1}'] = answerList[i].toString();
+      // select_1 ~ 20
+      for (var i = 0; i < selectList.length; i++) {
+        map['select_${i + 1}'] = selectList[i].toString();
       }
+
+      // point_1 ~ 20
+      for (var i = 0; i < pointList.length; i++) {
+        map['point_${i + 1}'] = pointList[i].toString();
+      }
+
       map['point_total'] = totalPoint.toString();
       map['result_status'] = resultStatus;
 
