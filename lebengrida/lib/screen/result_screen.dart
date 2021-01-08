@@ -83,7 +83,7 @@ class _ResultPageState extends State<ResultPage> {
     String returnText = '';
     double minVal = 10;
 
-    if (_userResult.pointTotal == '40') {
+    if (_userResult.totalScore == '40') {
       returnText = _maxResult + '\n';
     } else {
       for (int i = 0; i < _totalScoreArray.length; i ++) {
@@ -183,12 +183,11 @@ class _ResultPageState extends State<ResultPage> {
 
       _getUserResults(widget.mobile).then((value) {
         _userResult = value[Provider.of<LoginAuth>(context, listen: false).currentTestDateIndex];
-        _a1Total = (int.parse(_userResult.point_1) + int.parse(_userResult.point_2) + int.parse(_userResult.point_3) + int.parse(_userResult.point_4) + .0);
-        _a2Total = (int.parse(_userResult.point_5) + int.parse(_userResult.point_6) + int.parse(_userResult.point_7) + int.parse(_userResult.point_8) + .0);
-        _bTotal = (int.parse(_userResult.point_9) + int.parse(_userResult.point_10) + int.parse(_userResult.point_11) + int.parse(_userResult.point_12) + .0);
-        _cTotal = (int.parse(_userResult.point_13) + int.parse(_userResult.point_14) + int.parse(_userResult.point_15) + int.parse(_userResult.point_16) + .0);
-        _dTotal = (int.parse(_userResult.point_17) + int.parse(_userResult.point_18) + int.parse(_userResult.point_19) + int.parse(_userResult.point_20) + .0);
-
+        _a1Total = int.parse(_userResult.a1Score) + .0;
+        _a2Total = int.parse(_userResult.a2Score) + .0;
+        _bTotal = int.parse(_userResult.bScore) + .0;
+        _cTotal = int.parse(_userResult.cScore) + .0;
+        _dTotal = int.parse(_userResult.dScore) + .0;
         _totalScoreArray = [_a1Total, _a2Total, _bTotal, _cTotal, _dTotal];
         _resultTextArray = [_a1Result, _a2Result, _bResult, _cResult, _dResult];
 
@@ -259,7 +258,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      '총점 : ${_userResult.pointTotal}점',
+                      '총점 : ${_userResult.totalScore }점',
                       style: TextStyle(
                         fontSize: 25,
                         color: Colors.black87,
