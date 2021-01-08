@@ -44,6 +44,7 @@ class _QuestionPageState extends State<QuestionPage> {
   bool _isStartAnswer = false;
   int _selectedAnswer = 0;
   int _correctAnswer = 0;
+  List<int> _attemptList = [];
   List<int> _selectList = [];
   List<int> _scoreList = [];
   int _currentIdx = 0;
@@ -135,6 +136,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 _qIdx++;
                 // 1차 시도
                 if (_attempt == 1) {
+                  _attemptList.add(_attempt);
                   _selectList.add(_selectedAnswer);
                   // 정답
                   if (_correctAnswer == _selectedAnswer) {
@@ -145,6 +147,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   }
                   // 2차 시도
                 } else {
+                  _attemptList.add(_attempt);
                   _selectList.add(_selectedAnswer);
                   // 정답
                   if (_correctAnswer == _selectedAnswer) {
@@ -165,6 +168,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 _qIdx = 0;
                 // 1차 시도
                 if (_attempt == 1) {
+                  _attemptList.add(_attempt);
                   _selectList.add(_selectedAnswer);
                   // 정답
                   if (_correctAnswer == _selectedAnswer) {
@@ -175,6 +179,7 @@ class _QuestionPageState extends State<QuestionPage> {
                   }
                   // 2차 시도
                 } else {
+                  _attemptList.add(_attempt);
                   _selectList.add(_selectedAnswer);
                   // 정답
                   if (_correctAnswer == _selectedAnswer) {
@@ -188,7 +193,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 print('score list -> $_scoreList');
                 audioPlayer.stop();
                 _playEndingAudio();
-                _saveTestResult(widget.mobile, _selectList, _scoreList);
+                _saveTestResult(widget.mobile, _attemptList, _selectList, _scoreList);
               }
             });
           },
@@ -532,7 +537,7 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   // 검사 결과 저장
-  _saveTestResult(String mobile, List<int> selectList, List<int> pointList) {
+  _saveTestResult(String mobile, List<int> attemptList, List<int> selectList, List<int> pointList) {
     String _msg = '';
     String _resultStatus = '';
     int _totalPoint = 0;
@@ -552,7 +557,7 @@ class _QuestionPageState extends State<QuestionPage> {
       _resultStatus = 'nopass';
     }
 
-    ResultServices.saveTestResult(mobile, selectList, pointList, _totalPoint, _resultStatus).then((result) {
+    ResultServices.saveTestResult(mobile, attemptList, selectList, pointList, _totalPoint, _resultStatus).then((result) {
       if ('success' == result) {
         Provider.of<LoginAuth>(context, listen: false).setTestDate(formatDate(DateTime.now(), [yyyy, '-', mm, '-', dd]));
         _msg = '검사 결과가 저장되었습니다.';
@@ -627,6 +632,7 @@ class _QuestionPageState extends State<QuestionPage> {
           _qIdx++;
           // 1차 시도
           if (_attempt == 1) {
+            _attemptList.add(_attempt);
             _selectList.add(_result);
             // 정답
             if (_correctAnswer == _result) {
@@ -637,6 +643,7 @@ class _QuestionPageState extends State<QuestionPage> {
             }
             // 2차 시도
           } else {
+            _attemptList.add(_attempt);
             _selectList.add(_result);
             // 정답
             if (_correctAnswer == _result) {
@@ -657,6 +664,7 @@ class _QuestionPageState extends State<QuestionPage> {
           _qIdx = 0;
           // 1차 시도
           if (_attempt == 1) {
+            _attemptList.add(_attempt);
             _selectList.add(_result);
             // 정답
             if (_correctAnswer == _result) {
@@ -667,6 +675,7 @@ class _QuestionPageState extends State<QuestionPage> {
             }
             // 2차 시도
           } else {
+            _attemptList.add(_attempt);
             _selectList.add(_result);
             // 정답
             if (_correctAnswer == _result) {
@@ -680,7 +689,7 @@ class _QuestionPageState extends State<QuestionPage> {
           print('stt return answer list -> $_scoreList');
           audioPlayer.stop();
           _playEndingAudio();
-          _saveTestResult(widget.mobile, _selectList, _scoreList);
+          _saveTestResult(widget.mobile, _attemptList, _selectList, _scoreList);
         }
 
         // 음성이 불분명할 경우 재요청(계속)
@@ -703,6 +712,7 @@ class _QuestionPageState extends State<QuestionPage> {
         if (_qIdx < _qData.length - 1) {
           // 2차 시도
           if (_attempt == 2) {
+            _attemptList.add(0);
             _selectList.add(0);
             _scoreList.add(0);
             _qIdx++;
@@ -724,12 +734,13 @@ class _QuestionPageState extends State<QuestionPage> {
             _play2ndQuestionAudio();
             // 2차 시도
           } else {
+            _attemptList.add(0);
             _selectList.add(0);
             _scoreList.add(0);
             _attempt = 1;
             audioPlayer.stop();
             _playEndingAudio();
-            _saveTestResult(widget.mobile, _selectList, _scoreList);
+            _saveTestResult(widget.mobile, _attemptList, _selectList, _scoreList);
           }
         }
       }
@@ -835,8 +846,9 @@ class _QuestionPageState extends State<QuestionPage> {
                 ),
                 SizedBox(height: 20),
                 Text('문제번호 : ${_qIdx + 1}, 시도 횟수 : $_attempt'),
-                Text('선택한 답 리스트 : $_selectList'),
-                Text('점수결과 리스트 : $_scoreList'),
+                Text('- 시도 횟수 리스트 : $_attemptList'),
+                Text('- 선택한 답 리스트 : $_selectList'),
+                Text('- 점수결과 리스트 : $_scoreList'),
                 // Text('_isSkipAudio : $_isSkipAudio'),
                 // Text('_isStartAnswer : $_isStartAnswer'),
                 // Text('countdown key : $_countdownKey'),
