@@ -758,7 +758,7 @@ class _QuestionPageState extends State<QuestionPage> {
           if (_attempt == 2) {
             _score = 0;
             _attemptList.add(0);
-            _selectList.add(0);
+            _selectList.add(_result);
             _scoreList.add(_score);
             _qIdx++;
             _attempt = 1;
@@ -781,7 +781,7 @@ class _QuestionPageState extends State<QuestionPage> {
           } else {
             _score = 0;
             _attemptList.add(0);
-            _selectList.add(0);
+            _selectList.add(_result);
             _scoreList.add(_score);
             _saveTestProgress(widget.mobile, _qIdx + 1, _attempt, _result, _score, _testKey);
             _attempt = 1;
