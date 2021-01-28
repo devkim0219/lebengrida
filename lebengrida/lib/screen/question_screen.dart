@@ -675,7 +675,7 @@ class _QuestionPageState extends State<QuestionPage> {
               _score = 0;
               _scoreList.add(_score);
             }
-            _saveTestProgress(widget.mobile, _qIdx, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx, _attempt, _result, _score, _testKey);
             // 2차 시도
           } else {
             _attemptList.add(_attempt);
@@ -689,7 +689,7 @@ class _QuestionPageState extends State<QuestionPage> {
               _score = 0;
               _scoreList.add(_score);
             }
-            _saveTestProgress(widget.mobile, _qIdx, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx, _attempt, _result, _score, _testKey);
           }
           _attempt = 1;
           print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
@@ -712,7 +712,7 @@ class _QuestionPageState extends State<QuestionPage> {
               _score = 0;
               _scoreList.add(_score);
             }
-            _saveTestProgress(widget.mobile, _qIdx, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx, _attempt, _result, _score, _testKey);
             // 2차 시도
           } else {
             _attemptList.add(_attempt);
@@ -726,7 +726,7 @@ class _QuestionPageState extends State<QuestionPage> {
               _score = 0;
               _scoreList.add(_score);
             }
-            _saveTestProgress(widget.mobile, _qIdx, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx, _attempt, _result, _score, _testKey);
           }
           _qIdx = 0;
           print('stt return answer.. index -> $_qIdx, attempt -> $_attempt');
@@ -764,7 +764,7 @@ class _QuestionPageState extends State<QuestionPage> {
             _attempt = 1;
             audioPlayer.stop();
             _playQuestionAudio();
-            _saveTestProgress(widget.mobile, _qIdx, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx, _attempt, _result, _score, _testKey);
           } else {
             _attempt = 2;
             audioPlayer.stop();
@@ -783,7 +783,7 @@ class _QuestionPageState extends State<QuestionPage> {
             _attemptList.add(0);
             _selectList.add(0);
             _scoreList.add(_score);
-            _saveTestProgress(widget.mobile, _qIdx + 1, _attempt, _selectedAnswer, _score, _testKey);
+            _saveTestProgress(widget.mobile, _qIdx + 1, _attempt, _result, _score, _testKey);
             _attempt = 1;
             audioPlayer.stop();
             _playEndingAudio();
